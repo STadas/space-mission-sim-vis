@@ -1,0 +1,56 @@
+---
+name: Test
+
+on:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install p7zip
+        run: |
+          sudo apt-get update && sudo apt-get -y install p7zip-full
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+        with:
+          aqtversion: '==1.1.1'
+          extra: --external 7z
+          version: 5.15.2
+
+      - name: Install dependencies
+        run: |
+            sudo apt-get update
+            sudo apt-get -y install \
+              cmake \
+              build-essential \
+              libgtest-dev
+
+      - name: CMake generate
+        shell: bash
+        run: |
+          cmake \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DBUILD_TESTS=ON \
+            -DBUILD_APP=OFF \
+            -S . \
+            -B build-test
+
+      - name: CMake build
+        shell: bash
+        run: |
+          cmake \
+            --build build-test \
+            --config Release
+
+      - name: Run tests
+        shell: bash
+        working-directory: build-test
+        run: |
+          ./bin/testbuild-test --platform minimal

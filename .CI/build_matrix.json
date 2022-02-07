@@ -1,0 +1,40 @@
+{
+  "config": [
+    {
+      "name": "Windows latest MSVC",
+      "os": "windows-latest",
+      "artifact": "SpaceMissionSimVis-windows_msvc.zip",
+      "build_type": "Release",
+      "cc": "cl",
+      "cxx": "cl",
+      "archiver": "7z a",
+      "generators": "Visual Studio 16 2019",
+      "qt_version": "5.15.2",
+      "asset_mimetype": "application/zip"
+    },
+    {
+      "name": "Ubuntu latest GCC",
+      "os": "ubuntu-latest",
+      "artifact": "SpaceMissionSimVis-ubuntu_gcc.zip",
+      "build_type": "Release",
+      "cc": "gcc",
+      "cxx": "g++",
+      "archiver": "7z a",
+      "generators": "Ninja",
+      "qt_version": "5.15.2",
+      "asset_mimetype": "application/zip"
+    },
+    {
+      "name": "macOS latest Clang",
+      "os": "macos-latest",
+      "artifact": "SpaceMissionSimVis-macos_clang.zip",
+      "build_type": "Release",
+      "cc": "clang",
+      "cxx": "clang++",
+      "archiver": "7z a",
+      "generators": "Ninja",
+      "qt_version": "5.15.2",
+      "asset_mimetype": "application/zip"
+    }
+  ]
+}
