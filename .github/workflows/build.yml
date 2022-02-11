@@ -136,13 +136,13 @@ jobs:
                 repo,
                 release_id: release.data.id
               })
-              await github.rest.repos.deleteRef({
+              await github.rest.git.deleteRef({
                 owner,
                 repo,
                 ref: `tags/${process.env.tag_name}`
               })
             } catch (err) {
-              core.info(`Error deleting release or tag: ${err}`)
+              core.error(`Error deleting release or tag: ${err}`)
             }
 
       - name: Create new tag and release
