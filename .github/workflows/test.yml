@@ -53,4 +53,4 @@ jobs:
         shell: bash
         working-directory: build-test
         run: |
-          ./bin/testbuild-test --platform minimal
+          ./bin/SpaceMissionSimVis-test --platform minimal
