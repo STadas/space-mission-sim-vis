@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QFile>
-#include <optional>
 
 namespace FileUtil
 {
@@ -16,16 +15,17 @@ static QFileDevice::FileError writeFile(const QString &data, const QString &file
     return file.error();
 }
 
-//TODO: error codes
-static std::optional<QString> readFile(const QString &filePath)
+static QString readFile(const QString &filePath, int &err)
 {
     QFile file(filePath);
     if (file.open(QIODevice::ReadOnly))
     {
         QString res = file.readAll();
         file.close();
+        err = file.error();
         return res;
     }
+    err = file.error();
     return {};
 }
 } // namespace FileUtil

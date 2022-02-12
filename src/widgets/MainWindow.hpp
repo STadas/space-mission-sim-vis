@@ -3,10 +3,9 @@
 #include <QtCore>
 #include <QtWidgets>
 
-#include "VBoxLayout.hpp"
+#include "common/VBoxLayout.hpp"
 #include "util/FileUtil.hpp"
-
-//TODO: move file stuff somewhere else?
+#include "Editor.hpp"
 
 class MainWindow : public QMainWindow
 {
@@ -22,18 +21,17 @@ private:
 
     QLayout *centralLayout_;
 
-    QTextEdit *textEdit_;
+    Editor *activeEditor_;
 
     void createMenus();
     void createActions();
 
-    QString defaultSavePath_{};
     QMenu *fileMenu_;
 
-    QAction *actNewFile_;
-    QAction *actOpenFile_;
-    QAction *actSaveFile_;
-    QAction *actSaveFileAs_;
+    QAction *actFileNew_;
+    QAction *actFileOpen_;
+    QAction *actFileSave_;
+    QAction *actFileSaveAs_;
 
 private slots:
     void newFile();
