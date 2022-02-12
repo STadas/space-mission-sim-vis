@@ -2,9 +2,9 @@
 
 #include <QFile>
 
-namespace FileUtil
-{
-static QFileDevice::FileError writeFile(const QString &filePath, const QString &data)
+namespace FileUtil {
+static QFileDevice::FileError writeFile(const QString &filePath,
+                                        const QString &data)
 {
     QFile file(filePath);
     if (file.open(QIODevice::WriteOnly))
@@ -28,4 +28,4 @@ static QString readFile(const QString &filePath, QFileDevice::FileError &err)
     err = file.error();
     return {};
 }
-} // namespace FileUtil
+}  // namespace FileUtil

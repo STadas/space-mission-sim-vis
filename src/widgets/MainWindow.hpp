@@ -3,8 +3,8 @@
 #include <QtCore>
 #include <QtWidgets>
 
-#include "common/VBoxLayout.hpp"
 #include "Editor.hpp"
+#include "common/VBoxLayout.hpp"
 
 class MainWindow : public QMainWindow
 {

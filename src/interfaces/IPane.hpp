@@ -2,5 +2,5 @@
 
 class IPane
 {
-    virtual ~IPane() {};
+    virtual ~IPane(){};
 };

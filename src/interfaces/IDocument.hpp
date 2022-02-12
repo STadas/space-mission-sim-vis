@@ -3,7 +3,7 @@
 class IDocument
 {
 public:
-    virtual ~IDocument() {};
+    virtual ~IDocument(){};
 
     virtual bool isModified() = 0;
 
