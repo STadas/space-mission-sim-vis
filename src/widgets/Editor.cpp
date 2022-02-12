@@ -23,9 +23,9 @@ int Editor::load()
         return 0;
     }
 
-    int err;
+    QFileDevice::FileError err;
     QString newText = FileUtil::readFile(filePath, err);
-    if (err)
+    if (err != QFileDevice::FileError::NoError)
     {
         return err;
     }
@@ -48,8 +48,8 @@ int Editor::save()
         return this->saveAs();
     }
 
-    int err = FileUtil::writeFile(this->toPlainText(), this->defaultSavePath_);
-    if (!err)
+    auto err = FileUtil::writeFile(this->toPlainText(), this->defaultSavePath_);
+    if (err == QFileDevice::FileError::NoError)
     {
         this->document()->setModified(false);
     }
@@ -66,8 +66,8 @@ int Editor::saveAs()
     }
     this->defaultSavePath_ = filePath;
 
-    int err = FileUtil::writeFile(this->toPlainText(), filePath);
-    if (!err)
+    auto err = FileUtil::writeFile(filePath, this->toPlainText());
+    if (err == QFileDevice::FileError::NoError)
     {
         this->document()->setModified(false);
     }

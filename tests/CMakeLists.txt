@@ -2,7 +2,7 @@ project(SpaceMissionSimVis-test)
 
 set(SOURCE_TEST
     ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/src/ExampleTest.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/FileUtil.cpp
     )
 
 add_executable("${PROJECT_NAME}" ${SOURCE_TEST})
@@ -22,3 +22,5 @@ set_target_properties("${PROJECT_NAME}"
         RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_BINARY_DIR}/bin"
         RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_BINARY_DIR}/bin"
         )
+
+    file(COPY files DESTINATION "${CMAKE_BINARY_DIR}/bin")

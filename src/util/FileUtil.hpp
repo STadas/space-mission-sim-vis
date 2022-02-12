@@ -4,7 +4,7 @@
 
 namespace FileUtil
 {
-static QFileDevice::FileError writeFile(const QString &data, const QString &filePath)
+static QFileDevice::FileError writeFile(const QString &filePath, const QString &data)
 {
     QFile file(filePath);
     if (file.open(QIODevice::WriteOnly))
@@ -15,7 +15,7 @@ static QFileDevice::FileError writeFile(const QString &data, const QString &file
     return file.error();
 }
 
-static QString readFile(const QString &filePath, int &err)
+static QString readFile(const QString &filePath, QFileDevice::FileError &err)
 {
     QFile file(filePath);
     if (file.open(QIODevice::ReadOnly))
