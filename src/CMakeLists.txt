@@ -4,6 +4,11 @@ set(EXECUTABLE_PROJECT "${PROJECT_NAME}")
 set(SOURCE_PROJECT
         widgets/MainWindow.cpp
         widgets/MainWindow.hpp
+        widgets/Editor.cpp
+        widgets/Editor.hpp
+
+        common/VBoxLayout.cpp
+        common/VBoxLayout.hpp
         )
 
 source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${SOURCE_PROJECT})
