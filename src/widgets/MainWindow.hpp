@@ -4,7 +4,6 @@
 #include <QtWidgets>
 
 #include "common/VBoxLayout.hpp"
-#include "util/FileUtil.hpp"
 #include "Editor.hpp"
 
 class MainWindow : public QMainWindow
