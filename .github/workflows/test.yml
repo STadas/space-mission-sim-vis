@@ -51,6 +51,6 @@ jobs:
 
       - name: Run tests
         shell: bash
-        working-directory: build-test
+        working-directory: build-test/bin
         run: |
-          ./bin/testbuild-test --platform minimal
+          ./SpaceMissionSimVis-test --platform minimal
