@@ -14,5 +14,6 @@ public:
     virtual ConnectionErr disconnect() = 0;
     virtual ConnectionErr sendCommand(const ParsedCommand &command) = 0;
     virtual ConnectionErr sendCommand(const ParsedCommand &command,
-                                      unsigned char *&img, size_t &size) = 0;
+                                      unsigned char *&img,
+                                      unsigned long &size) = 0;
 };

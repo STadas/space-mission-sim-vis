@@ -14,7 +14,7 @@ public:
     SimPreview(QWidget *parent = nullptr);
     ~SimPreview() override;
 
-    void showPreview(unsigned char *&data, const size_t &size) override;
+    void showPreview(unsigned char *&data, const unsigned long &size) override;
     bool eventFilter(QObject *object, QEvent *event) override;
 
 private:

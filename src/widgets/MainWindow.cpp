@@ -142,7 +142,7 @@ void MainWindow::execActiveLine()
 
     unsigned char *img = nullptr;
 
-    size_t size{};
+    unsigned long size{};
     ConnectionErr connectionErr =
         this->activeConnection->sendCommand(*parsedCommand, img, size);
 

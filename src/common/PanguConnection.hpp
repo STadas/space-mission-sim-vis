@@ -15,7 +15,7 @@ public:
     ConnectionErr connect() override;
     ConnectionErr disconnect() override;
     ConnectionErr sendCommand(const ParsedCommand &command, unsigned char *&img,
-                              size_t &size) override;
+                              unsigned long &size) override;
     ConnectionErr sendCommand(const ParsedCommand &command) override;
 
 private:

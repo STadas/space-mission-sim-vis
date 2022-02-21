@@ -16,7 +16,7 @@ SimPreview::~SimPreview()
 {
 }
 
-void SimPreview::showPreview(unsigned char *&data, const size_t &size)
+void SimPreview::showPreview(unsigned char *&data, const unsigned long &size)
 {
     /* this->imgLabel_->setText("showImage"); */
     QSize oldSize = this->size();

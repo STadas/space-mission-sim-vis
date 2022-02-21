@@ -122,7 +122,8 @@ ConnectionErr PanguConnection::sendCommand(const ParsedCommand &command)
 }
 
 ConnectionErr PanguConnection::sendCommand(const ParsedCommand &command,
-                                           unsigned char *&img, size_t &size)
+                                           unsigned char *&img,
+                                           unsigned long &size)
 {
     ConnectionErr err = this->sendCommand(command);
     if (err != ConnectionErr::OK)
