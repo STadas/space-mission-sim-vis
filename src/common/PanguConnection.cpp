@@ -22,7 +22,7 @@ ConnectionErr PanguConnection::connect()
 
 #ifdef _WIN32
     WSAData wsaData;
-    if (WSAStartup(MAKEWORD(1, 1), &wsaData))
+    if (WSAStartup(MAKEWORD(2, 2), &wsaData))
     {
         return ConnectionErr::BAD_SOCK;
     }
