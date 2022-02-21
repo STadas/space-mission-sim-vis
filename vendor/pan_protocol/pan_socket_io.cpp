@@ -484,7 +484,11 @@ int pan_socket_write(SOCKET s, void *src, unsigned long n) {
   long have = n;
   unsigned char *ptr = (unsigned char *)src;
   while (have > 0) {
+#ifdef _WIN32
+    long sent = SOCKET_SEND(s, ptr, have, 0);
+#else
     long sent = SOCKET_SEND(s, ptr, have, MSG_NOSIGNAL);
+#endif
     if (sent <= 0)
       return n - have;
     have -= sent;
