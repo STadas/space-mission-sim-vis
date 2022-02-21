@@ -60,6 +60,10 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 
+#ifndef _WINSOCKAPI_
+#define _WINSOCKAPI_
+#endif
+
 /* Sleep for a fixed number of seconds */
 #include <windows.h> /* Needed for Sleep() */
 #define sleep(P)	Sleep((P)*1000)
@@ -162,6 +166,10 @@ typedef unsigned __int64 ulonglong;
 */
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
+#endif
+
+#ifndef _WINSOCKAPI_
+#define _WINSOCKAPI_
 #endif
 
 /* Sleep for a fixed number of seconds */

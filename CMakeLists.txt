@@ -30,10 +30,6 @@ if (BUILD_TESTS)
     find_package(GTest REQUIRED)
 endif ()
 
-if (MSVC)
-    add_compile_definitions(_WINSOCKAPI_)
-endif ()
-
 add_subdirectory("src")
 
 if (BUILD_TESTS)
