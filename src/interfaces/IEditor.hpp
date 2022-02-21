@@ -1,11 +1,14 @@
 #pragma once
 
-class IDocument
+#include <QtCore>
+
+class IEditor
 {
 public:
-    virtual ~IDocument(){};
+    virtual ~IEditor(){};
 
     virtual bool isModified() = 0;
+    virtual QString activeLineText() = 0;
 
     virtual int save() = 0;
     virtual int saveAs() = 0;
