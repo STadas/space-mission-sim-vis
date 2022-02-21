@@ -62,9 +62,9 @@
 #ifndef PAN_SOCKET_IO_H_INCLUDED
 #define PAN_SOCKET_IO_H_INCLUDED
 
+#include "socket_stuff.h"
 #include "platform.h"
 #include "pangu_endian.h"
-#include "socket_stuff.h"
 
 // This is used to enable/disable debug printing.
 extern int pan_socket_debug_print;

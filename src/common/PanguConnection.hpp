@@ -3,8 +3,8 @@
 #include <QtCore>
 
 #include "interfaces/IConnection.hpp"
-#include "pan_protocol/pan_protocol_lib.h"
 #include "util/SocketUtil.hpp"
+#include "pan_protocol/pan_protocol_lib.h"
 
 class PanguConnection : public IConnection
 {
