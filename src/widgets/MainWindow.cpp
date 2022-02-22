@@ -145,12 +145,14 @@ void MainWindow::execActiveLine()
     unsigned long size{};
     ConnectionErr connectionErr =
         this->activeConnection->sendCommand(*parsedCommand, img, size);
+    fprintf(stdout, "returned from sendCommand\n");
 
     if (connectionErr != ConnectionErr::OK)
     {
         MessageController::connectionError(connectionErr, this);
         return;
     }
+    fprintf(stdout, "this shouldnt print if command was unsuccessful\n");
 
     if (!parsedCommand->expectsImage())
     {
