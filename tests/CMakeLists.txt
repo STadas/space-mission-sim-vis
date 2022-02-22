@@ -2,7 +2,10 @@ project(SpaceMissionSimVis-test)
 
 set(SOURCE_TEST
     ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/CommandUtil.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/FileUtil.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/SocketUtil.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/StringUtil.cpp
     )
 
 add_executable("${PROJECT_NAME}" ${SOURCE_TEST})
@@ -10,6 +13,7 @@ add_executable("${PROJECT_NAME}" ${SOURCE_TEST})
 target_link_libraries("${PROJECT_NAME}"
     PRIVATE
     SpaceMissionSimVis-lib
+    pan_protocol-lib
     gtest
     )
 

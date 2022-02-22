@@ -3,6 +3,9 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    this->activeConnection = new PanguConnection("localhost", 10363);
+    this->activeConnection->connect();
+
     this->createMenus();
     this->createActions();
 
@@ -16,8 +19,14 @@ MainWindow::MainWindow(QWidget *parent)
     this->centralLayout_ = new VBoxLayout(this->centralWidget_);
     this->activeEditor_ = new Editor(this->centralWidget_);
 
-    //NOTE: could probably make a pane/window system to make this more flexible
     this->centralLayout_->addWidget(this->activeEditor_);
+
+    this->activePreview_ = new SimPreview(this);
+
+    /* TODO: refactor this to make it easier to add and remove other elements */
+    QDockWidget *dock = new QDockWidget("Preview", this);
+    dock->setWidget(this->activePreview_);
+    this->addDockWidget(Qt::RightDockWidgetArea, dock);
 }
 
 void MainWindow::createMenus()
@@ -26,8 +35,12 @@ void MainWindow::createMenus()
 
     this->fileMenu_ = new QMenu("File", this);
     this->menuBar_->addMenu(this->fileMenu_);
+
+    this->toolsMenu_ = new QMenu("Tools", this);
+    this->menuBar_->addMenu(this->toolsMenu_);
 }
 
+/* TODO: move this into its own thing somewhere else */
 void MainWindow::createActions()
 {
     this->actFileNew_ = new QAction("New file", this);
@@ -56,15 +69,21 @@ void MainWindow::createActions()
     this->fileMenu_->addAction(actFileSave_);
     connect(this->actFileSave_, &QAction::triggered, this,
             &MainWindow::saveFile);
+
+    this->actLineExec_ = new QAction("Execute command", this);
+    this->actLineExec_->setStatusTip(
+        "Execute the command in the currently active line");
+    this->toolsMenu_->addAction(this->actLineExec_);
+    connect(this->actLineExec_, &QAction::triggered, this,
+            &MainWindow::execActiveLine);
 }
 
 void MainWindow::newFile()
 {
     if (this->activeEditor_->isModified())
     {
-        QMessageBox::StandardButton answer = QMessageBox::question(
-            this, "New file",
-            "Are you sure? This will discard any unsaved changes.");
+        QMessageBox::StandardButton answer =
+            MessageController::fileMessage(FileMessage::FILE_NEW, this);
         if (answer == QMessageBox::No)
         {
             return;
@@ -78,9 +97,8 @@ void MainWindow::openFile()
 {
     if (this->activeEditor_->isModified())
     {
-        QMessageBox::StandardButton answer = QMessageBox::question(
-            this, "Open file",
-            "Are you sure? This will discard any unsaved changes.");
+        QMessageBox::StandardButton answer =
+            MessageController::fileMessage(FileMessage::FILE_OPEN, this);
         if (answer == QMessageBox::No)
         {
             return;
@@ -89,8 +107,7 @@ void MainWindow::openFile()
 
     if (this->activeEditor_->load())
     {
-        QMessageBox::critical(this, "Open file",
-                              "There was an error opening the file.");
+        MessageController::fileMessage(FileMessage::OPEN_FAIL, this);
     };
 }
 
@@ -98,8 +115,7 @@ void MainWindow::saveFileAs()
 {
     if (this->activeEditor_->saveAs())
     {
-        QMessageBox::critical(this, "Save file as",
-                              "There was an error saving the file.");
+        MessageController::fileMessage(FileMessage::SAVE_FAIL, this);
     }
 }
 
@@ -107,7 +123,42 @@ void MainWindow::saveFile()
 {
     if (this->activeEditor_->save())
     {
-        QMessageBox::critical(this, "Save file",
-                              "There was an error saving the file.");
+        MessageController::fileMessage(FileMessage::SAVE_FAIL, this);
     }
+}
+
+void MainWindow::execActiveLine()
+{
+    std::unique_ptr<ParsedCommand> parsedCommand;
+
+    CommandErr commandErr = CommandUtil::parsePangu(
+        this->activeEditor_->activeLineText(), parsedCommand);
+
+    if (commandErr != CommandErr::OK)
+    {
+        MessageController::commandError(commandErr, this);
+        return;
+    }
+
+    unsigned char *img = nullptr;
+
+    unsigned long size{};
+    ConnectionErr connectionErr =
+        this->activeConnection->sendCommand(*parsedCommand, img, size);
+
+    if (connectionErr != ConnectionErr::OK)
+    {
+        MessageController::connectionError(connectionErr, this);
+        return;
+    }
+
+    if (!parsedCommand->expectsImage())
+    {
+        if (img != nullptr)
+            delete img;
+        return;
+    }
+
+    this->activePreview_->showPreview(img, size);
+    delete img;
 }

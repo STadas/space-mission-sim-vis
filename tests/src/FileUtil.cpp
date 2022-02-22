@@ -60,7 +60,7 @@ TEST(FileUtilTest, WriteNonExisting)
     const QString filePath = "files/notYetExistingFile.txt";
     const QString writtenData = "foo bar\n";
 
-    int err = FileUtil::writeFile(filePath, writtenData);
+    auto err = FileUtil::writeFile(filePath, writtenData);
 
     // Errcode
     ASSERT_EQ(err, QFileDevice::FileError::NoError);
@@ -85,8 +85,8 @@ TEST(FileUtilTest, ReadExisting)
     const QString filePath = "files/fileWithText.txt";
     const QString expectedData = "foo bar\n";
 
-    QFileDevice::FileError err;
-    QString data = FileUtil::readFile(filePath, err);
+    QString data;
+    auto err = FileUtil::readFile(filePath, data);
 
     ASSERT_EQ(err, QFileDevice::FileError::NoError);
     ASSERT_EQ(data, expectedData);
@@ -97,8 +97,8 @@ TEST(FileUtilTest, ReadExistingEmpty)
     const QString filePath = "files/emptyFile.txt";
     const QString expectedData = "";
 
-    QFileDevice::FileError err;
-    QString data = FileUtil::readFile(filePath, err);
+    QString data;
+    auto err = FileUtil::readFile(filePath, data);
 
     ASSERT_EQ(err, QFileDevice::FileError::NoError);
     ASSERT_EQ(data, expectedData);
@@ -108,8 +108,8 @@ TEST(FileUtilTest, ReadNonExisting)
 {
     const QString filePath = "files/nonExistingFile.txt";
 
-    QFileDevice::FileError err;
-    QString data = FileUtil::readFile(filePath, err);
+    QString data;
+    auto err = FileUtil::readFile(filePath, data);
 
     ASSERT_EQ(err, QFileDevice::FileError::OpenError);
 }

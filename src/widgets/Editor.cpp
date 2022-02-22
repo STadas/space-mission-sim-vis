@@ -1,7 +1,7 @@
 #include "Editor.hpp"
 
 Editor::Editor(QWidget *parent)
-    : QTextEdit(parent)
+    : QPlainTextEdit(parent)
 {
 }
 
@@ -14,17 +14,24 @@ bool Editor::isModified()
     return this->document()->isModified();
 }
 
+QString Editor::activeLineText()
+{
+    return this->textCursor().block().text();
+}
+
 int Editor::load()
 {
+    QFileDevice::FileError err = QFileDevice::FileError::NoError;
+
     QString filePath = QFileDialog::getOpenFileName(
         this, "Open file", "", "Flight files (*.fli);;All files (*)");
     if (filePath.length() == 0)
     {
-        return 0;
+        return err;
     }
 
-    QFileDevice::FileError err;
-    QString newText = FileUtil::readFile(filePath, err);
+    QString newText;
+    err = FileUtil::readFile(filePath, newText);
     if (err != QFileDevice::FileError::NoError)
     {
         return err;

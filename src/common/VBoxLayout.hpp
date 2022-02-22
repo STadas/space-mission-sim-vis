@@ -8,6 +8,4 @@ class VBoxLayout : public QVBoxLayout
 
 public:
     VBoxLayout(QWidget *parent);
-
-private:
 };

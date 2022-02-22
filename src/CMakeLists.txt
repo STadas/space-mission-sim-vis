@@ -1,18 +1,57 @@
 set(LIBRARY_PROJECT "${PROJECT_NAME}-lib")
 set(EXECUTABLE_PROJECT "${PROJECT_NAME}")
 
+# src
 set(SOURCE_PROJECT
-        widgets/MainWindow.cpp
-        widgets/MainWindow.hpp
         widgets/Editor.cpp
         widgets/Editor.hpp
+        widgets/MainWindow.cpp
+        widgets/MainWindow.hpp
+        widgets/SimPreview.cpp
+        widgets/SimPreview.hpp
 
+        common/MessageController.cpp
+        common/MessageController.hpp
+        common/PanguConnection.cpp
+        common/PanguConnection.hpp
+        common/ParsedCommand.cpp
+        common/ParsedCommand.hpp
         common/VBoxLayout.cpp
         common/VBoxLayout.hpp
+
+        util/CommandUtil.cpp
+        util/CommandUtil.hpp
+        util/FileUtil.cpp
+        util/FileUtil.hpp
+        util/SocketUtil.cpp
+        util/SocketUtil.hpp
+        util/StringUtil.cpp
+        util/StringUtil.hpp
         )
 
 source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${SOURCE_PROJECT})
 add_library(${LIBRARY_PROJECT} OBJECT ${SOURCE_PROJECT})
+
+# pan_protocol
+set(LIBRARY_PAN_PROTOCOL "pan_protocol-lib")
+set(DIR_PAN_PROTOCOL "${CMAKE_SOURCE_DIR}/vendor/pan_protocol")
+
+set(SOURCE_PAN_PROTOCOL
+        "${DIR_PAN_PROTOCOL}/pan_protocol_lib.cpp"
+        "${DIR_PAN_PROTOCOL}/pan_protocol_lib.h"
+        "${DIR_PAN_PROTOCOL}/pan_socket_io.cpp"
+        "${DIR_PAN_PROTOCOL}/pan_socket_io.h"
+        )
+
+source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${SOURCE_PAN_PROTOCOL})
+add_library(${LIBRARY_PAN_PROTOCOL} OBJECT ${SOURCE_PAN_PROTOCOL})
+
+target_include_directories("${LIBRARY_PROJECT}"
+        PUBLIC
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${CMAKE_SOURCE_DIR}/vendor"
+        )
+
 
 target_link_libraries(${LIBRARY_PROJECT}
         PUBLIC
@@ -24,16 +63,22 @@ target_link_libraries(${LIBRARY_PROJECT}
         Threads::Threads
         )
 
-target_include_directories("${LIBRARY_PROJECT}"
-        PUBLIC
-        "${CMAKE_CURRENT_SOURCE_DIR}"
-        "${CMAKE_SOURCE_DIR}/vendor"
-        )
 
+if (WIN32)
+    target_link_libraries(${LIBRARY_PROJECT}
+        PUBLIC
+        wsock32
+        ws2_32
+        )
+endif ()
+
+
+# build app
 if (BUILD_APP)
     add_executable("${EXECUTABLE_PROJECT}" "main.cpp")
 
     target_link_libraries("${EXECUTABLE_PROJECT}" PUBLIC ${LIBRARY_PROJECT})
+    target_link_libraries("${EXECUTABLE_PROJECT}" PUBLIC ${LIBRARY_PAN_PROTOCOL})
 
     set_target_properties("${EXECUTABLE_PROJECT}"
             PROPERTIES

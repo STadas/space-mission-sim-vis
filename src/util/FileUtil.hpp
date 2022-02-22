@@ -2,30 +2,14 @@
 
 #include <QFile>
 
-namespace FileUtil {
-static QFileDevice::FileError writeFile(const QString &filePath,
-                                        const QString &data)
+class FileUtil
 {
-    QFile file(filePath);
-    if (file.open(QIODevice::WriteOnly))
-    {
-        file.write(data.toUtf8());
-        file.close();
-    }
-    return file.error();
-}
+public:
+    static QFileDevice::FileError writeFile(const QString &filePath,
+                                            const QString &data);
+    static QFileDevice::FileError readFile(const QString &filePath,
+                                           QString &data);
 
-static QString readFile(const QString &filePath, QFileDevice::FileError &err)
-{
-    QFile file(filePath);
-    if (file.open(QIODevice::ReadOnly))
-    {
-        QString res = file.readAll();
-        file.close();
-        err = file.error();
-        return res;
-    }
-    err = file.error();
-    return {};
-}
-}  // namespace FileUtil
+private:
+    FileUtil(){};
+};
