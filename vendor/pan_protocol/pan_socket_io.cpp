@@ -222,11 +222,11 @@ int pan_socket_size_ulong(unsigned long v) { return 4; }
 int pan_socket_read_ulong(SOCKET s, unsigned long *p) {
   uint32_t tmp = 0;
   int status = pan_socket_read(s, (void *)&tmp, sizeof(tmp));
-  fprintf(stdout, "returned from pan_socket_read");
+  fprintf(stdout, "returned from pan_socket_read\n");
   if (status == sizeof(tmp)) {
-    fprintf(stdout, "ntohl");
+    fprintf(stdout, "ntohl\n");
     *p = ntohl((unsigned long)tmp);
-    fprintf(stdout, "ntohl done");
+    fprintf(stdout, "ntohl done\n");
   }
   return status;
 }
