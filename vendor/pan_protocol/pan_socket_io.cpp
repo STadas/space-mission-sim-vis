@@ -452,7 +452,11 @@ long pan_socket_read(SOCKET s, void *dst, unsigned long n) {
   long want = n;
   unsigned char *ptr = (unsigned char *)dst;
   while (want > 0) {
+#ifdef _WIN32
     long got = SOCKET_RECV(s, ptr, want, 0);
+#else
+    long got = SOCKET_RECV(s, ptr, want, MSG_NOSIGNAL);
+#endif
     if (got <= 0)
       return n - want;
     want -= got;
