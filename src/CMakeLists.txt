@@ -32,6 +32,27 @@ set(SOURCE_PROJECT
 source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${SOURCE_PROJECT})
 add_library(${LIBRARY_PROJECT} OBJECT ${SOURCE_PROJECT})
 
+# pan_protocol
+set(LIBRARY_PAN_PROTOCOL "pan_protocol-lib")
+set(DIR_PAN_PROTOCOL "${CMAKE_SOURCE_DIR}/vendor/pan_protocol")
+
+set(SOURCE_PAN_PROTOCOL
+        "${DIR_PAN_PROTOCOL}/pan_protocol_lib.cpp"
+        "${DIR_PAN_PROTOCOL}/pan_protocol_lib.h"
+        "${DIR_PAN_PROTOCOL}/pan_socket_io.cpp"
+        "${DIR_PAN_PROTOCOL}/pan_socket_io.h"
+        )
+
+source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${SOURCE_PAN_PROTOCOL})
+add_library(${LIBRARY_PAN_PROTOCOL} OBJECT ${SOURCE_PAN_PROTOCOL})
+
+target_include_directories("${LIBRARY_PROJECT}"
+        PUBLIC
+        "${CMAKE_CURRENT_SOURCE_DIR}"
+        "${CMAKE_SOURCE_DIR}/vendor"
+        )
+
+
 target_link_libraries(${LIBRARY_PROJECT}
         PUBLIC
         Qt5::Core
@@ -42,27 +63,14 @@ target_link_libraries(${LIBRARY_PROJECT}
         Threads::Threads
         )
 
-target_include_directories("${LIBRARY_PROJECT}"
+
+if (WIN32)
+    target_link_libraries(${LIBRARY_PROJECT}
         PUBLIC
-        "${CMAKE_CURRENT_SOURCE_DIR}"
-        "${CMAKE_SOURCE_DIR}/vendor"
+        wsock32
+        ws2_32
         )
-
-
-# pan_protocol
-set(LIBRARY_PAN_PROTOCOL "pan_protocol-lib")
-set(DIR_PAN_PROTOCOL "${CMAKE_SOURCE_DIR}/vendor/pan_protocol")
-
-set(SOURCE_PAN_PROTOCOL
-        "${DIR_PAN_PROTOCOL}/pan_protocol_lib.cpp"
-        "${DIR_PAN_PROTOCOL}/pan_protocol_lib.h"
-        "${DIR_PAN_PROTOCOL}/pan_socket_io.cpp"
-        "${DIR_PAN_PROTOCOL}/pan_socket_io.h"
-        "${DIR_PAN_PROTOCOL}/socket_stuff.h"
-        )
-
-source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${SOURCE_PAN_PROTOCOL})
-add_library(${LIBRARY_PAN_PROTOCOL} OBJECT ${SOURCE_PAN_PROTOCOL})
+endif ()
 
 
 # build app

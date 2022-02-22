@@ -17,6 +17,10 @@ project("SpaceMissionSimVis" VERSION 1.0.0 LANGUAGES CXX)
 
 add_compile_options(-fno-sized-deallocation)
 
+if (WIN32)
+add_compile_definitions(_WINSOCKAPI_)
+endif ()
+
 find_package(Qt5 REQUIRED
     COMPONENTS
     Widgets
