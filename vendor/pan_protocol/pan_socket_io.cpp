@@ -222,8 +222,12 @@ int pan_socket_size_ulong(unsigned long v) { return 4; }
 int pan_socket_read_ulong(SOCKET s, unsigned long *p) {
   uint32_t tmp = 0;
   int status = pan_socket_read(s, (void *)&tmp, sizeof(tmp));
-  if (status == sizeof(tmp))
+  fprintf(stdout, "returned from pan_socket_read");
+  if (status == sizeof(tmp)) {
+    fprintf(stdout, "ntohl");
     *p = ntohl((unsigned long)tmp);
+    fprintf(stdout, "ntohl done");
+  }
   return status;
 }
 
@@ -449,12 +453,21 @@ char *pan_socket_poke_string(char *p, char *v) {
  * them in the block of memory pointed to by "p".
  */
 long pan_socket_read(SOCKET s, void *dst, unsigned long n) {
+  fprintf(stdout, "in pan_socket_read\n");
   long want = n;
   unsigned char *ptr = (unsigned char *)dst;
+  fprintf(stdout, "dst to ptr\n");
   while (want > 0) {
+#ifdef _WIN32
     long got = SOCKET_RECV(s, ptr, want, 0);
-    if (got <= 0)
+#else
+    long got = SOCKET_RECV(s, ptr, want, MSG_NOSIGNAL);
+#endif
+    fprintf(stdout, "recv didnt crash\n");
+    if (got <= 0) {
+      fprintf(stdout, "bad recv. n: %lu, want: %ld\n", n, want);
       return n - want;
+    }
     want -= got;
     ptr += got;
   }

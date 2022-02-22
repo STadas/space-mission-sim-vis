@@ -176,8 +176,9 @@ char *pan_net_want(SOCKET s, unsigned long want) {
     long ecode;
     char *emsg;
     pan_socket_read_long(s, &ecode);
+    fprintf(stdout, "read error message (long)\n");
     pan_socket_read_string(s, &emsg);
-    fprintf(stdout, "read error message\n");
+    fprintf(stdout, "read error message (string)\n");
     /* Write the start of the message to buffer */
     int count = 0;
     (void)sprintf(err_buf, "Error from server: %n", &count);
