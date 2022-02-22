@@ -1,6 +1,6 @@
 #include <QApplication>
 
-#include <csignal>
+#include <signal.h>
 
 #include "widgets/MainWindow.hpp"
 
