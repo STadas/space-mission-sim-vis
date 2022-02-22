@@ -1,5 +1,7 @@
 #include <QApplication>
 
+#include <csignal>
+
 #include "widgets/MainWindow.hpp"
 
 int main(int argc, char *argv[])
