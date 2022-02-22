@@ -490,9 +490,13 @@ int pan_socket_write(SOCKET s, void *src, unsigned long n) {
     long sent = SOCKET_SEND(s, ptr, have, MSG_NOSIGNAL);
 #endif
     if (sent <= 0)
+    {
+      fprintf(stdout, "bad. n: '%lu', have: '%lu'\n", n, have);
       return n - have;
+    }
     have -= sent;
     ptr += sent;
+    fprintf(stdout, "good. have: %ld, sent: %ld, n: %lu\n", have, sent, n);
   }
   return n;
 }

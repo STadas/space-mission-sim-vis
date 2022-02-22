@@ -3447,7 +3447,8 @@ char *pan_net_set_viewpoint_by_degrees_d_TX(SOCKET s, double x, double y,
 
   /* Write the buffer in one go. */
   assert(nbytes == bufsize);
-  pan_socket_write(s, buf, nbytes);
+  int test = pan_socket_write(s, buf, nbytes);
+  fprintf(stdout, "pan_socket_write result: %d\n", test);
 
   /* We want a MSG_OKAY reply */
   return pan_net_want(s, MSG_OKAY);
