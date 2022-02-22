@@ -165,6 +165,7 @@ enum
 /* Server message numbers */
 enum
 {
+	MSG_UNKNOWN			= -1,
 	MSG_OKAY			=  0,
 	MSG_ERROR			=  1,
 	MSG_IMAGE			=  2,
