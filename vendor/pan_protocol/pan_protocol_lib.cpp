@@ -196,15 +196,10 @@ char *pan_net_want(SOCKET s, unsigned long want) {
   }
 
   /* Unexpected message received */
-  int count = 0;
-  fprintf(
-      stdout,
-      "Error: received message type %ld when expecting message type %ld.\n%n",
-      mcode, want, &count);
   (void)sprintf(
       err_buf,
-      "Error: received message type %ld when expecting message type %ld.\n%n",
-      mcode, want, &count);
+      "Error: received message type %lu when expecting message type %lu.\n",
+      mcode, want);
   return err_buf;
 }
 
