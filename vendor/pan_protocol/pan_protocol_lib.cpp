@@ -159,7 +159,6 @@ char *pan_net_want(SOCKET s, unsigned long want) {
   /* Get the reply code from the server */
   unsigned long mcode = MSG_SERVER_LIMIT;
   pan_socket_read_ulong(s, &mcode);
-  fprintf(stdout, "got reply code\n");
 
   /* If it is what we expect then return happy. */
   if (mcode == want)
@@ -168,7 +167,6 @@ char *pan_net_want(SOCKET s, unsigned long want) {
   /* Declare buffer to store any error message. */
   static char err_buf[1024];
   const int err_buf_size = sizeof(err_buf) / sizeof(*err_buf);
-  fprintf(stdout, "declared buffer for error message\n");
 
   /* Deal with any incoming error messages */
   if (mcode == MSG_ERROR) {
@@ -176,22 +174,17 @@ char *pan_net_want(SOCKET s, unsigned long want) {
     long ecode;
     char *emsg;
     pan_socket_read_long(s, &ecode);
-    fprintf(stdout, "read error message (long)\n");
     pan_socket_read_string(s, &emsg);
-    fprintf(stdout, "read error message (string)\n");
     /* Write the start of the message to buffer */
     int count = 0;
     (void)sprintf(err_buf, "Error from server: %n", &count);
-    fprintf(stdout, "stored error message\n");
     /* Copy the error message to the buffer. Leaving space
        for newline and terminator characters. */
     strncat(err_buf, emsg, err_buf_size - count - 2);
     /* Add newline at end. Terminator is added automatically. */
     strcat(err_buf, "\n");
-    fprintf(stdout, "formatted error message\n");
 
     (void)free(emsg);
-    fprintf(stdout, "freed emsg\n");
     return err_buf;
   }
 
@@ -3453,8 +3446,6 @@ char *pan_net_set_viewpoint_by_degrees_d_TX(SOCKET s, double x, double y,
 
   /* Write the buffer in one go. */
   assert(nbytes == bufsize);
-  int test = pan_socket_write(s, buf, nbytes);
-  fprintf(stdout, "pan_socket_write result: %d\n", test);
 
   /* We want a MSG_OKAY reply */
   return pan_net_want(s, MSG_OKAY);

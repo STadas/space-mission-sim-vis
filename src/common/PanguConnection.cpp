@@ -86,7 +86,6 @@ ConnectionErr PanguConnection::sendCommand(const ParsedCommand &command)
                 std::get<double>(*command.args()[3]),
                 std::get<double>(*command.args()[4]),
                 std::get<double>(*command.args()[5]));
-            fprintf(stdout, "returned from set_viewpoint\n");
 
             if (panguErr)
             {
