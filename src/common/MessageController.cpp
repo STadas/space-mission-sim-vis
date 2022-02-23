@@ -1,7 +1,7 @@
 #include "MessageController.hpp"
 #include "enums/ConnectionErr.hpp"
 
-void MessageController::commandError(CommandErr err, QWidget *parent)
+void MessageController::error(CommandErr err, QWidget *parent)
 {
     QString windowTitle = "Syntax error";
     switch (err)
@@ -45,7 +45,7 @@ void MessageController::commandError(CommandErr err, QWidget *parent)
     }
 }
 
-void MessageController::connectionError(ConnectionErr err, QWidget *parent)
+void MessageController::error(ConnectionErr err, QWidget *parent)
 {
     QString windowTitle = "Connection error";
     switch (err)
@@ -70,8 +70,8 @@ void MessageController::connectionError(ConnectionErr err, QWidget *parent)
     }
 }
 
-QMessageBox::StandardButton MessageController::fileMessage(FileMessage msg,
-                                                           QWidget *parent)
+QMessageBox::StandardButton MessageController::message(FileMessage msg,
+                                                       QWidget *parent)
 {
     switch (msg)
     {

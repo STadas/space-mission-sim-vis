@@ -83,7 +83,7 @@ void MainWindow::newFile()
     if (this->activeEditor_->isModified())
     {
         QMessageBox::StandardButton answer =
-            MessageController::fileMessage(FileMessage::FILE_NEW, this);
+            MessageController::message(FileMessage::FILE_NEW, this);
         if (answer == QMessageBox::No)
         {
             return;
@@ -98,7 +98,7 @@ void MainWindow::openFile()
     if (this->activeEditor_->isModified())
     {
         QMessageBox::StandardButton answer =
-            MessageController::fileMessage(FileMessage::FILE_OPEN, this);
+            MessageController::message(FileMessage::FILE_OPEN, this);
         if (answer == QMessageBox::No)
         {
             return;
@@ -107,7 +107,7 @@ void MainWindow::openFile()
 
     if (this->activeEditor_->load())
     {
-        MessageController::fileMessage(FileMessage::OPEN_FAIL, this);
+        MessageController::message(FileMessage::OPEN_FAIL, this);
     };
 }
 
@@ -115,7 +115,7 @@ void MainWindow::saveFileAs()
 {
     if (this->activeEditor_->saveAs())
     {
-        MessageController::fileMessage(FileMessage::SAVE_FAIL, this);
+        MessageController::message(FileMessage::SAVE_FAIL, this);
     }
 }
 
@@ -123,7 +123,7 @@ void MainWindow::saveFile()
 {
     if (this->activeEditor_->save())
     {
-        MessageController::fileMessage(FileMessage::SAVE_FAIL, this);
+        MessageController::message(FileMessage::SAVE_FAIL, this);
     }
 }
 
@@ -136,7 +136,7 @@ void MainWindow::execActiveLine()
 
     if (commandErr != CommandErr::OK)
     {
-        MessageController::commandError(commandErr, this);
+        MessageController::error(commandErr, this);
         return;
     }
 
@@ -148,7 +148,7 @@ void MainWindow::execActiveLine()
 
     if (connectionErr != ConnectionErr::OK)
     {
-        MessageController::connectionError(connectionErr, this);
+        MessageController::error(connectionErr, this);
         return;
     }
 
