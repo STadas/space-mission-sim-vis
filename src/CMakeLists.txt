@@ -27,6 +27,8 @@ set(SOURCE_PROJECT
         util/SocketUtil.hpp
         util/StringUtil.cpp
         util/StringUtil.hpp
+        util/TimeUtil.cpp
+        util/TimeUtil.hpp
         )
 
 source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${SOURCE_PROJECT})

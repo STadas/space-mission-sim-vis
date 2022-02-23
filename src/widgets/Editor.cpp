@@ -22,7 +22,7 @@ bool Editor::isModified()
 
 QString Editor::activeLineText()
 {
-    return this->activeBlock_.text();
+    return this->textCursor().block().text();
 }
 
 int Editor::load()
@@ -47,6 +47,13 @@ int Editor::load()
     this->setPlainText(newText);
 
     return err;
+}
+
+void Editor::goToLine(int lineNum)
+{
+    QTextCursor newCursor(this->document()->findBlockByLineNumber(
+        std::min(lineNum, this->document()->lineCount() - 1)));
+    this->setTextCursor(newCursor);
 }
 
 void Editor::clear()
@@ -109,6 +116,7 @@ void Editor::highlightCurrentLine()
     {
         QTextEdit::ExtraSelection selection;
 
+        //TODO: could have a setting for the color
         QColor lineColor = QColor(Qt::yellow).lighter(128);
 
         selection.format.setBackground(lineColor);

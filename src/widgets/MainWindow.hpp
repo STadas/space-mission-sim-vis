@@ -8,6 +8,7 @@
 #include "common/PanguConnection.hpp"
 #include "common/VBoxLayout.hpp"
 #include "util/CommandUtil.hpp"
+#include "util/TimeUtil.hpp"
 #include "widgets/SimPreview.hpp"
 
 class MainWindow : public QMainWindow
@@ -39,7 +40,9 @@ private:
     QAction *actFileOpen_;
     QAction *actFileSave_;
     QAction *actFileSaveAs_;
-    QAction *actLineExec_;
+
+    QAction *actActiveLineExec_;
+    QAction *actMultiLineExec_;
 
 private slots:
     void newFile();
@@ -48,4 +51,5 @@ private slots:
     void saveFile();
 
     void execActiveLine();
+    void execMultiLine();
 };

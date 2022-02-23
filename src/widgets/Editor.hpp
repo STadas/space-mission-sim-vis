@@ -15,6 +15,7 @@ public:
 
     bool isModified() override;
     QString activeLineText() override;
+    void goToLine(int lineNum) override;
 
     int save() override;
     int saveAs() override;

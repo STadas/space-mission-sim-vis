@@ -70,12 +70,20 @@ void MainWindow::createActions()
     connect(this->actFileSave_, &QAction::triggered, this,
             &MainWindow::saveFile);
 
-    this->actLineExec_ = new QAction("Execute command", this);
-    this->actLineExec_->setStatusTip(
+    this->actActiveLineExec_ = new QAction("Execute command", this);
+    this->actActiveLineExec_->setStatusTip(
         "Execute the command in the currently active line");
-    this->toolsMenu_->addAction(this->actLineExec_);
-    connect(this->actLineExec_, &QAction::triggered, this,
+    this->toolsMenu_->addAction(this->actActiveLineExec_);
+    connect(this->actActiveLineExec_, &QAction::triggered, this,
             &MainWindow::execActiveLine);
+
+    this->actMultiLineExec_ = new QAction("Step through commands", this);
+    this->actMultiLineExec_->setStatusTip(
+        "Step through and execute all commands (with delay) starting with the "
+        "currently active line");
+    this->toolsMenu_->addAction(this->actMultiLineExec_);
+    connect(this->actMultiLineExec_, &QAction::triggered, this,
+            &MainWindow::execMultiLine);
 }
 
 void MainWindow::newFile()
@@ -161,4 +169,26 @@ void MainWindow::execActiveLine()
 
     this->activePreview_->showPreview(img, size);
     delete img;
+}
+
+void MainWindow::execMultiLine()
+{
+    bool ok;
+    int msDelay = QInputDialog::getInt(this, "Command delay", "Delay (ms)", 1000, 0, INT32_MAX, 500, &ok);
+
+    if (!ok)
+        return;
+
+    int currPos = this->activeEditor_->textCursor().blockNumber();
+    do
+    {
+        this->activeEditor_->goToLine(currPos);
+
+        this->execActiveLine();
+
+        if (this->activeEditor_->activeLineText() != "")
+            TimeUtil::delay(msDelay);
+
+        currPos++;
+    } while (currPos < this->activeEditor_->document()->lineCount());
 }
