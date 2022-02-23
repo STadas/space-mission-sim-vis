@@ -27,4 +27,7 @@ private:
     QString defaultSavePath_{};
 
     QTextBlock activeBlock_;
+
+private slots:
+    void highlightCurrentLine();
 };

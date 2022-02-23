@@ -3,29 +3,12 @@
 Editor::Editor(QWidget *parent)
     : QPlainTextEdit(parent)
 {
-    /* Set up active block highlighting */
     this->setLineWrapMode(QPlainTextEdit::NoWrap);
-    QTextBlockFormat activeLineFmt = this->textCursor().blockFormat();
-    QTextBlockFormat defaultLineFmt = this->textCursor().blockFormat();
 
-    activeLineFmt.setBackground(Qt::lightGray);
-    this->textCursor().setBlockFormat(activeLineFmt);
+    connect(this, &QPlainTextEdit::cursorPositionChanged, this,
+            &Editor::highlightCurrentLine);
 
-    connect(this, &QPlainTextEdit::cursorPositionChanged, this, [=]() {
-        if (this->textCursor().block() != this->activeBlock_)
-        {
-            QTextCursor tempCrs = this->textCursor();
-
-            tempCrs.select(QTextCursor::BlockUnderCursor);
-            this->activeBlock_ = tempCrs.block();
-
-            tempCrs.select(QTextCursor::Document);
-            tempCrs.setBlockFormat(defaultLineFmt);
-
-            tempCrs = QTextCursor(this->activeBlock_);
-            tempCrs.setBlockFormat(activeLineFmt);
-        }
-    });
+    highlightCurrentLine();
 }
 
 Editor::~Editor()
@@ -115,4 +98,25 @@ void Editor::keyPressEvent(QKeyEvent *keyEvent)
     }
 
     QPlainTextEdit::keyPressEvent(keyEvent);
+}
+
+void Editor::highlightCurrentLine()
+{
+    /* https://doc.qt.io/qt-5/qtwidgets-widgets-codeeditor-example.html */
+    QList<QTextEdit::ExtraSelection> extraSelections;
+
+    if (!isReadOnly())
+    {
+        QTextEdit::ExtraSelection selection;
+
+        QColor lineColor = QColor(Qt::yellow).lighter(128);
+
+        selection.format.setBackground(lineColor);
+        selection.format.setProperty(QTextFormat::FullWidthSelection, true);
+        selection.cursor = textCursor();
+        selection.cursor.clearSelection();
+        extraSelections.append(selection);
+    }
+
+    setExtraSelections(extraSelections);
 }
