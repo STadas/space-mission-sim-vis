@@ -12,8 +12,9 @@ public:
 
     virtual ConnectionErr connect() = 0;
     virtual ConnectionErr disconnect() = 0;
-    virtual ConnectionErr sendCommand(const ParsedCommand &command) = 0;
-    virtual ConnectionErr sendCommand(const ParsedCommand &command,
+    virtual ConnectionErr sendCommand(
+        std::unique_ptr<ParsedCommand> &command) = 0;
+    virtual ConnectionErr sendCommand(std::unique_ptr<ParsedCommand> &command,
                                       unsigned char *&img,
                                       unsigned long &size) = 0;
 };

@@ -152,7 +152,7 @@ void MainWindow::execActiveLine()
 
     unsigned long size{};
     ConnectionErr connectionErr =
-        this->activeConnection->sendCommand(*parsedCommand, img, size);
+        this->activeConnection->sendCommand(parsedCommand, img, size);
 
     if (connectionErr != ConnectionErr::OK)
     {

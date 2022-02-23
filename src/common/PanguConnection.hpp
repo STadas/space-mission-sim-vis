@@ -14,9 +14,10 @@ public:
 
     ConnectionErr connect() override;
     ConnectionErr disconnect() override;
-    ConnectionErr sendCommand(const ParsedCommand &command, unsigned char *&img,
+    ConnectionErr sendCommand(std::unique_ptr<ParsedCommand> &command,
+                              unsigned char *&img,
                               unsigned long &size) override;
-    ConnectionErr sendCommand(const ParsedCommand &command) override;
+    ConnectionErr sendCommand(std::unique_ptr<ParsedCommand> &command) override;
 
 private:
     QString serverName_;

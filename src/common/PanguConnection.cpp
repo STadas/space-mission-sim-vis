@@ -68,7 +68,8 @@ ConnectionErr PanguConnection::disconnect()
     return ConnectionErr::OK;
 }
 
-ConnectionErr PanguConnection::sendCommand(const ParsedCommand &command)
+ConnectionErr PanguConnection::sendCommand(
+    std::unique_ptr<ParsedCommand> &command)
 {
     /* try-catch does have a performance cost (and +4 spaces) but it's probably
      * more readable and maintainable than repeating what's already there in
@@ -77,15 +78,15 @@ ConnectionErr PanguConnection::sendCommand(const ParsedCommand &command)
     try
     {
         char *panguErr;
-        if (command.name() == "start")
+        if (command->name() == "start")
         {
             panguErr = pan_net_set_viewpoint_by_degrees_d_TX(
-                this->sock_, std::get<double>(*command.args()[0]),
-                std::get<double>(*command.args()[1]),
-                std::get<double>(*command.args()[2]),
-                std::get<double>(*command.args()[3]),
-                std::get<double>(*command.args()[4]),
-                std::get<double>(*command.args()[5]));
+                this->sock_, std::get<double>(*command->args()[0]),
+                std::get<double>(*command->args()[1]),
+                std::get<double>(*command->args()[2]),
+                std::get<double>(*command->args()[3]),
+                std::get<double>(*command->args()[4]),
+                std::get<double>(*command->args()[5]));
 
             if (panguErr)
             {
@@ -95,16 +96,16 @@ ConnectionErr PanguConnection::sendCommand(const ParsedCommand &command)
             return ConnectionErr::OK;
         }
 
-        if (command.name() == "quaternion")
+        if (command->name() == "quaternion")
         {
             panguErr = pan_net_set_viewpoint_by_quaternion_d_TX(
-                this->sock_, std::get<double>(*command.args()[0]),
-                std::get<double>(*command.args()[1]),
-                std::get<double>(*command.args()[2]),
-                std::get<double>(*command.args()[3]),
-                std::get<double>(*command.args()[4]),
-                std::get<double>(*command.args()[5]),
-                std::get<double>(*command.args()[6]));
+                this->sock_, std::get<double>(*command->args()[0]),
+                std::get<double>(*command->args()[1]),
+                std::get<double>(*command->args()[2]),
+                std::get<double>(*command->args()[3]),
+                std::get<double>(*command->args()[4]),
+                std::get<double>(*command->args()[5]),
+                std::get<double>(*command->args()[6]));
 
             if (panguErr)
             {
@@ -121,9 +122,9 @@ ConnectionErr PanguConnection::sendCommand(const ParsedCommand &command)
     return ConnectionErr::BAD_REQUEST;
 }
 
-ConnectionErr PanguConnection::sendCommand(const ParsedCommand &command,
-                                           unsigned char *&img,
-                                           unsigned long &size)
+ConnectionErr PanguConnection::sendCommand(
+    std::unique_ptr<ParsedCommand> &command, unsigned char *&img,
+    unsigned long &size)
 {
     ConnectionErr err = this->sendCommand(command);
     if (err != ConnectionErr::OK)
@@ -131,7 +132,7 @@ ConnectionErr PanguConnection::sendCommand(const ParsedCommand &command,
         return err;
     }
 
-    if (!command.expectsImage())
+    if (!command->expectsImage())
     {
         return ConnectionErr::OK;
     }
