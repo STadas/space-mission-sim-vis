@@ -14,7 +14,9 @@ public:
     SimPreview(QWidget *parent = nullptr);
     ~SimPreview() override;
 
+    //TODO: this should probably go into its own thread (QtConcurrent::run?)
     void showPreview(unsigned char *&data, const unsigned long &size) override;
+
     bool eventFilter(QObject *object, QEvent *event) override;
 
 private:

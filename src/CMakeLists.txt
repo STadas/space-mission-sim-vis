@@ -115,7 +115,7 @@ if (BUILD_APP)
             PROPERTIES
             MACOSX_BUNDLE_BUNDLE_NAME "SpaceMissionSimVis"
             MACOSX_BUNDLE_GUI_IDENTIFIER "com.SpaceMissionSimVis"
-            MACOSX_BUNDLE_INFO_STRING "testing ci stuff"
+            MACOSX_BUNDLE_INFO_STRING "A tool to make producing spacecraft landing simulations easier"
             MACOSX_BUNDLE_LONG_VERSION_STRING "${PROJECT_VERSION}"
             MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
             MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"

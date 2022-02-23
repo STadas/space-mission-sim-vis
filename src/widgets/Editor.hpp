@@ -1,7 +1,6 @@
 #pragma once
 
 #include <QtWidgets>
-#include <string>
 
 #include "interfaces/IEditor.hpp"
 #include "util/FileUtil.hpp"
@@ -26,4 +25,6 @@ public:
 
 private:
     QString defaultSavePath_{};
+
+    QTextBlock activeBlock_;
 };

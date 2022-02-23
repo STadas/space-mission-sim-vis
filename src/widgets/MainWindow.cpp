@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     this->activePreview_ = new SimPreview(this);
 
-    /* TODO: refactor this to make it easier to add and remove other elements */
+    //TODO: refactor this to make it easier to add and remove other elements
     QDockWidget *dock = new QDockWidget("Preview", this);
     dock->setWidget(this->activePreview_);
     this->addDockWidget(Qt::RightDockWidgetArea, dock);
@@ -40,7 +40,7 @@ void MainWindow::createMenus()
     this->menuBar_->addMenu(this->toolsMenu_);
 }
 
-/* TODO: move this into its own thing somewhere else */
+//TODO: move this into its own thing somewhere else
 void MainWindow::createActions()
 {
     this->actFileNew_ = new QAction("New file", this);
