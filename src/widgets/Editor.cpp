@@ -80,3 +80,16 @@ int Editor::saveAs()
     }
     return err;
 }
+
+void Editor::keyPressEvent(QKeyEvent *keyEvent)
+{
+    /* We don't want newlines in blocks. Remove ShiftModifier flag to instead
+     * make a new block when user presses Shift+Return */
+    if ((keyEvent->modifiers() & Qt::ShiftModifier) &&
+        keyEvent->key() == Qt::Key_Return)
+    {
+        keyEvent->setModifiers(keyEvent->modifiers() & ~Qt::ShiftModifier);
+    }
+
+    QPlainTextEdit::keyPressEvent(keyEvent);
+}

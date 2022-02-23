@@ -22,6 +22,8 @@ public:
     int load() override;
     void clear() override;
 
+    void keyPressEvent(QKeyEvent *keyEvent) override;
+
 private:
     QString defaultSavePath_{};
 };
