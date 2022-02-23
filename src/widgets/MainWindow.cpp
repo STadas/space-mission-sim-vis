@@ -149,7 +149,6 @@ void MainWindow::execActiveLine()
     }
 
     unsigned char *img = nullptr;
-
     unsigned long size{};
     ConnectionErr connectionErr =
         this->activeConnection->sendCommand(parsedCommand, img, size);
@@ -174,16 +173,20 @@ void MainWindow::execActiveLine()
 void MainWindow::execMultiLine()
 {
     bool ok;
-    int msDelay = QInputDialog::getInt(this, "Command delay", "Delay (ms)", 1000, 0, INT32_MAX, 500, &ok);
+    //TODO: could have a setting for default initial delay
+    int msDelay = QInputDialog::getInt(this, "Command delay", "Delay (ms)",
+                                       1000, 0, INT32_MAX, 100, &ok);
 
     if (!ok)
         return;
 
+    this->activeEditor_->setReadOnly(true);
+
     int currPos = this->activeEditor_->textCursor().blockNumber();
+    //TODO: need a way to cancel this
     do
     {
         this->activeEditor_->goToLine(currPos);
-
         this->execActiveLine();
 
         if (this->activeEditor_->activeLineText() != "")
@@ -191,4 +194,6 @@ void MainWindow::execMultiLine()
 
         currPos++;
     } while (currPos < this->activeEditor_->document()->lineCount());
+
+    this->activeEditor_->setReadOnly(false);
 }

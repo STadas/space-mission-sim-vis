@@ -5,8 +5,12 @@ Editor::Editor(QWidget *parent)
 {
     this->setLineWrapMode(QPlainTextEdit::NoWrap);
 
-    connect(this, &QPlainTextEdit::cursorPositionChanged, this,
-            &Editor::highlightCurrentLine);
+    connect(this, &QPlainTextEdit::cursorPositionChanged, this, [=] {
+        if (!this->isReadOnly())
+        {
+            this->highlightCurrentLine();
+        }
+    });
 
     highlightCurrentLine();
 }
@@ -54,6 +58,7 @@ void Editor::goToLine(int lineNum)
     QTextCursor newCursor(this->document()->findBlockByLineNumber(
         std::min(lineNum, this->document()->lineCount() - 1)));
     this->setTextCursor(newCursor);
+    this->highlightCurrentLine();
 }
 
 void Editor::clear()
@@ -112,19 +117,16 @@ void Editor::highlightCurrentLine()
     /* https://doc.qt.io/qt-5/qtwidgets-widgets-codeeditor-example.html */
     QList<QTextEdit::ExtraSelection> extraSelections;
 
-    if (!isReadOnly())
-    {
-        QTextEdit::ExtraSelection selection;
+    QTextEdit::ExtraSelection selection;
 
-        //TODO: could have a setting for the color
-        QColor lineColor = QColor(Qt::yellow).lighter(128);
+    //TODO: could have a setting for the color
+    QColor lineColor = QColor(Qt::yellow).lighter(128);
 
-        selection.format.setBackground(lineColor);
-        selection.format.setProperty(QTextFormat::FullWidthSelection, true);
-        selection.cursor = textCursor();
-        selection.cursor.clearSelection();
-        extraSelections.append(selection);
-    }
+    selection.format.setBackground(lineColor);
+    selection.format.setProperty(QTextFormat::FullWidthSelection, true);
+    selection.cursor = this->textCursor();
+    selection.cursor.clearSelection();
+    extraSelections.append(selection);
 
-    setExtraSelections(extraSelections);
+    this->setExtraSelections(extraSelections);
 }
