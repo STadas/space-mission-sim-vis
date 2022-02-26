@@ -7,5 +7,5 @@ class VBoxLayout : public QVBoxLayout
     Q_OBJECT
 
 public:
-    VBoxLayout(QWidget *parent);
+    VBoxLayout(QWidget *parent = nullptr);
 };

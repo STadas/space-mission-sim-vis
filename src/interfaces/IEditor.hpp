@@ -9,6 +9,7 @@ public:
 
     virtual bool isModified() = 0;
     virtual QString activeLineText() = 0;
+    virtual void goToLine(int lineNum) = 0;
 
     virtual int save() = 0;
     virtual int saveAs() = 0;

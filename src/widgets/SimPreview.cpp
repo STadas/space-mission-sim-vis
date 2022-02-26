@@ -10,18 +10,20 @@ SimPreview::SimPreview(QWidget *parent)
                                    QSizePolicy::Expanding);
     this->imgLabel_->setMinimumSize(1, 1);
     this->imgLabel_->installEventFilter(this);
+
+    connect(this, &SimPreview::changePreview, this, &SimPreview::showPreview);
 }
 
 SimPreview::~SimPreview()
 {
 }
 
-void SimPreview::showPreview(unsigned char *&data, const unsigned long &size)
+void SimPreview::showPreview(unsigned char *data, const unsigned long &size)
 {
-    /* this->imgLabel_->setText("showImage"); */
     QSize oldSize = this->size();
 
     this->pm_.loadFromData(QByteArray((char *)data, size), "PNG");
+    delete data;
     this->imgLabel_->setPixmap(this->pm_);
 
     QSize newSize = this->size();
