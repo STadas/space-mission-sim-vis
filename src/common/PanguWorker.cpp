@@ -27,6 +27,7 @@ void PanguWorker::setCancelled(bool cancelled)
 void PanguWorker::linePreReturn(int currLine, int toLine, int msDelay,
                                 CommandErr err)
 {
+    /* Only one line is being done */
     if (currLine == toLine)
     {
         emit lineDone();
@@ -34,6 +35,7 @@ void PanguWorker::linePreReturn(int currLine, int toLine, int msDelay,
         return;
     }
 
+    /* Multiple lines are being done. Check if last one or cancelled. */
     if (currLine == toLine - 1 || (currLine < toLine && this->isCancelled_))
     {
         emit lineDone();
@@ -61,10 +63,11 @@ void PanguWorker::onGiveLine(QString lineStr, int currLine, int toLine,
 
     if (commandErr != CommandErr::OK)
     {
-        emit this->error(commandErr);
+        if (commandErr != CommandErr::EMPTY)
+            this->setCancelled(true);
 
-        if (commandErr == CommandErr::EMPTY)
-            return this->linePreReturn(currLine, toLine, msDelay, commandErr);
+        emit this->error(commandErr);
+        return this->linePreReturn(currLine, toLine, msDelay, commandErr);
     }
 
     unsigned char *img = nullptr;
@@ -75,7 +78,8 @@ void PanguWorker::onGiveLine(QString lineStr, int currLine, int toLine,
     if (connectionErr != ConnectionErr::OK)
     {
         emit this->error(connectionErr);
-        return;
+        this->setCancelled(true);
+        return this->linePreReturn(currLine, toLine, msDelay, commandErr);
     }
 
     if (!parsedCommand->expectsImage() && img != nullptr)
