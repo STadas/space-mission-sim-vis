@@ -12,7 +12,7 @@ MessageController::MessageController(QObject *parent)
         this, qOverload<ConnectionErr, QWidget *>(&MessageController::onError));
 
     connect(this, qOverload<FileErr, QWidget *>(&MessageController::error),
-            this, qOverload<FileErr, QWidget *>(&MessageController::error));
+            this, qOverload<FileErr, QWidget *>(&MessageController::onError));
 }
 
 MessageController::~MessageController()
@@ -124,7 +124,7 @@ QMessageBox::StandardButton MessageController::question(FileQuestion qst,
                 "Are you sure? This will discard any unsaved changes.");
         }
         default: {
-            return QMessageBox::Close;
+            return QMessageBox::StandardButton::Close;
         }
     }
 }

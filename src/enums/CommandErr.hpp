@@ -1,7 +1,5 @@
 #pragma once
 
-#include <QtCore>
-
 enum class CommandErr {
     OK,
     BAD_ARG_TYPE,

@@ -5,6 +5,7 @@ PanguWorker::PanguWorker()
     : QObject(nullptr)
     , connection_(new PanguConnection(this))
     , previewLock(new QSemaphore(1))
+    , isCancelled_(false)
 {
     this->connection_->connect();
 
