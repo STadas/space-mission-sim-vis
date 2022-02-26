@@ -23,7 +23,8 @@ void PanguWorker::setCancelled(bool cancelled)
     this->isCancelled_ = cancelled;
 }
 
-void PanguWorker::linePreReturn(int currLine, int toLine, int msDelay, CommandErr err)
+void PanguWorker::linePreReturn(int currLine, int toLine, int msDelay,
+                                CommandErr err)
 {
     if (currLine == toLine)
     {

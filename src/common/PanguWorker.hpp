@@ -34,7 +34,8 @@ signals:
     void error(ConnectionErr err);
 
     void askLine(int fromLine, int toLine = 0, int msDelay = 0);
-    void giveLine(QString lineStr, int fromLine = 0, int toLine = 0, int msDelay = 0);
+    void giveLine(QString lineStr, int fromLine = 0, int toLine = 0,
+                  int msDelay = 0);
 
     void changePreview(unsigned char *img, unsigned long size);
 
