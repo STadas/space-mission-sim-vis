@@ -157,7 +157,7 @@ char *pan_net_safety_checks(void) {
  */
 char *pan_net_want(SOCKET s, unsigned long want) {
   /* Get the reply code from the server */
-  unsigned long mcode;
+  unsigned long mcode = MSG_SERVER_LIMIT;
   pan_socket_read_ulong(s, &mcode);
 
   /* If it is what we expect then return happy. */
@@ -189,11 +189,10 @@ char *pan_net_want(SOCKET s, unsigned long want) {
   }
 
   /* Unexpected message received */
-  int count = 0;
   (void)sprintf(
       err_buf,
-      "Error: received message type %ld when expecting message type %ld.\n%n",
-      mcode, want, &count);
+      "Error: received message type %lu when expecting message type %lu.\n",
+      mcode, want);
   return err_buf;
 }
 
