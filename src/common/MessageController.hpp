@@ -4,17 +4,26 @@
 #include <QtWidgets>
 #include "enums/CommandErr.hpp"
 #include "enums/ConnectionErr.hpp"
-#include "enums/FileMessage.hpp"
+#include "enums/FileErr.hpp"
+#include "enums/FileQuestion.hpp"
 
-class MessageController
+class MessageController : public QObject
 {
+    Q_OBJECT
+
 public:
-    static void error(CommandErr err, QWidget *parent);
-    static void error(ConnectionErr err, QWidget *parent);
+    MessageController(QObject *parent);
+    ~MessageController();
 
-    static QMessageBox::StandardButton message(FileMessage msg,
-                                               QWidget *parent);
+    QMessageBox::StandardButton question(FileQuestion qst, QWidget *parent);
 
-private:
-    MessageController(){};
+signals:
+    void error(CommandErr err, QWidget *parent = nullptr);
+    void error(ConnectionErr err, QWidget *parent = nullptr);
+    void error(FileErr err, QWidget *parent = nullptr);
+
+public slots:
+    void onError(CommandErr err, QWidget *parent = nullptr);
+    void onError(ConnectionErr err, QWidget *parent = nullptr);
+    void onError(FileErr err, QWidget *parent = nullptr);
 };

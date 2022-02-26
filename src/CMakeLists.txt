@@ -3,17 +3,12 @@ set(EXECUTABLE_PROJECT "${PROJECT_NAME}")
 
 # src
 set(SOURCE_PROJECT
-        widgets/Editor.cpp
-        widgets/Editor.hpp
-        widgets/MainWindow.cpp
-        widgets/MainWindow.hpp
-        widgets/SimPreview.cpp
-        widgets/SimPreview.hpp
-
         common/MessageController.cpp
         common/MessageController.hpp
         common/PanguConnection.cpp
         common/PanguConnection.hpp
+        common/PanguWorker.cpp
+        common/PanguWorker.hpp
         common/ParsedCommand.cpp
         common/ParsedCommand.hpp
         common/VBoxLayout.cpp
@@ -27,8 +22,15 @@ set(SOURCE_PROJECT
         util/SocketUtil.hpp
         util/StringUtil.cpp
         util/StringUtil.hpp
-        util/TimeUtil.cpp
-        util/TimeUtil.hpp
+        util/ThreadUtil.cpp
+        util/ThreadUtil.hpp
+
+        widgets/MainWindow.cpp
+        widgets/MainWindow.hpp
+        widgets/PanguEditor.cpp
+        widgets/PanguEditor.hpp
+        widgets/SimPreview.cpp
+        widgets/SimPreview.hpp
         )
 
 source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${SOURCE_PROJECT})

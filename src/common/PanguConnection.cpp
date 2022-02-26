@@ -1,8 +1,9 @@
 #include "PanguConnection.hpp"
 
-PanguConnection::PanguConnection(const QString &serverName,
+PanguConnection::PanguConnection(QObject *parent, const QString &serverName,
                                  const int &serverPort)
-    : serverName_(serverName)
+    : QObject(parent)
+    , serverName_(serverName)
     , serverPort_(serverPort)
 {
 }

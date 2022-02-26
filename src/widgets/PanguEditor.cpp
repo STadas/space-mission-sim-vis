@@ -1,6 +1,6 @@
-#include "Editor.hpp"
+#include "PanguEditor.hpp"
 
-Editor::Editor(QWidget *parent)
+PanguEditor::PanguEditor(QWidget *parent)
     : QPlainTextEdit(parent)
 {
     this->setLineWrapMode(QPlainTextEdit::NoWrap);
@@ -15,21 +15,21 @@ Editor::Editor(QWidget *parent)
     highlightCurrentLine();
 }
 
-Editor::~Editor()
+PanguEditor::~PanguEditor()
 {
 }
 
-bool Editor::isModified()
+bool PanguEditor::isModified()
 {
     return this->document()->isModified();
 }
 
-QString Editor::activeLineText()
+QString PanguEditor::activeLineText()
 {
     return this->textCursor().block().text();
 }
 
-int Editor::load()
+int PanguEditor::load()
 {
     QFileDevice::FileError err = QFileDevice::FileError::NoError;
 
@@ -53,7 +53,7 @@ int Editor::load()
     return err;
 }
 
-void Editor::goToLine(int lineNum)
+void PanguEditor::goToLine(int lineNum)
 {
     QTextCursor newCursor(this->document()->findBlockByLineNumber(
         std::min(lineNum, this->document()->lineCount() - 1)));
@@ -61,12 +61,12 @@ void Editor::goToLine(int lineNum)
     this->highlightCurrentLine();
 }
 
-void Editor::clear()
+void PanguEditor::clear()
 {
     this->setPlainText("");
 }
 
-int Editor::save()
+int PanguEditor::save()
 {
     if (this->defaultSavePath_ == "")
     {
@@ -81,7 +81,7 @@ int Editor::save()
     return err;
 }
 
-int Editor::saveAs()
+int PanguEditor::saveAs()
 {
     QString filePath = QFileDialog::getSaveFileName(
         this, "Save file as", "", "Flight files (*.fli);;All files (*)");
@@ -99,7 +99,7 @@ int Editor::saveAs()
     return err;
 }
 
-void Editor::keyPressEvent(QKeyEvent *keyEvent)
+void PanguEditor::keyPressEvent(QKeyEvent *keyEvent)
 {
     /* We don't want newlines in blocks. Remove ShiftModifier flag to instead
      * make a new block when user presses Shift+Return */
@@ -112,7 +112,7 @@ void Editor::keyPressEvent(QKeyEvent *keyEvent)
     QPlainTextEdit::keyPressEvent(keyEvent);
 }
 
-void Editor::highlightCurrentLine()
+void PanguEditor::highlightCurrentLine()
 {
     /* https://doc.qt.io/qt-5/qtwidgets-widgets-codeeditor-example.html */
     QList<QTextEdit::ExtraSelection> extraSelections;

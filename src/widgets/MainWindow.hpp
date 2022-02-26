@@ -1,14 +1,15 @@
 #pragma once
 
+#include <QtConcurrent>
 #include <QtCore>
 #include <QtWidgets>
 
-#include "Editor.hpp"
+#include "PanguEditor.hpp"
 #include "common/MessageController.hpp"
 #include "common/PanguConnection.hpp"
+#include "common/PanguWorker.hpp"
 #include "common/VBoxLayout.hpp"
 #include "util/CommandUtil.hpp"
-#include "util/TimeUtil.hpp"
 #include "widgets/SimPreview.hpp"
 
 class MainWindow : public QMainWindow
@@ -17,21 +18,15 @@ class MainWindow : public QMainWindow
 
 public:
     MainWindow(QWidget *parent = nullptr);
-    ~MainWindow(){};
+    ~MainWindow();
 
 private:
-    QWidget *centralWidget_;
-    QMenuBar *menuBar_;
-    QStatusBar *statusBar_;
+    PanguWorker *panguWorker_;
+    PanguEditor *editor_;
+    SimPreview *preview_;
+    MessageController *messageController_;
 
-    QLayout *centralLayout_;
-
-    Editor *activeEditor_;
-    SimPreview *activePreview_;
-    IConnection *activeConnection;
-
-    void createMenus();
-    void createActions();
+    QThread *workerThread_;
 
     QMenu *fileMenu_;
     QMenu *toolsMenu_;
@@ -42,14 +37,16 @@ private:
     QAction *actFileSaveAs_;
 
     QAction *actActiveLineExec_;
-    QAction *actMultiLineExec_;
+    QAction *actMultiLineStart_;
+    QAction *actMultiLineStop_;
+
+    void createMenus();
+    void createActions();
+    void createSignalConnections();
 
 private slots:
     void newFile();
     void openFile();
     void saveFileAs();
     void saveFile();
-
-    void execActiveLine();
-    void execMultiLine();
 };

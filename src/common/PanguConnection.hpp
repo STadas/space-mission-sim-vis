@@ -6,10 +6,13 @@
 #include "pan_protocol/pan_protocol_lib.h"
 #include "util/SocketUtil.hpp"
 
-class PanguConnection : public IConnection
+class PanguConnection : public QObject, IConnection
 {
+    Q_OBJECT
+
 public:
-    PanguConnection(const QString &serverName, const int &serverPort);
+    PanguConnection(QObject *parent, const QString &serverName = "localhost",
+                    const int &serverPort = 10363);
     ~PanguConnection() override;
 
     ConnectionErr connect() override;

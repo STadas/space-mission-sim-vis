@@ -1,7 +1,25 @@
 #include "MessageController.hpp"
-#include "enums/ConnectionErr.hpp"
 
-void MessageController::error(CommandErr err, QWidget *parent)
+MessageController::MessageController(QObject *parent)
+    : QObject(parent)
+{
+    connect(this, qOverload<CommandErr, QWidget *>(&MessageController::error),
+            this,
+            qOverload<CommandErr, QWidget *>(&MessageController::onError));
+
+    connect(
+        this, qOverload<ConnectionErr, QWidget *>(&MessageController::error),
+        this, qOverload<ConnectionErr, QWidget *>(&MessageController::onError));
+
+    connect(this, qOverload<FileErr, QWidget *>(&MessageController::error),
+            this, qOverload<FileErr, QWidget *>(&MessageController::error));
+}
+
+MessageController::~MessageController()
+{
+}
+
+void MessageController::onError(CommandErr err, QWidget *parent)
 {
     QString windowTitle = "Syntax error";
     switch (err)
@@ -45,7 +63,7 @@ void MessageController::error(CommandErr err, QWidget *parent)
     }
 }
 
-void MessageController::error(ConnectionErr err, QWidget *parent)
+void MessageController::onError(ConnectionErr err, QWidget *parent)
 {
     QString windowTitle = "Connection error";
     switch (err)
@@ -59,6 +77,7 @@ void MessageController::error(ConnectionErr err, QWidget *parent)
                 "There was an error when getting the preview image. Please "
                 "check "
                 "your settings and the status of the PANGU server.");
+            break;
         }
         default: {
             QMessageBox::critical(
@@ -70,33 +89,42 @@ void MessageController::error(ConnectionErr err, QWidget *parent)
     }
 }
 
-QMessageBox::StandardButton MessageController::message(FileMessage msg,
-                                                       QWidget *parent)
+void MessageController::onError(FileErr err, QWidget *parent)
 {
-    switch (msg)
+    switch (err)
     {
-        case FileMessage::FILE_NEW: {
+        case FileErr::OPEN_FAIL: {
+            QMessageBox::critical(parent, "Open file",
+                                  "There was an error opening the file.");
+            break;
+        }
+        case FileErr::SAVE_FAIL: {
+            QMessageBox::critical(parent, "Save file as",
+                                  "There was an error saving the file.");
+            break;
+        }
+        default: {
+        }
+    }
+}
+
+QMessageBox::StandardButton MessageController::question(FileQuestion qst,
+                                                        QWidget *parent)
+{
+    switch (qst)
+    {
+        case FileQuestion::FILE_NEW: {
             return QMessageBox::question(
                 parent, "New file",
                 "Are you sure? This will discard any unsaved changes.");
         }
-        case FileMessage::FILE_OPEN: {
+        case FileQuestion::FILE_OPEN: {
             return QMessageBox::question(
                 parent, "Open file",
                 "Are you sure? This will discard any unsaved changes.");
         }
-        case FileMessage::OPEN_FAIL: {
-            QMessageBox::critical(parent, "Open file",
-                                  "There was an error opening the file.");
-            return QMessageBox::StandardButton::Close;
-        }
-        case FileMessage::SAVE_FAIL: {
-            QMessageBox::critical(parent, "Save file as",
-                                  "There was an error saving the file.");
-            return QMessageBox::StandardButton::Close;
-        }
         default: {
-            return QMessageBox::StandardButton::Close;
+            return QMessageBox::Close;
         }
     }
 }

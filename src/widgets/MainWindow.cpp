@@ -1,46 +1,86 @@
 #include "MainWindow.hpp"
+#include "common/MessageController.hpp"
+#include "common/PanguWorker.hpp"
+#include "widgets/PanguEditor.hpp"
+#include "widgets/SimPreview.hpp"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
+    , editor_(new PanguEditor(this))
+    , preview_(new SimPreview(this))
+    , messageController_(new MessageController(this))
+    , workerThread_(new QThread)
+    , panguWorker_(new PanguWorker)
 {
-    this->activeConnection = new PanguConnection("localhost", 10363);
-    this->activeConnection->connect();
+    /* As weird as this is, it needs to be done for us to be able to use the
+     * enums with signals and slots. Potential for a generated source code
+     * file? */
+    qRegisterMetaType<CommandErr>("CommandErr");
+    qRegisterMetaType<ConnectionErr>("ConnectionErr");
+    qRegisterMetaType<FileErr>("FileErr");
+    qRegisterMetaType<FileQuestion>("FileQuestion");
 
+    this->panguWorker_->moveToThread(this->workerThread_);
+    this->workerThread_->start();
+
+    this->setCentralWidget(new QWidget(this));
+    this->setStatusBar(new QStatusBar(this));
+    this->setMenuBar(new QMenuBar(this));
+
+    this->createSignalConnections();
     this->createMenus();
     this->createActions();
 
-    this->centralWidget_ = new QWidget(this);
-    this->statusBar_ = new QStatusBar(this);
-
-    this->setCentralWidget(this->centralWidget_);
-    this->setStatusBar(this->statusBar_);
-    this->setMenuBar(this->menuBar_);
-
-    this->centralLayout_ = new VBoxLayout(this->centralWidget_);
-    this->activeEditor_ = new Editor(this->centralWidget_);
-
-    this->centralLayout_->addWidget(this->activeEditor_);
-
-    this->activePreview_ = new SimPreview(this);
+    this->centralWidget()->setLayout(new VBoxLayout);
+    this->centralWidget()->layout()->addWidget(this->editor_);
 
     //TODO: refactor this to make it easier to add and remove other elements
     QDockWidget *dock = new QDockWidget("Preview", this);
-    dock->setWidget(this->activePreview_);
+    dock->setWidget(this->preview_);
     this->addDockWidget(Qt::RightDockWidgetArea, dock);
+}
+
+MainWindow::~MainWindow()
+{
+}
+
+void MainWindow::createSignalConnections()
+{
+    connect(this->panguWorker_, qOverload<CommandErr>(&PanguWorker::error),
+            this, [=](CommandErr err) {
+                emit this->messageController_->error(err, this);
+            });
+
+    connect(this->panguWorker_, qOverload<ConnectionErr>(&PanguWorker::error),
+            this, [=](ConnectionErr err) {
+                emit this->messageController_->error(err, this);
+            });
+
+    connect(this->panguWorker_, &PanguWorker::askLine, this,
+            [=](int fromLine, int toLine, int msDelay) {
+                this->editor_->goToLine(fromLine);
+                emit this->panguWorker_->giveLine(
+                    this->editor_->activeLineText(), fromLine, toLine, msDelay);
+            });
+
+    connect(this->panguWorker_, &PanguWorker::changePreview, this->preview_,
+            &SimPreview::changePreview);
+
+    connect(this->panguWorker_, &PanguWorker::multiLineDone, this, [=] {
+        this->panguWorker_->setCancelled(false);
+        this->editor_->setReadOnly(false);
+    });
 }
 
 void MainWindow::createMenus()
 {
-    this->menuBar_ = new QMenuBar(this);
-
     this->fileMenu_ = new QMenu("File", this);
-    this->menuBar_->addMenu(this->fileMenu_);
+    this->menuBar()->addMenu(this->fileMenu_);
 
     this->toolsMenu_ = new QMenu("Tools", this);
-    this->menuBar_->addMenu(this->toolsMenu_);
+    this->menuBar()->addMenu(this->toolsMenu_);
 }
 
-//TODO: move this into its own thing somewhere else
 void MainWindow::createActions()
 {
     this->actFileNew_ = new QAction("New file", this);
@@ -74,126 +114,87 @@ void MainWindow::createActions()
     this->actActiveLineExec_->setStatusTip(
         "Execute the command in the currently active line");
     this->toolsMenu_->addAction(this->actActiveLineExec_);
-    connect(this->actActiveLineExec_, &QAction::triggered, this,
-            &MainWindow::execActiveLine);
+    connect(this->actActiveLineExec_, &QAction::triggered, this, [=] {
+        if (this->panguWorker_->previewLock->available())
+            emit this->panguWorker_->giveLine(this->editor_->activeLineText());
+    });
 
-    this->actMultiLineExec_ = new QAction("Step through commands", this);
-    this->actMultiLineExec_->setStatusTip(
+    this->actMultiLineStart_ = new QAction("Step through commands", this);
+    this->actMultiLineStart_->setStatusTip(
         "Step through and execute all commands (with delay) starting with the "
         "currently active line");
-    this->toolsMenu_->addAction(this->actMultiLineExec_);
-    connect(this->actMultiLineExec_, &QAction::triggered, this,
-            &MainWindow::execMultiLine);
+    this->toolsMenu_->addAction(this->actMultiLineStart_);
+    connect(this->actMultiLineStart_, &QAction::triggered, this, [=] {
+        if (!this->panguWorker_->previewLock->available())
+            return;
+
+        bool ok;
+        int msDelay = QInputDialog::getInt(this, "Command delay", "Delay (ms)",
+                                           1000, 0, INT32_MAX, 100, &ok);
+        if (!ok)
+            return;
+
+        this->editor_->setReadOnly(true);
+
+        emit this->panguWorker_->doMultiLine(
+            this->editor_->textCursor().blockNumber(),
+            this->editor_->document()->lineCount(), msDelay);
+    });
+
+    this->actMultiLineStop_ = new QAction("Stop stepping", this);
+    this->actMultiLineStop_->setStatusTip(
+        "Step through and execute all commands (with delay) starting with the "
+        "currently active line");
+    this->toolsMenu_->addAction(this->actMultiLineStop_);
+    connect(this->actMultiLineStop_, &QAction::triggered, this->panguWorker_,
+            &PanguWorker::stopMultiLine);
 }
 
 void MainWindow::newFile()
 {
-    if (this->activeEditor_->isModified())
+    if (this->editor_->isModified())
     {
         QMessageBox::StandardButton answer =
-            MessageController::message(FileMessage::FILE_NEW, this);
+            this->messageController_->question(FileQuestion::FILE_NEW, this);
         if (answer == QMessageBox::No)
         {
             return;
         }
     }
 
-    this->activeEditor_->clear();
+    this->editor_->clear();
 }
 
 void MainWindow::openFile()
 {
-    if (this->activeEditor_->isModified())
+    if (this->editor_->isModified())
     {
         QMessageBox::StandardButton answer =
-            MessageController::message(FileMessage::FILE_OPEN, this);
+            this->messageController_->question(FileQuestion::FILE_OPEN, this);
         if (answer == QMessageBox::No)
         {
             return;
         }
     }
 
-    if (this->activeEditor_->load())
+    if (this->editor_->load())
     {
-        MessageController::message(FileMessage::OPEN_FAIL, this);
+        emit this->messageController_->error(FileErr::OPEN_FAIL, this);
     };
 }
 
 void MainWindow::saveFileAs()
 {
-    if (this->activeEditor_->saveAs())
+    if (this->editor_->saveAs())
     {
-        MessageController::message(FileMessage::SAVE_FAIL, this);
+        emit this->messageController_->error(FileErr::SAVE_FAIL, this);
     }
 }
 
 void MainWindow::saveFile()
 {
-    if (this->activeEditor_->save())
+    if (this->editor_->save())
     {
-        MessageController::message(FileMessage::SAVE_FAIL, this);
+        emit this->messageController_->error(FileErr::SAVE_FAIL, this);
     }
-}
-
-void MainWindow::execActiveLine()
-{
-    std::unique_ptr<ParsedCommand> parsedCommand;
-
-    CommandErr commandErr = CommandUtil::parsePangu(
-        this->activeEditor_->activeLineText(), parsedCommand);
-
-    if (commandErr != CommandErr::OK)
-    {
-        MessageController::error(commandErr, this);
-        return;
-    }
-
-    unsigned char *img = nullptr;
-    unsigned long size{};
-    ConnectionErr connectionErr =
-        this->activeConnection->sendCommand(parsedCommand, img, size);
-
-    if (connectionErr != ConnectionErr::OK)
-    {
-        MessageController::error(connectionErr, this);
-        return;
-    }
-
-    if (!parsedCommand->expectsImage())
-    {
-        if (img != nullptr)
-            delete img;
-        return;
-    }
-
-    this->activePreview_->showPreview(img, size);
-    delete img;
-}
-
-void MainWindow::execMultiLine()
-{
-    bool ok;
-    //TODO: could have a setting for default initial delay
-    int msDelay = QInputDialog::getInt(this, "Command delay", "Delay (ms)",
-                                       1000, 0, INT32_MAX, 100, &ok);
-
-    if (!ok)
-        return;
-
-    this->activeEditor_->setReadOnly(true);
-
-    int currPos = this->activeEditor_->textCursor().blockNumber();
-    //TODO: need a way to cancel this
-    do
-    {
-        this->activeEditor_->goToLine(currPos);
-        this->execActiveLine();
-
-        if (this->activeEditor_->activeLineText() != "")
-            TimeUtil::delay(msDelay);
-
-        currPos++;
-    } while (currPos < this->activeEditor_->document()->lineCount());
-
-    this->activeEditor_->setReadOnly(false);
 }
