@@ -143,8 +143,7 @@ void MainWindow::createActions()
 
     this->actMultiLineStop_ = new QAction("Stop stepping", this);
     this->actMultiLineStop_->setStatusTip(
-        "Step through and execute all commands (with delay) starting with the "
-        "currently active line");
+        "Stop the currently active command stepping");
     this->toolsMenu_->addAction(this->actMultiLineStop_);
     connect(this->actMultiLineStop_, &QAction::triggered, this->panguWorker_,
             &PanguWorker::stopMultiLine);
