@@ -1,9 +1,9 @@
 #include "ParsedCommand.hpp"
 
-ParsedCommand::ParsedCommand(QString name, bool expectsImage,
+ParsedCommand::ParsedCommand(QString name, bool expectsImg,
                              std::vector<std::shared_ptr<Arg>> args)
     : name_(name)
-    , expectsImage_(expectsImage)
+    , expectsImg_(expectsImg)
     , args_(args)
 {
 }

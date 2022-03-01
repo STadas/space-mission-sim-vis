@@ -14,8 +14,8 @@ PreviewWorker::PreviewWorker()
     connect(this, &PreviewWorker::doMultiLine, this, &PreviewWorker::askLine);
     connect(this, &PreviewWorker::stopMultiLine, this,
             &PreviewWorker::onStopMultiLine);
-    connect(this, &PreviewWorker::updateImageIndexes, this,
-            &PreviewWorker::onUpdateImageIndexes);
+    connect(this, &PreviewWorker::updateImgIndices, this,
+            &PreviewWorker::onUpdateImgIndices);
 }
 
 PreviewWorker::~PreviewWorker()
@@ -32,15 +32,17 @@ QSemaphore *PreviewWorker::previewLock() const
     return this->previewLock_;
 }
 
-std::vector<int> PreviewWorker::imageIndexes() const
+std::vector<int> PreviewWorker::imgIndices() const
 {
-    return this->imageIndexes_;
+    return this->imgIndices_;
 }
 
-void PreviewWorker::onUpdateImageIndexes(const QString &str)
+void PreviewWorker::onUpdateImgIndices(const QString &str)
 {
+    /* TODO: Some kind of progress bar in the statusbar would be good for large
+     * files */
     std::vector<QString> lines = StringUtil::split(str, "\\n");
-    std::vector<int> newImageIndexes;
+    std::vector<int> newImgIndices;
     int lineNum = 0;
 
     for (auto &line : lines)
@@ -48,15 +50,15 @@ void PreviewWorker::onUpdateImageIndexes(const QString &str)
         std::unique_ptr<ParsedCommand> parsedCommand;
         CommandErr err = this->parser_->parse(line, parsedCommand);
 
-        if (err == CommandErr::OK && parsedCommand->expectsImage())
+        if (err == CommandErr::OK && parsedCommand->expectsImg())
         {
-            newImageIndexes.push_back(lineNum);
+            newImgIndices.push_back(lineNum);
         }
 
         lineNum++;
     }
-    this->imageIndexes_ = newImageIndexes;
-    emit this->imageIndexesUpdated();
+    this->imgIndices_ = newImgIndices;
+    emit this->imgIndicesUpdated();
 }
 
 void PreviewWorker::linePreReturn(int currLine, int toLine, int msDelay,
@@ -117,7 +119,7 @@ void PreviewWorker::onGiveLine(QString lineStr, int currLine, int toLine,
         return this->linePreReturn(currLine, toLine, msDelay, commandErr);
     }
 
-    if (!parsedCommand->expectsImage() && img != nullptr)
+    if (!parsedCommand->expectsImg() && img != nullptr)
         delete img;
 
     emit this->changePreview(img, size);

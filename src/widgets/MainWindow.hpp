@@ -23,12 +23,13 @@ private:
     CamPreview *preview_;
     ProgressBar *progressBar_;
 
+    bool autoCommScan_;
+
     MessageController *messageController_;
 
     PreviewWorker *previewWorker_;
 
     QThread *previewWorkerThread_;
-    QThread *lintWorkerThread_;
 
     QMenu *fileMenu_;
     QMenu *toolsMenu_;
@@ -41,6 +42,10 @@ private:
     QAction *actActiveLineExec_;
     QAction *actMultiLineStart_;
     QAction *actMultiLineStop_;
+
+    QAction *actCommScan;
+    ;
+    QAction *actToggleAutoCommScan_;
 
     void createMenus();
     void createActions();

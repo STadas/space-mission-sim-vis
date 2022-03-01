@@ -3,13 +3,13 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , previewWorker_(new PreviewWorker)
-    , editor_(new Editor(this))
     , preview_(new CamPreview(this))
+    , editor_(new Editor(this))
     , progressBar_(new ProgressBar(this))
+    , autoCommScan_(false)
     , messageController_(new MessageController(this))
+    , previewWorker_(new PreviewWorker)
     , previewWorkerThread_(new QThread)
-    , lintWorkerThread_(new QThread)
 {
     /* As weird as this is, it needs to be done for us to be able to use the
      * enums with signals and slots. Potential for a generated source code
@@ -34,11 +34,11 @@ MainWindow::MainWindow(QWidget *parent)
     this->centralWidget()->layout()->addWidget(this->editor_);
 
     //TODO: refactor this to make it easier to add and remove other elements
-    QDockWidget *dockPreview = new QDockWidget("Preview", this);
+    QDockWidget *dockPreview = new QDockWidget("Simulation Preview", this);
     dockPreview->setWidget(this->preview_);
     this->addDockWidget(Qt::RightDockWidgetArea, dockPreview);
 
-    QDockWidget *dockProgressBar = new QDockWidget("Progress", this);
+    QDockWidget *dockProgressBar = new QDockWidget("Simulation Progress", this);
     dockProgressBar->setWidget(this->progressBar_);
     this->addDockWidget(Qt::RightDockWidgetArea, dockProgressBar);
 }
@@ -69,12 +69,12 @@ void MainWindow::createSignalConnections()
 
         if (this->progressBar_->value() != fromLine)
         {
-            auto indexes = this->previewWorker_->imageIndexes();
-            auto it = std::find(indexes.begin(), indexes.end(), fromLine);
-            if (it != indexes.end())
+            auto indices = this->previewWorker_->imgIndices();
+            auto it = std::find(indices.begin(), indices.end(), fromLine);
+            if (it != indices.end())
             {
                 this->progressBar_->blockSignals(true);
-                this->progressBar_->setValue(it - indexes.begin());
+                this->progressBar_->setValue(it - indices.begin());
                 this->progressBar_->blockSignals(false);
             }
         }
@@ -96,7 +96,7 @@ void MainWindow::createSignalConnections()
         if (this->previewWorker_->previewLock()->available())
         {
             emit this->previewWorker_->askLine(
-                this->previewWorker_->imageIndexes()[imgIdx]);
+                this->previewWorker_->imgIndices()[imgIdx]);
         }
     };
     connect(this->progressBar_, &ProgressBar::valueChanged, this,
@@ -105,24 +105,27 @@ void MainWindow::createSignalConnections()
     auto onPBarReleased = [=] {
         this->previewWorker_->setCancelled(true);
         emit this->previewWorker_->askLine(
-            this->previewWorker_->imageIndexes()[this->progressBar_->value()]);
+            this->previewWorker_->imgIndices()[this->progressBar_->value()]);
     };
     connect(this->progressBar_, &ProgressBar::sliderReleased, this,
             onPBarReleased);
 
     auto onEditorContentChanged = [=] {
-        emit this->previewWorker_->updateImageIndexes(
-            this->editor_->toPlainText());
+        if (autoCommScan_)
+        {
+            emit this->previewWorker_->updateImgIndices(
+                this->editor_->toPlainText());
+        }
     };
     connect(this->editor_->document(), &QTextDocument::contentsChanged, this,
             onEditorContentChanged);
 
-    auto onImageIndexesUpdated = [=] {
-        if (this->previewWorker_->imageIndexes().size() > 0)
+    auto onImgIndicesUpdated = [=] {
+        if (this->previewWorker_->imgIndices().size() > 0)
         {
             this->progressBar_->setEnabled(true);
             this->progressBar_->setMaximum(
-                this->previewWorker_->imageIndexes().size() - 1);
+                this->previewWorker_->imgIndices().size() - 1);
         }
         else
         {
@@ -130,8 +133,8 @@ void MainWindow::createSignalConnections()
             this->progressBar_->setEnabled(false);
         }
     };
-    connect(this->previewWorker_, &PreviewWorker::imageIndexesUpdated, this,
-            onImageIndexesUpdated);
+    connect(this->previewWorker_, &PreviewWorker::imgIndicesUpdated, this,
+            onImgIndicesUpdated);
 }
 
 void MainWindow::createMenus()
@@ -212,6 +215,31 @@ void MainWindow::createActions()
     this->toolsMenu_->addAction(this->actMultiLineStop_);
     connect(this->actMultiLineStop_, &QAction::triggered, this->previewWorker_,
             &PreviewWorker::stopMultiLine);
+
+    this->actCommScan = new QAction("Scan all commands", this);
+    this->actCommScan->setStatusTip("Scan all commands to update components "
+                                    "like the simulation progress bar");
+    this->toolsMenu_->addAction(this->actCommScan);
+    connect(this->actCommScan, &QAction::triggered, this, [=] {
+        emit this->previewWorker_->updateImgIndices(
+            this->editor_->toPlainText());
+    });
+
+    this->actToggleAutoCommScan_ = new QAction("Auto command scanning", this);
+    this->actToggleAutoCommScan_->setStatusTip(
+        "Automatically scan all commands when editing to update components "
+        "like the simulation progress bar");
+    this->actToggleAutoCommScan_->setCheckable(true);
+    this->actToggleAutoCommScan_->setChecked(false);
+    this->toolsMenu_->addAction(this->actToggleAutoCommScan_);
+    connect(this->actToggleAutoCommScan_, &QAction::triggered, this, [=] {
+        this->autoCommScan_ = this->actToggleAutoCommScan_->isChecked();
+        if (this->actToggleAutoCommScan_->isChecked())
+        {
+            emit this->previewWorker_->updateImgIndices(
+                this->editor_->toPlainText());
+        }
+    });
 }
 
 void MainWindow::newFile()

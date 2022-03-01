@@ -1,6 +1,7 @@
 #include "StringUtil.hpp"
 
-std::vector<QString> StringUtil::split(const QString &str, const QString &regexStr)
+std::vector<QString> StringUtil::split(const QString &str,
+                                       const QString &regexStr)
 {
     std::string stdStr = str.toStdString();
     std::vector<QString> res{};

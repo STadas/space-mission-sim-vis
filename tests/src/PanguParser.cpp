@@ -7,7 +7,8 @@ class PanguParserTest : public ::testing::Test
 protected:
     PanguParserTest()
         : parser()
-    {}
+    {
+    }
 
     PanguParser parser;
 };
