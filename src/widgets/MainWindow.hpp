@@ -4,13 +4,11 @@
 #include <QtCore>
 #include <QtWidgets>
 
-#include "PanguEditor.hpp"
+#include "Editor.hpp"
 #include "common/MessageController.hpp"
-#include "common/PanguConnection.hpp"
-#include "common/PanguWorker.hpp"
+#include "common/PreviewWorker.hpp"
 #include "common/VBoxLayout.hpp"
-#include "util/CommandUtil.hpp"
-#include "widgets/SimPreview.hpp"
+#include "widgets/CamPreview.hpp"
 
 class MainWindow : public QMainWindow
 {
@@ -21,12 +19,16 @@ public:
     ~MainWindow();
 
 private:
-    PanguWorker *panguWorker_;
-    PanguEditor *editor_;
-    SimPreview *preview_;
+    Editor *editor_;
+    CamPreview *preview_;
+    ProgressBar *progressBar_;
+
     MessageController *messageController_;
 
-    QThread *workerThread_;
+    PreviewWorker *previewWorker_;
+
+    QThread *previewWorkerThread_;
+    QThread *lintWorkerThread_;
 
     QMenu *fileMenu_;
     QMenu *toolsMenu_;

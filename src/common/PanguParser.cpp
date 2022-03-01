@@ -1,8 +1,16 @@
-#include "CommandUtil.hpp"
-#include "common/ParsedCommand.hpp"
+#include "PanguParser.hpp"
 
-CommandErr CommandUtil::parsePangu(
-    const QString &strCommand, std::unique_ptr<ParsedCommand> &parsedCommand)
+PanguParser::PanguParser(QObject *parent)
+    : QObject(parent)
+{
+}
+
+PanguParser::~PanguParser()
+{
+}
+
+CommandErr PanguParser::parse(const QString &strCommand,
+                              std::unique_ptr<ParsedCommand> &parsedCommand)
 {
     std::vector<QString> words = StringUtil::split(strCommand, ' ');
     std::vector<std::shared_ptr<Arg>> args{};

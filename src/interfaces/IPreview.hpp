@@ -7,6 +7,6 @@ class IPreview
 public:
     ~IPreview(){};
 
-    virtual void changePreview(unsigned char *data,
-                               const unsigned long &size) = 0;
+    virtual void showPreview(unsigned char *data,
+                             const unsigned long &size) = 0;
 };

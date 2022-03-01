@@ -7,15 +7,15 @@ set(SOURCE_PROJECT
         common/MessageController.hpp
         common/PanguConnection.cpp
         common/PanguConnection.hpp
-        common/PanguWorker.cpp
-        common/PanguWorker.hpp
+        common/PanguParser.cpp
+        common/PanguParser.hpp
+        common/PreviewWorker.cpp
+        common/PreviewWorker.hpp
         common/ParsedCommand.cpp
         common/ParsedCommand.hpp
         common/VBoxLayout.cpp
         common/VBoxLayout.hpp
 
-        util/CommandUtil.cpp
-        util/CommandUtil.hpp
         util/FileUtil.cpp
         util/FileUtil.hpp
         util/SocketUtil.cpp
@@ -25,12 +25,14 @@ set(SOURCE_PROJECT
         util/ThreadUtil.cpp
         util/ThreadUtil.hpp
 
+        widgets/CamPreview.cpp
+        widgets/CamPreview.hpp
         widgets/MainWindow.cpp
         widgets/MainWindow.hpp
-        widgets/PanguEditor.cpp
-        widgets/PanguEditor.hpp
-        widgets/SimPreview.cpp
-        widgets/SimPreview.hpp
+        widgets/Editor.cpp
+        widgets/Editor.hpp
+        widgets/ProgressBar.cpp
+        widgets/ProgressBar.hpp
         )
 
 source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${SOURCE_PROJECT})

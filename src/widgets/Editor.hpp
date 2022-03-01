@@ -5,13 +5,13 @@
 #include "interfaces/IEditor.hpp"
 #include "util/FileUtil.hpp"
 
-class PanguEditor : public QPlainTextEdit, IEditor
+class Editor : public QPlainTextEdit, IEditor
 {
     Q_OBJECT
 
 public:
-    PanguEditor(QWidget *parent);
-    ~PanguEditor() override;
+    Editor(QWidget *parent);
+    ~Editor() override;
 
     bool isModified() override;
     QString activeLineText() override;

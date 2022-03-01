@@ -1,30 +1,29 @@
-#include "SimPreview.hpp"
+#include "CamPreview.hpp"
 
-SimPreview::SimPreview(QWidget *parent)
+CamPreview::CamPreview(QWidget *parent)
     : QWidget(parent)
     , imgLabel_(new QLabel(this))
 {
     QLayout *layout = new VBoxLayout(this);
-    this->layout()->addWidget(imgLabel_);
     this->imgLabel_->setSizePolicy(QSizePolicy::Expanding,
                                    QSizePolicy::Expanding);
     this->imgLabel_->setMinimumSize(1, 1);
     this->imgLabel_->installEventFilter(this);
 
-    connect(this, &SimPreview::changePreview, this, &SimPreview::showPreview);
+    this->layout()->addWidget(this->imgLabel_);
 }
 
-SimPreview::~SimPreview()
+CamPreview::~CamPreview()
 {
 }
 
-void SimPreview::showPreview(unsigned char *data, const unsigned long &size)
+void CamPreview::showPreview(unsigned char *data, const unsigned long &size)
 {
     QSize oldSize = this->size();
 
     this->pm_.loadFromData(QByteArray((char *)data, size), "PNG");
-    delete data;
     this->imgLabel_->setPixmap(this->pm_);
+    delete data;
 
     QSize newSize = this->size();
 
@@ -33,7 +32,7 @@ void SimPreview::showPreview(unsigned char *data, const unsigned long &size)
     this->eventFilter(this->imgLabel_, &resizeEvent);
 }
 
-bool SimPreview::eventFilter(QObject *object, QEvent *event)
+bool CamPreview::eventFilter(QObject *object, QEvent *event)
 {
     /* https://stackoverflow.com/a/68486532 */
     if (object == this->imgLabel_ && event->type() == QEvent::Resize)
