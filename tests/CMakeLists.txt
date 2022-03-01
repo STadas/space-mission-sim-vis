@@ -2,7 +2,7 @@ project(SpaceMissionSimVis-test)
 
 set(SOURCE_TEST
     ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp
-    ${CMAKE_CURRENT_LIST_DIR}/src/CommandUtil.cpp
+    ${CMAKE_CURRENT_LIST_DIR}/src/PanguParser.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/FileUtil.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/SocketUtil.cpp
     ${CMAKE_CURRENT_LIST_DIR}/src/StringUtil.cpp

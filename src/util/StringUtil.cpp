@@ -1,14 +1,19 @@
 #include "StringUtil.hpp"
 
-std::vector<QString> StringUtil::split(const QString &str,
-                                       const char &separator)
+std::vector<QString> StringUtil::split(const QString &str, const QString &regexStr)
 {
-    std::istringstream iss(str.toStdString());
-    std::string word;
+    std::string stdStr = str.toStdString();
     std::vector<QString> res{};
-    while (std::getline(iss, word, separator))
+
+    /* https://stackoverflow.com/a/16752826 */
+    /* https://stackoverflow.com/a/42310788 */
+    std::regex rgx(regexStr.toStdString());
+    std::sregex_token_iterator strIt(stdStr.begin(), stdStr.end(), rgx, -1);
+    std::sregex_token_iterator end;
+
+    for (; strIt != end; strIt++)
     {
-        res.push_back(QString::fromStdString(word));
+        res.push_back(QString::fromStdString(*strIt));
     }
     return res;
 }
@@ -21,6 +26,5 @@ bool StringUtil::isNumeric(const QString &str)
     std::stringstream iss(stdStr);
 
     iss >> result;
-
     return !iss.fail() && iss.eof();
 }

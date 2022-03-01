@@ -10,7 +10,7 @@ class PanguParser : public QObject, IParser
     Q_OBJECT
 
 public:
-    PanguParser(QObject *parent);
+    PanguParser(QObject *parent = nullptr);
     ~PanguParser();
     CommandErr parse(const QString &strCommand,
                      std::unique_ptr<ParsedCommand> &parsedCommand) override;

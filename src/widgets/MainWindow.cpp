@@ -63,7 +63,6 @@ void MainWindow::createSignalConnections()
             onConnectionError);
 
     auto onAskLine = [=](int fromLine, int toLine, int msDelay) {
-        qDebug() << fromLine;
         this->editor_->goToLine(fromLine);
         emit this->previewWorker_->giveLine(this->editor_->activeLineText(),
                                             fromLine, toLine, msDelay);

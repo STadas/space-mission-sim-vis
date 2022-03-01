@@ -39,7 +39,7 @@ std::vector<int> PreviewWorker::imageIndexes() const
 
 void PreviewWorker::onUpdateImageIndexes(const QString &str)
 {
-    std::vector<QString> lines = StringUtil::split(str, '\n');
+    std::vector<QString> lines = StringUtil::split(str, "\\n");
     std::vector<int> newImageIndexes;
     int lineNum = 0;
 
