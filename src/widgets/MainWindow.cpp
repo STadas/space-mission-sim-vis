@@ -1,16 +1,15 @@
 #include "MainWindow.hpp"
-#include "common/MessageController.hpp"
-#include "common/PanguWorker.hpp"
-#include "widgets/PanguEditor.hpp"
-#include "widgets/SimPreview.hpp"
+#include "common/PreviewWorker.hpp"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , editor_(new PanguEditor(this))
-    , preview_(new SimPreview(this))
+    , preview_(new CamPreview(this))
+    , editor_(new Editor(this))
+    , progressBar_(new ProgressBar(this))
+    , autoCommScan_(false)
     , messageController_(new MessageController(this))
-    , workerThread_(new QThread)
-    , panguWorker_(new PanguWorker)
+    , previewWorker_(new PreviewWorker)
+    , previewWorkerThread_(new QThread)
 {
     /* As weird as this is, it needs to be done for us to be able to use the
      * enums with signals and slots. Potential for a generated source code
@@ -20,8 +19,8 @@ MainWindow::MainWindow(QWidget *parent)
     qRegisterMetaType<FileErr>("FileErr");
     qRegisterMetaType<FileQuestion>("FileQuestion");
 
-    this->panguWorker_->moveToThread(this->workerThread_);
-    this->workerThread_->start();
+    this->previewWorker_->moveToThread(this->previewWorkerThread_);
+    this->previewWorkerThread_->start();
 
     this->setCentralWidget(new QWidget(this));
     this->setStatusBar(new QStatusBar(this));
@@ -35,9 +34,13 @@ MainWindow::MainWindow(QWidget *parent)
     this->centralWidget()->layout()->addWidget(this->editor_);
 
     //TODO: refactor this to make it easier to add and remove other elements
-    QDockWidget *dock = new QDockWidget("Preview", this);
-    dock->setWidget(this->preview_);
-    this->addDockWidget(Qt::RightDockWidgetArea, dock);
+    QDockWidget *dockPreview = new QDockWidget("Simulation Preview", this);
+    dockPreview->setWidget(this->preview_);
+    this->addDockWidget(Qt::RightDockWidgetArea, dockPreview);
+
+    QDockWidget *dockProgressBar = new QDockWidget("Simulation Progress", this);
+    dockProgressBar->setWidget(this->progressBar_);
+    this->addDockWidget(Qt::RightDockWidgetArea, dockProgressBar);
 }
 
 MainWindow::~MainWindow()
@@ -46,30 +49,95 @@ MainWindow::~MainWindow()
 
 void MainWindow::createSignalConnections()
 {
-    connect(this->panguWorker_, qOverload<CommandErr>(&PanguWorker::error),
-            this, [=](CommandErr err) {
-                emit this->messageController_->error(err, this);
-            });
+    auto onCommandError = [=](CommandErr err) {
+        emit this->messageController_->error(err, this);
+    };
+    connect(this->previewWorker_, qOverload<CommandErr>(&PreviewWorker::error),
+            this, onCommandError);
 
-    connect(this->panguWorker_, qOverload<ConnectionErr>(&PanguWorker::error),
-            this, [=](ConnectionErr err) {
-                emit this->messageController_->error(err, this);
-            });
+    auto onConnectionError = [=](ConnectionErr err) {
+        emit this->messageController_->error(err, this);
+    };
+    connect(this->previewWorker_,
+            qOverload<ConnectionErr>(&PreviewWorker::error), this,
+            onConnectionError);
 
-    connect(this->panguWorker_, &PanguWorker::askLine, this,
-            [=](int fromLine, int toLine, int msDelay) {
-                this->editor_->goToLine(fromLine);
-                emit this->panguWorker_->giveLine(
-                    this->editor_->activeLineText(), fromLine, toLine, msDelay);
-            });
+    auto onAskLine = [=](int fromLine, int toLine, int msDelay) {
+        this->editor_->goToLine(fromLine);
+        emit this->previewWorker_->giveLine(this->editor_->activeLineText(),
+                                            fromLine, toLine, msDelay);
 
-    connect(this->panguWorker_, &PanguWorker::changePreview, this->preview_,
-            &SimPreview::changePreview);
+        if (this->progressBar_->value() != fromLine)
+        {
+            auto indices = this->previewWorker_->imgIndices();
+            auto it = std::find(indices.begin(), indices.end(), fromLine);
+            if (it != indices.end())
+            {
+                this->progressBar_->blockSignals(true);
+                this->progressBar_->setValue(it - indices.begin());
+                this->progressBar_->blockSignals(false);
+            }
+        }
+    };
+    connect(this->previewWorker_, &PreviewWorker::askLine, this, onAskLine);
 
-    connect(this->panguWorker_, &PanguWorker::multiLineDone, this, [=] {
-        this->panguWorker_->setCancelled(false);
+    connect(this->previewWorker_, &PreviewWorker::changePreview, this->preview_,
+            &CamPreview::showPreview);
+
+    auto onMultiLineDone = [=] {
         this->editor_->setReadOnly(false);
-    });
+    };
+    connect(this->previewWorker_, &PreviewWorker::multiLineDone, this,
+            onMultiLineDone);
+
+    auto onPBarChanged = [=](int imgIdx) {
+        this->previewWorker_->setCancelled(true);
+        if (this->previewWorker_->previewLock()->available())
+        {
+            emit this->previewWorker_->askLine(
+                this->previewWorker_->imgIndices()[imgIdx]);
+        }
+        else
+        {
+            this->editor_->goToLine(this->previewWorker_->imgIndices()[imgIdx]);
+        }
+    };
+    connect(this->progressBar_, &ProgressBar::valueChanged, this,
+            onPBarChanged);
+
+    auto onPBarReleased = [=] {
+        this->previewWorker_->setCancelled(true);
+        emit this->previewWorker_->askLine(
+            this->previewWorker_->imgIndices()[this->progressBar_->value()]);
+    };
+    connect(this->progressBar_, &ProgressBar::sliderReleased, this,
+            onPBarReleased);
+
+    auto onEditorContentChanged = [=] {
+        if (autoCommScan_)
+        {
+            emit this->previewWorker_->updateImgIndices(
+                this->editor_->toPlainText());
+        }
+    };
+    connect(this->editor_->document(), &QTextDocument::contentsChanged, this,
+            onEditorContentChanged);
+
+    auto onImgIndicesUpdated = [=] {
+        if (this->previewWorker_->imgIndices().size() > 0)
+        {
+            this->progressBar_->setEnabled(true);
+            this->progressBar_->setMaximum(
+                this->previewWorker_->imgIndices().size() - 1);
+        }
+        else
+        {
+            this->progressBar_->setMaximum(0);
+            this->progressBar_->setEnabled(false);
+        }
+    };
+    connect(this->previewWorker_, &PreviewWorker::imgIndicesUpdated, this,
+            onImgIndicesUpdated);
 }
 
 void MainWindow::createMenus()
@@ -115,8 +183,11 @@ void MainWindow::createActions()
         "Execute the command in the currently active line");
     this->toolsMenu_->addAction(this->actActiveLineExec_);
     connect(this->actActiveLineExec_, &QAction::triggered, this, [=] {
-        if (this->panguWorker_->previewLock->available())
-            emit this->panguWorker_->giveLine(this->editor_->activeLineText());
+        if (this->previewWorker_->previewLock()->available())
+        {
+            emit this->previewWorker_->giveLine(
+                this->editor_->activeLineText());
+        }
     });
 
     this->actMultiLineStart_ = new QAction("Step through commands", this);
@@ -125,7 +196,7 @@ void MainWindow::createActions()
         "currently active line");
     this->toolsMenu_->addAction(this->actMultiLineStart_);
     connect(this->actMultiLineStart_, &QAction::triggered, this, [=] {
-        if (!this->panguWorker_->previewLock->available())
+        if (!this->previewWorker_->previewLock()->available())
             return;
 
         bool ok;
@@ -136,7 +207,7 @@ void MainWindow::createActions()
 
         this->editor_->setReadOnly(true);
 
-        emit this->panguWorker_->doMultiLine(
+        emit this->previewWorker_->doMultiLine(
             this->editor_->textCursor().blockNumber(),
             this->editor_->document()->lineCount(), msDelay);
     });
@@ -145,8 +216,33 @@ void MainWindow::createActions()
     this->actMultiLineStop_->setStatusTip(
         "Stop the currently active command stepping");
     this->toolsMenu_->addAction(this->actMultiLineStop_);
-    connect(this->actMultiLineStop_, &QAction::triggered, this->panguWorker_,
-            &PanguWorker::stopMultiLine);
+    connect(this->actMultiLineStop_, &QAction::triggered, this->previewWorker_,
+            &PreviewWorker::stopMultiLine);
+
+    this->actCommScan = new QAction("Scan all commands", this);
+    this->actCommScan->setStatusTip("Scan all commands to update components "
+                                    "like the simulation progress bar");
+    this->toolsMenu_->addAction(this->actCommScan);
+    connect(this->actCommScan, &QAction::triggered, this, [=] {
+        emit this->previewWorker_->updateImgIndices(
+            this->editor_->toPlainText());
+    });
+
+    this->actToggleAutoCommScan_ = new QAction("Auto command scanning", this);
+    this->actToggleAutoCommScan_->setStatusTip(
+        "Automatically scan all commands when editing to update components "
+        "like the simulation progress bar");
+    this->actToggleAutoCommScan_->setCheckable(true);
+    this->actToggleAutoCommScan_->setChecked(false);
+    this->toolsMenu_->addAction(this->actToggleAutoCommScan_);
+    connect(this->actToggleAutoCommScan_, &QAction::triggered, this, [=] {
+        this->autoCommScan_ = this->actToggleAutoCommScan_->isChecked();
+        if (this->actToggleAutoCommScan_->isChecked())
+        {
+            emit this->previewWorker_->updateImgIndices(
+                this->editor_->toPlainText());
+        }
+    });
 }
 
 void MainWindow::newFile()

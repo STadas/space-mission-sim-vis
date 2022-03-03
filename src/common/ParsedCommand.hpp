@@ -8,12 +8,12 @@ typedef std::variant<std::string, long, double> Arg;
 class ParsedCommand
 {
 public:
-    ParsedCommand(QString name, bool expectsImage,
+    ParsedCommand(QString name, bool expectsImg,
                   std::vector<std::shared_ptr<Arg>> args);
 
-    bool expectsImage() const
+    bool expectsImg() const
     {
-        return this->expectsImage_;
+        return this->expectsImg_;
     };
 
     QString name() const
@@ -27,6 +27,6 @@ public:
 
 private:
     QString name_;
-    bool expectsImage_;
+    bool expectsImg_;
     std::vector<std::shared_ptr<Arg>> args_;
 };

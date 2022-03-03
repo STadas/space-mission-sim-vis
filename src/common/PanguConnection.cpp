@@ -133,7 +133,7 @@ ConnectionErr PanguConnection::sendCommand(
         return err;
     }
 
-    if (!command->expectsImage())
+    if (!command->expectsImg())
     {
         return ConnectionErr::OK;
     }
