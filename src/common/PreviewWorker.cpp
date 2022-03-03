@@ -69,6 +69,7 @@ void PreviewWorker::linePreReturn(int currLine, int toLine, int msDelay,
     {
         emit lineDone();
         this->previewLock()->release();
+        this->setCancelled(false);
         return;
     }
 
@@ -78,6 +79,7 @@ void PreviewWorker::linePreReturn(int currLine, int toLine, int msDelay,
         emit lineDone();
         emit this->multiLineDone();
         this->previewLock()->release();
+        this->setCancelled(false);
         return;
     }
 

@@ -85,7 +85,6 @@ void MainWindow::createSignalConnections()
             &CamPreview::showPreview);
 
     auto onMultiLineDone = [=] {
-        this->previewWorker_->setCancelled(false);
         this->editor_->setReadOnly(false);
     };
     connect(this->previewWorker_, &PreviewWorker::multiLineDone, this,
@@ -97,6 +96,10 @@ void MainWindow::createSignalConnections()
         {
             emit this->previewWorker_->askLine(
                 this->previewWorker_->imgIndices()[imgIdx]);
+        }
+        else
+        {
+            this->editor_->goToLine(this->previewWorker_->imgIndices()[imgIdx]);
         }
     };
     connect(this->progressBar_, &ProgressBar::valueChanged, this,
