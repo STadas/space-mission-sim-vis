@@ -44,7 +44,6 @@ private:
     QAction *actMultiLineStop_;
 
     QAction *actCommScan;
-    ;
     QAction *actToggleAutoCommScan_;
 
     void createMenus();
