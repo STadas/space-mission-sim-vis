@@ -20,7 +20,7 @@ public:
 
 private:
     Editor *editor_;
-    CamPreview *preview_;
+    CamPreview *camPreview_;
     ProgressBar *progressBar_;
 
     bool autoCommScan_;
@@ -33,6 +33,8 @@ private:
 
     QMenu *fileMenu_;
     QMenu *toolsMenu_;
+    QMenu *commandsMenu_;
+    QMenu *serverMenu_;
 
     QAction *actFileNew_;
     QAction *actFileOpen_;
@@ -43,16 +45,33 @@ private:
     QAction *actMultiLineStart_;
     QAction *actMultiLineStop_;
 
-    QAction *actCommScan;
+    QAction *actCommScan_;
     QAction *actToggleAutoCommScan_;
+
+    QAction *actStartServer_;
+    QAction *actStopServer_;
+    QAction *actConnectToServer_;
+    QAction *actDisconnectFromServer_;
 
     void createMenus();
     void createActions();
     void createSignalConnections();
 
 private slots:
-    void newFile();
-    void openFile();
-    void saveFileAs();
-    void saveFile();
+    void onActFileNew();
+    void onActFileOpen();
+    void onActFileSave();
+    void onActFileSaveAs();
+
+    void onActActiveLineExec();
+    void onActMultiLineStart();
+    void onActMultiLineStop();
+
+    void onActCommScan();
+    void onActToggleAutoCommScan();
+
+    void onActStartServer();
+    void onActStopServer();
+    void onActConnectToServer();
+    void onActDisconnectFromServer();
 };

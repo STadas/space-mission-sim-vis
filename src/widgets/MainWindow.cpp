@@ -3,7 +3,7 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , preview_(new CamPreview(this))
+    , camPreview_(new CamPreview(this))
     , editor_(new Editor(this))
     , progressBar_(new ProgressBar(this))
     , autoCommScan_(false)
@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     //TODO: refactor this to make it easier to add and remove other elements
     QDockWidget *dockPreview = new QDockWidget("Simulation Preview", this);
-    dockPreview->setWidget(this->preview_);
+    dockPreview->setWidget(this->camPreview_);
     this->addDockWidget(Qt::RightDockWidgetArea, dockPreview);
 
     QDockWidget *dockProgressBar = new QDockWidget("Simulation Progress", this);
@@ -81,8 +81,7 @@ void MainWindow::createSignalConnections()
     };
     connect(this->previewWorker_, &PreviewWorker::askLine, this, onAskLine);
 
-    connect(this->previewWorker_, &PreviewWorker::changePreview, this->preview_,
-            &CamPreview::showPreview);
+    connect(this->previewWorker_, &PreviewWorker::changePreview, this->camPreview_, &CamPreview::showPreview);
 
     auto onMultiLineDone = [=] {
         this->editor_->setReadOnly(false);
@@ -147,6 +146,12 @@ void MainWindow::createMenus()
 
     this->toolsMenu_ = new QMenu("Tools", this);
     this->menuBar()->addMenu(this->toolsMenu_);
+
+    this->commandsMenu_ = new QMenu("Commands", this);
+    this->toolsMenu_->addMenu(this->commandsMenu_);
+
+    this->serverMenu_ = new QMenu("Server", this);
+    this->toolsMenu_->addMenu(this->serverMenu_);
 }
 
 void MainWindow::createActions()
@@ -155,78 +160,50 @@ void MainWindow::createActions()
     this->actFileNew_->setShortcuts(QKeySequence::New);
     this->actFileNew_->setStatusTip("Start editing a new file");
     this->fileMenu_->addAction(actFileNew_);
-    connect(this->actFileNew_, &QAction::triggered, this, &MainWindow::newFile);
+    connect(this->actFileNew_, &QAction::triggered, this, &MainWindow::onActFileNew);
 
     this->actFileOpen_ = new QAction("Open file", this);
     this->actFileOpen_->setShortcuts(QKeySequence::Open);
     this->actFileOpen_->setStatusTip("Open a file to edit");
     this->fileMenu_->addAction(actFileOpen_);
-    connect(this->actFileOpen_, &QAction::triggered, this,
-            &MainWindow::openFile);
+    connect(this->actFileOpen_, &QAction::triggered, this, &MainWindow::onActFileOpen);
 
     this->actFileSaveAs_ = new QAction("Save as", this);
     this->actFileSaveAs_->setShortcuts(QKeySequence::SaveAs);
     this->actFileSaveAs_->setStatusTip("Save as a new file");
     this->fileMenu_->addAction(actFileSaveAs_);
-    connect(this->actFileSaveAs_, &QAction::triggered, this,
-            &MainWindow::saveFileAs);
+    connect(this->actFileSaveAs_, &QAction::triggered, this, &MainWindow::onActFileSaveAs);
 
     this->actFileSave_ = new QAction("Save", this);
     this->actFileSave_->setShortcuts(QKeySequence::Save);
     this->actFileSave_->setStatusTip("Save the currently opened file");
     this->fileMenu_->addAction(actFileSave_);
-    connect(this->actFileSave_, &QAction::triggered, this,
-            &MainWindow::saveFile);
+    connect(this->actFileSave_, &QAction::triggered, this, &MainWindow::onActFileSave);
 
-    this->actActiveLineExec_ = new QAction("Execute command", this);
+    this->actActiveLineExec_ = new QAction("Execute line", this);
     this->actActiveLineExec_->setStatusTip(
         "Execute the command in the currently active line");
-    this->toolsMenu_->addAction(this->actActiveLineExec_);
-    connect(this->actActiveLineExec_, &QAction::triggered, this, [=] {
-        if (this->previewWorker_->previewLock()->available())
-        {
-            emit this->previewWorker_->giveLine(
-                this->editor_->activeLineText());
-        }
-    });
+    this->commandsMenu_->addAction(this->actActiveLineExec_);
+    connect(this->actActiveLineExec_, &QAction::triggered, this, &MainWindow::onActActiveLineExec);
 
-    this->actMultiLineStart_ = new QAction("Step through commands", this);
+    this->actMultiLineStart_ = new QAction("Step through lines", this);
     this->actMultiLineStart_->setStatusTip(
         "Step through and execute all commands (with delay) starting with the "
         "currently active line");
-    this->toolsMenu_->addAction(this->actMultiLineStart_);
-    connect(this->actMultiLineStart_, &QAction::triggered, this, [=] {
-        if (!this->previewWorker_->previewLock()->available())
-            return;
-
-        bool ok;
-        int msDelay = QInputDialog::getInt(this, "Command delay", "Delay (ms)",
-                                           1000, 0, INT32_MAX, 100, &ok);
-        if (!ok)
-            return;
-
-        this->editor_->setReadOnly(true);
-
-        emit this->previewWorker_->doMultiLine(
-            this->editor_->textCursor().blockNumber(),
-            this->editor_->document()->lineCount(), msDelay);
-    });
+    this->commandsMenu_->addAction(this->actMultiLineStart_);
+    connect(this->actMultiLineStart_, &QAction::triggered, this, &MainWindow::onActMultiLineStart);
 
     this->actMultiLineStop_ = new QAction("Stop stepping", this);
     this->actMultiLineStop_->setStatusTip(
         "Stop the currently active command stepping");
-    this->toolsMenu_->addAction(this->actMultiLineStop_);
-    connect(this->actMultiLineStop_, &QAction::triggered, this->previewWorker_,
-            &PreviewWorker::stopMultiLine);
+    this->commandsMenu_->addAction(this->actMultiLineStop_);
+    connect(this->actMultiLineStop_, &QAction::triggered, this, &MainWindow::onActMultiLineStop);
 
-    this->actCommScan = new QAction("Scan all commands", this);
-    this->actCommScan->setStatusTip("Scan all commands to update components "
+    this->actCommScan_ = new QAction("Scan all commands", this);
+    this->actCommScan_->setStatusTip("Scan all commands to update components "
                                     "like the simulation progress bar");
-    this->toolsMenu_->addAction(this->actCommScan);
-    connect(this->actCommScan, &QAction::triggered, this, [=] {
-        emit this->previewWorker_->updateImgIndices(
-            this->editor_->toPlainText());
-    });
+    this->commandsMenu_->addAction(this->actCommScan_);
+    connect(this->actCommScan_, &QAction::triggered, this, &MainWindow::onActCommScan);
 
     this->actToggleAutoCommScan_ = new QAction("Auto command scanning", this);
     this->actToggleAutoCommScan_->setStatusTip(
@@ -234,18 +211,31 @@ void MainWindow::createActions()
         "like the simulation progress bar");
     this->actToggleAutoCommScan_->setCheckable(true);
     this->actToggleAutoCommScan_->setChecked(false);
-    this->toolsMenu_->addAction(this->actToggleAutoCommScan_);
-    connect(this->actToggleAutoCommScan_, &QAction::triggered, this, [=] {
-        this->autoCommScan_ = this->actToggleAutoCommScan_->isChecked();
-        if (this->actToggleAutoCommScan_->isChecked())
-        {
-            emit this->previewWorker_->updateImgIndices(
-                this->editor_->toPlainText());
-        }
-    });
+    this->commandsMenu_->addAction(this->actToggleAutoCommScan_);
+    connect(this->actToggleAutoCommScan_, &QAction::triggered, this, &MainWindow::onActToggleAutoCommScan);
+
+    this->actStartServer_ = new QAction("Start server", this);
+    this->actStartServer_->setStatusTip("Start and connect to a server to send commands to");
+    this->serverMenu_->addAction(this->actStartServer_);
+    connect(this->actStartServer_, &QAction::triggered, this, &MainWindow::onActStartServer);
+
+    this->actStopServer_ = new QAction("Stop server", this);
+    this->actStopServer_->setStatusTip("Disconnect and stop the currently used server");
+    this->serverMenu_->addAction(this->actStopServer_);
+    connect(this->actStopServer_, &QAction::triggered, this, &MainWindow::onActStopServer);
+
+    this->actConnectToServer_ = new QAction("Connect to server", this);
+    this->actConnectToServer_->setStatusTip("Connect to the currently used server");
+    this->serverMenu_->addAction(this->actConnectToServer_);
+    connect(this->actConnectToServer_, &QAction::triggered, this, &MainWindow::onActConnectToServer);
+
+    this->actDisconnectFromServer_ = new QAction("Disconnect from server", this);
+    this->actDisconnectFromServer_->setStatusTip("Disconnect from the currently used server without stopping it");
+    this->serverMenu_->addAction(this->actDisconnectFromServer_);
+    connect(this->actDisconnectFromServer_, &QAction::triggered, this, &MainWindow::onActDisconnectFromServer);
 }
 
-void MainWindow::newFile()
+void MainWindow::onActFileNew()
 {
     if (this->editor_->isModified())
     {
@@ -260,7 +250,7 @@ void MainWindow::newFile()
     this->editor_->clear();
 }
 
-void MainWindow::openFile()
+void MainWindow::onActFileOpen()
 {
     if (this->editor_->isModified())
     {
@@ -278,7 +268,7 @@ void MainWindow::openFile()
     };
 }
 
-void MainWindow::saveFileAs()
+void MainWindow::onActFileSaveAs()
 {
     if (this->editor_->saveAs())
     {
@@ -286,10 +276,72 @@ void MainWindow::saveFileAs()
     }
 }
 
-void MainWindow::saveFile()
+void MainWindow::onActFileSave()
 {
     if (this->editor_->save())
     {
         emit this->messageController_->error(FileErr::SAVE_FAIL, this);
     }
+}
+
+void MainWindow::onActActiveLineExec()
+{
+    if (!this->previewWorker_->previewLock()->available())
+        return;
+
+    emit this->previewWorker_->giveLine(this->editor_->activeLineText());
+}
+
+void MainWindow::onActMultiLineStart()
+{
+    if (!this->previewWorker_->previewLock()->available())
+        return;
+
+    bool ok;
+    int msDelay = QInputDialog::getInt(this, "Command delay", "Delay (ms)",
+                                       1000, 0, INT32_MAX, 100, &ok);
+    if (!ok)
+        return;
+
+    this->editor_->setReadOnly(true);
+
+    emit this->previewWorker_->doMultiLine(
+        this->editor_->textCursor().blockNumber(),
+        this->editor_->document()->lineCount(), msDelay);
+}
+
+void MainWindow::onActMultiLineStop()
+{
+    emit this->previewWorker_->stopMultiLine();
+}
+
+void MainWindow::onActCommScan()
+{
+    emit this->previewWorker_->updateImgIndices(this->editor_->toPlainText());
+}
+
+void MainWindow::onActToggleAutoCommScan()
+{
+    this->autoCommScan_ = this->actToggleAutoCommScan_->isChecked();
+    if (this->actToggleAutoCommScan_->isChecked())
+    {
+        emit this->previewWorker_->updateImgIndices(
+            this->editor_->toPlainText());
+    }
+}
+
+void MainWindow::onActStartServer()
+{
+}
+
+void MainWindow::onActStopServer()
+{
+}
+
+void MainWindow::onActConnectToServer()
+{
+}
+
+void MainWindow::onActDisconnectFromServer()
+{
 }
