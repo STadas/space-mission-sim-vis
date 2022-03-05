@@ -49,94 +49,33 @@ MainWindow::~MainWindow()
 
 void MainWindow::createSignalConnections()
 {
-    auto onCommandError = [=](CommandErr err) {
-        emit this->messageController_->error(err, this);
-    };
     connect(this->previewWorker_, qOverload<CommandErr>(&PreviewWorker::error),
-            this, onCommandError);
+            this, &MainWindow::onCommandError);
 
-    auto onConnectionError = [=](ConnectionErr err) {
-        emit this->messageController_->error(err, this);
-    };
     connect(this->previewWorker_,
             qOverload<ConnectionErr>(&PreviewWorker::error), this,
-            onConnectionError);
+            &MainWindow::onConnectionError);
 
-    auto onAskLine = [=](int fromLine, int toLine, int msDelay) {
-        this->editor_->goToLine(fromLine);
-        emit this->previewWorker_->giveLine(this->editor_->activeLineText(),
-                                            fromLine, toLine, msDelay);
+    connect(this->previewWorker_, &PreviewWorker::askLine, this,
+            &MainWindow::onAskLine);
 
-        if (this->progressBar_->value() != fromLine)
-        {
-            auto indices = this->previewWorker_->imgIndices();
-            auto it = std::find(indices.begin(), indices.end(), fromLine);
-            if (it != indices.end())
-            {
-                this->progressBar_->blockSignals(true);
-                this->progressBar_->setValue(it - indices.begin());
-                this->progressBar_->blockSignals(false);
-            }
-        }
-    };
-    connect(this->previewWorker_, &PreviewWorker::askLine, this, onAskLine);
-
-    connect(this->previewWorker_, &PreviewWorker::changePreview, this->camPreview_, &CamPreview::showPreview);
-
-    auto onMultiLineDone = [=] {
-        this->editor_->setReadOnly(false);
-    };
     connect(this->previewWorker_, &PreviewWorker::multiLineDone, this,
-            onMultiLineDone);
+            &MainWindow::onMultiLineDone);
 
-    auto onPBarChanged = [=](int imgIdx) {
-        this->previewWorker_->setCancelled(true);
-        if (this->previewWorker_->previewLock()->available())
-        {
-            emit this->previewWorker_->askLine(
-                this->previewWorker_->imgIndices()[imgIdx]);
-        }
-        else
-        {
-            this->editor_->goToLine(this->previewWorker_->imgIndices()[imgIdx]);
-        }
-    };
+    connect(this->previewWorker_, &PreviewWorker::changePreview, this,
+            &MainWindow::onChangePreview);
+
     connect(this->progressBar_, &ProgressBar::valueChanged, this,
-            onPBarChanged);
+            &MainWindow::onPBarChanged);
 
-    auto onPBarReleased = [=] {
-        this->previewWorker_->setCancelled(true);
-        emit this->previewWorker_->askLine(
-            this->previewWorker_->imgIndices()[this->progressBar_->value()]);
-    };
     connect(this->progressBar_, &ProgressBar::sliderReleased, this,
-            onPBarReleased);
+            &MainWindow::onPBarReleased);
 
-    auto onEditorContentChanged = [=] {
-        if (autoCommScan_)
-        {
-            emit this->previewWorker_->updateImgIndices(
-                this->editor_->toPlainText());
-        }
-    };
-    connect(this->editor_->document(), &QTextDocument::contentsChanged, this,
-            onEditorContentChanged);
-
-    auto onImgIndicesUpdated = [=] {
-        if (this->previewWorker_->imgIndices().size() > 0)
-        {
-            this->progressBar_->setEnabled(true);
-            this->progressBar_->setMaximum(
-                this->previewWorker_->imgIndices().size() - 1);
-        }
-        else
-        {
-            this->progressBar_->setMaximum(0);
-            this->progressBar_->setEnabled(false);
-        }
-    };
     connect(this->previewWorker_, &PreviewWorker::imgIndicesUpdated, this,
-            onImgIndicesUpdated);
+            &MainWindow::onImgIndicesUpdated);
+
+    connect(this->editor_->document(), &QTextDocument::contentsChanged, this,
+            &MainWindow::onEditorContentChanged);
 }
 
 void MainWindow::createMenus()
@@ -160,50 +99,58 @@ void MainWindow::createActions()
     this->actFileNew_->setShortcuts(QKeySequence::New);
     this->actFileNew_->setStatusTip("Start editing a new file");
     this->fileMenu_->addAction(actFileNew_);
-    connect(this->actFileNew_, &QAction::triggered, this, &MainWindow::onActFileNew);
+    connect(this->actFileNew_, &QAction::triggered, this,
+            &MainWindow::onActFileNew);
 
     this->actFileOpen_ = new QAction("Open file", this);
     this->actFileOpen_->setShortcuts(QKeySequence::Open);
     this->actFileOpen_->setStatusTip("Open a file to edit");
     this->fileMenu_->addAction(actFileOpen_);
-    connect(this->actFileOpen_, &QAction::triggered, this, &MainWindow::onActFileOpen);
+    connect(this->actFileOpen_, &QAction::triggered, this,
+            &MainWindow::onActFileOpen);
 
     this->actFileSaveAs_ = new QAction("Save as", this);
     this->actFileSaveAs_->setShortcuts(QKeySequence::SaveAs);
     this->actFileSaveAs_->setStatusTip("Save as a new file");
     this->fileMenu_->addAction(actFileSaveAs_);
-    connect(this->actFileSaveAs_, &QAction::triggered, this, &MainWindow::onActFileSaveAs);
+    connect(this->actFileSaveAs_, &QAction::triggered, this,
+            &MainWindow::onActFileSaveAs);
 
     this->actFileSave_ = new QAction("Save", this);
     this->actFileSave_->setShortcuts(QKeySequence::Save);
     this->actFileSave_->setStatusTip("Save the currently opened file");
     this->fileMenu_->addAction(actFileSave_);
-    connect(this->actFileSave_, &QAction::triggered, this, &MainWindow::onActFileSave);
+    connect(this->actFileSave_, &QAction::triggered, this,
+            &MainWindow::onActFileSave);
 
     this->actActiveLineExec_ = new QAction("Execute line", this);
     this->actActiveLineExec_->setStatusTip(
         "Execute the command in the currently active line");
     this->commandsMenu_->addAction(this->actActiveLineExec_);
-    connect(this->actActiveLineExec_, &QAction::triggered, this, &MainWindow::onActActiveLineExec);
+    connect(this->actActiveLineExec_, &QAction::triggered, this,
+            &MainWindow::onActActiveLineExec);
 
     this->actMultiLineStart_ = new QAction("Step through lines", this);
     this->actMultiLineStart_->setStatusTip(
         "Step through and execute all commands (with delay) starting with the "
         "currently active line");
     this->commandsMenu_->addAction(this->actMultiLineStart_);
-    connect(this->actMultiLineStart_, &QAction::triggered, this, &MainWindow::onActMultiLineStart);
+    connect(this->actMultiLineStart_, &QAction::triggered, this,
+            &MainWindow::onActMultiLineStart);
 
     this->actMultiLineStop_ = new QAction("Stop stepping", this);
     this->actMultiLineStop_->setStatusTip(
         "Stop the currently active command stepping");
     this->commandsMenu_->addAction(this->actMultiLineStop_);
-    connect(this->actMultiLineStop_, &QAction::triggered, this, &MainWindow::onActMultiLineStop);
+    connect(this->actMultiLineStop_, &QAction::triggered, this,
+            &MainWindow::onActMultiLineStop);
 
     this->actCommScan_ = new QAction("Scan all commands", this);
     this->actCommScan_->setStatusTip("Scan all commands to update components "
-                                    "like the simulation progress bar");
+                                     "like the simulation progress bar");
     this->commandsMenu_->addAction(this->actCommScan_);
-    connect(this->actCommScan_, &QAction::triggered, this, &MainWindow::onActCommScan);
+    connect(this->actCommScan_, &QAction::triggered, this,
+            &MainWindow::onActCommScan);
 
     this->actToggleAutoCommScan_ = new QAction("Auto command scanning", this);
     this->actToggleAutoCommScan_->setStatusTip(
@@ -212,27 +159,37 @@ void MainWindow::createActions()
     this->actToggleAutoCommScan_->setCheckable(true);
     this->actToggleAutoCommScan_->setChecked(false);
     this->commandsMenu_->addAction(this->actToggleAutoCommScan_);
-    connect(this->actToggleAutoCommScan_, &QAction::triggered, this, &MainWindow::onActToggleAutoCommScan);
+    connect(this->actToggleAutoCommScan_, &QAction::triggered, this,
+            &MainWindow::onActToggleAutoCommScan);
 
     this->actStartServer_ = new QAction("Start server", this);
-    this->actStartServer_->setStatusTip("Start and connect to a server to send commands to");
+    this->actStartServer_->setStatusTip(
+        "Start and connect to a server to send commands to");
     this->serverMenu_->addAction(this->actStartServer_);
-    connect(this->actStartServer_, &QAction::triggered, this, &MainWindow::onActStartServer);
+    connect(this->actStartServer_, &QAction::triggered, this,
+            &MainWindow::onActStartServer);
 
     this->actStopServer_ = new QAction("Stop server", this);
-    this->actStopServer_->setStatusTip("Disconnect and stop the currently used server");
+    this->actStopServer_->setStatusTip(
+        "Disconnect and stop the currently used server");
     this->serverMenu_->addAction(this->actStopServer_);
-    connect(this->actStopServer_, &QAction::triggered, this, &MainWindow::onActStopServer);
+    connect(this->actStopServer_, &QAction::triggered, this,
+            &MainWindow::onActStopServer);
 
     this->actConnectToServer_ = new QAction("Connect to server", this);
-    this->actConnectToServer_->setStatusTip("Connect to the currently used server");
+    this->actConnectToServer_->setStatusTip(
+        "Connect to the currently used server");
     this->serverMenu_->addAction(this->actConnectToServer_);
-    connect(this->actConnectToServer_, &QAction::triggered, this, &MainWindow::onActConnectToServer);
+    connect(this->actConnectToServer_, &QAction::triggered, this,
+            &MainWindow::onActConnectToServer);
 
-    this->actDisconnectFromServer_ = new QAction("Disconnect from server", this);
-    this->actDisconnectFromServer_->setStatusTip("Disconnect from the currently used server without stopping it");
+    this->actDisconnectFromServer_ =
+        new QAction("Disconnect from server", this);
+    this->actDisconnectFromServer_->setStatusTip(
+        "Disconnect from the currently used server without stopping it");
     this->serverMenu_->addAction(this->actDisconnectFromServer_);
-    connect(this->actDisconnectFromServer_, &QAction::triggered, this, &MainWindow::onActDisconnectFromServer);
+    connect(this->actDisconnectFromServer_, &QAction::triggered, this,
+            &MainWindow::onActDisconnectFromServer);
 }
 
 void MainWindow::onActFileNew()
@@ -344,4 +301,86 @@ void MainWindow::onActConnectToServer()
 
 void MainWindow::onActDisconnectFromServer()
 {
+}
+
+void MainWindow::onCommandError(CommandErr err)
+{
+    emit this->messageController_->error(err, this);
+}
+
+void MainWindow::onConnectionError(ConnectionErr err)
+{
+    emit this->messageController_->error(err, this);
+}
+
+void MainWindow::onAskLine(int fromLine, int toLine, int msDelay)
+{
+    this->editor_->goToLine(fromLine);
+    emit this->previewWorker_->giveLine(this->editor_->activeLineText(),
+                                        fromLine, toLine, msDelay);
+
+    if (this->progressBar_->value() != fromLine)
+    {
+        auto indices = this->previewWorker_->imgIndices();
+        auto it = std::find(indices.begin(), indices.end(), fromLine);
+        if (it != indices.end())
+        {
+            this->progressBar_->blockSignals(true);
+            this->progressBar_->setValue(it - indices.begin());
+            this->progressBar_->blockSignals(false);
+        }
+    }
+}
+
+void MainWindow::onMultiLineDone()
+{
+    this->editor_->setReadOnly(false);
+}
+
+void MainWindow::onChangePreview(unsigned char *data, const unsigned long &size)
+{
+    this->camPreview_->showPreview(data, size);
+}
+
+void MainWindow::onPBarChanged(int imgIndex)
+{
+    this->previewWorker_->setCancelled(true);
+    if (this->previewWorker_->previewLock()->available())
+    {
+        emit this->previewWorker_->askLine(
+            this->previewWorker_->imgIndices()[imgIndex]);
+    }
+    else
+    {
+        this->editor_->goToLine(this->previewWorker_->imgIndices()[imgIndex]);
+    }
+}
+
+void MainWindow::onPBarReleased()
+{
+    this->previewWorker_->setCancelled(true);
+    emit this->previewWorker_->askLine(
+        this->previewWorker_->imgIndices()[this->progressBar_->value()]);
+}
+
+void MainWindow::onImgIndicesUpdated()
+{
+    if (this->previewWorker_->imgIndices().size() > 0)
+    {
+        this->progressBar_->setEnabled(true);
+        this->progressBar_->setMaximum(
+            this->previewWorker_->imgIndices().size() - 1);
+    }
+    else
+    {
+        this->progressBar_->setMaximum(0);
+        this->progressBar_->setEnabled(false);
+    }
+}
+
+void MainWindow::onEditorContentChanged()
+{
+    if (autoCommScan_)
+        emit this->previewWorker_->updateImgIndices(
+            this->editor_->toPlainText());
 }

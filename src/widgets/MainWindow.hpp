@@ -74,4 +74,17 @@ private slots:
     void onActStopServer();
     void onActConnectToServer();
     void onActDisconnectFromServer();
+
+    void onCommandError(CommandErr err);
+    void onConnectionError(ConnectionErr err);
+
+    void onAskLine(int fromLine, int toLine, int msDelay);
+    void onMultiLineDone();
+    void onChangePreview(unsigned char *data, const unsigned long &size);
+
+    void onPBarChanged(int imgIndex);
+    void onPBarReleased();
+    void onImgIndicesUpdated();
+
+    void onEditorContentChanged();
 };
