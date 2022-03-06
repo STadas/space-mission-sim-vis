@@ -6,6 +6,7 @@
 
 #include "Editor.hpp"
 #include "common/MessageController.hpp"
+#include "common/PanguServerProcess.hpp"
 #include "common/PreviewWorker.hpp"
 #include "common/VBoxLayout.hpp"
 #include "widgets/CamPreview.hpp"
@@ -28,8 +29,9 @@ private:
     MessageController *messageController_;
 
     PreviewWorker *previewWorker_;
-
     QThread *previewWorkerThread_;
+
+    PanguServerProcess *serverProcess_;
 
     QMenu *fileMenu_;
     QMenu *toolsMenu_;

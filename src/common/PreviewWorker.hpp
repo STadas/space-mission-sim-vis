@@ -19,6 +19,8 @@ public:
 
     void setCancelled(const bool &cancelled);
 
+    PanguConnection *connection();
+
     QSemaphore *previewLock() const;
     std::vector<int> imgIndices() const;
 
@@ -28,7 +30,6 @@ private:
 
     QSemaphore *previewLock_;
     bool isCancelled_;
-    bool processingPreview_;
     std::vector<int> imgIndices_;
 
     void linePreReturn(int currLine, int toLine, int msDelay, CommandErr err);
@@ -54,7 +55,7 @@ signals:
 private slots:
     void onGiveLine(QString lineStr, int currLine, int toLine, int msDelay);
 
-    void onUpdateImgIndices(const QString &str);
-
     void onStopMultiLine();
+
+    void onUpdateImgIndices(const QString &str);
 };

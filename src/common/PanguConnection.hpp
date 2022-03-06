@@ -17,6 +17,7 @@ public:
 
     ConnectionErr connect() override;
     ConnectionErr disconnect() override;
+
     ConnectionErr sendCommand(std::unique_ptr<ParsedCommand> &command,
                               unsigned char *&img,
                               unsigned long &size) override;

@@ -9,6 +9,8 @@ set(SOURCE_PROJECT
         common/PanguConnection.hpp
         common/PanguParser.cpp
         common/PanguParser.hpp
+        common/PanguServerProcess.cpp
+        common/PanguServerProcess.hpp
         common/PreviewWorker.cpp
         common/PreviewWorker.hpp
         common/ParsedCommand.cpp

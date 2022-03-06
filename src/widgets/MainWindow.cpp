@@ -1,5 +1,5 @@
 #include "MainWindow.hpp"
-#include "common/PreviewWorker.hpp"
+#include "common/PanguServerProcess.hpp"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -8,8 +8,9 @@ MainWindow::MainWindow(QWidget *parent)
     , progressBar_(new ProgressBar(this))
     , autoCommScan_(false)
     , messageController_(new MessageController(this))
-    , previewWorker_(new PreviewWorker)
-    , previewWorkerThread_(new QThread)
+    , previewWorker_(new PreviewWorker)  // no parent so it can moveToThread
+    , previewWorkerThread_(new QThread(this))
+    , serverProcess_(new PanguServerProcess(this))
 {
     /* As weird as this is, it needs to be done for us to be able to use the
      * enums with signals and slots. Potential for a generated source code
@@ -45,6 +46,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    this->previewWorkerThread_->quit();
+    this->previewWorkerThread_->wait();
 }
 
 void MainWindow::createSignalConnections()
@@ -76,6 +79,11 @@ void MainWindow::createSignalConnections()
 
     connect(this->editor_->document(), &QTextDocument::contentsChanged, this,
             &MainWindow::onEditorContentChanged);
+
+    connect(this->serverProcess_, &PanguServerProcess::output, this,
+            [=](QString text) {
+                qDebug() << text;
+            });
 }
 
 void MainWindow::createMenus()
@@ -163,15 +171,15 @@ void MainWindow::createActions()
             &MainWindow::onActToggleAutoCommScan);
 
     this->actStartServer_ = new QAction("Start server", this);
-    this->actStartServer_->setStatusTip(
-        "Start and connect to a server to send commands to");
+    this->actStartServer_->setStatusTip("Start a server to send commands to");
     this->serverMenu_->addAction(this->actStartServer_);
     connect(this->actStartServer_, &QAction::triggered, this,
             &MainWindow::onActStartServer);
 
     this->actStopServer_ = new QAction("Stop server", this);
     this->actStopServer_->setStatusTip(
-        "Disconnect and stop the currently used server");
+        "Disconnect and stop the currently used server. This likely will not "
+        "work if you are starting it from a script file.");
     this->serverMenu_->addAction(this->actStopServer_);
     connect(this->actStopServer_, &QAction::triggered, this,
             &MainWindow::onActStopServer);
@@ -289,18 +297,24 @@ void MainWindow::onActToggleAutoCommScan()
 
 void MainWindow::onActStartServer()
 {
+    /* this->serverProcess_->start(". ~/uni/hons_proj/pangu/bashrc.pangu.sh && cd ~/uni/hons_proj/pangu/models/lunar_surface/ && progl ./view.sh -server", {}); */
+    this->serverProcess_->start("/home/arsic/pangu.sh");
 }
 
 void MainWindow::onActStopServer()
 {
+    this->previewWorker_->connection()->disconnect();
+    this->serverProcess_->stop();
 }
 
 void MainWindow::onActConnectToServer()
 {
+    this->previewWorker_->connection()->connect();
 }
 
 void MainWindow::onActDisconnectFromServer()
 {
+    this->previewWorker_->connection()->disconnect();
 }
 
 void MainWindow::onCommandError(CommandErr err)

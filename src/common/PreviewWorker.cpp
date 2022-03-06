@@ -6,7 +6,6 @@ PreviewWorker::PreviewWorker()
     , parser_(new PanguParser(this))
     , previewLock_(new QSemaphore(1))
     , isCancelled_(false)
-    , processingPreview_(false)
 {
     this->connection_->connect();
 
@@ -27,6 +26,11 @@ void PreviewWorker::setCancelled(const bool &cancelled)
     this->isCancelled_ = cancelled;
 }
 
+PanguConnection *PreviewWorker::connection()
+{
+    return this->connection_;
+}
+
 QSemaphore *PreviewWorker::previewLock() const
 {
     return this->previewLock_;
@@ -35,30 +39,6 @@ QSemaphore *PreviewWorker::previewLock() const
 std::vector<int> PreviewWorker::imgIndices() const
 {
     return this->imgIndices_;
-}
-
-void PreviewWorker::onUpdateImgIndices(const QString &str)
-{
-    /* TODO: Some kind of progress bar in the statusbar would be good for large
-     * files */
-    std::vector<QString> lines = StringUtil::split(str, "\\n");
-    std::vector<int> newImgIndices;
-    int lineNum = 0;
-
-    for (auto &line : lines)
-    {
-        std::unique_ptr<ParsedCommand> parsedCommand;
-        CommandErr err = this->parser_->parse(line, parsedCommand);
-
-        if (err == CommandErr::OK && parsedCommand->expectsImg())
-        {
-            newImgIndices.push_back(lineNum);
-        }
-
-        lineNum++;
-    }
-    this->imgIndices_ = newImgIndices;
-    emit this->imgIndicesUpdated();
 }
 
 void PreviewWorker::linePreReturn(int currLine, int toLine, int msDelay,
@@ -132,4 +112,28 @@ void PreviewWorker::onGiveLine(QString lineStr, int currLine, int toLine,
 void PreviewWorker::onStopMultiLine()
 {
     this->setCancelled(true);
+}
+
+void PreviewWorker::onUpdateImgIndices(const QString &str)
+{
+    /* TODO: Some kind of progress bar in the statusbar would be good for large
+     * files */
+    std::vector<QString> lines = StringUtil::split(str, "\\n");
+    std::vector<int> newImgIndices;
+    int lineNum = 0;
+
+    for (auto &line : lines)
+    {
+        std::unique_ptr<ParsedCommand> parsedCommand;
+        CommandErr err = this->parser_->parse(line, parsedCommand);
+
+        if (err == CommandErr::OK && parsedCommand->expectsImg())
+        {
+            newImgIndices.push_back(lineNum);
+        }
+
+        lineNum++;
+    }
+    this->imgIndices_ = newImgIndices;
+    emit this->imgIndicesUpdated();
 }
