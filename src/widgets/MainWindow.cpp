@@ -297,8 +297,13 @@ void MainWindow::onActToggleAutoCommScan()
 
 void MainWindow::onActStartServer()
 {
-    /* this->serverProcess_->start(". ~/uni/hons_proj/pangu/bashrc.pangu.sh && cd ~/uni/hons_proj/pangu/models/lunar_surface/ && progl ./view.sh -server", {}); */
-    this->serverProcess_->start("/home/arsic/pangu.sh");
+    QString filePath = QFileDialog::getOpenFileName(this, "Open file", "", "Executables (*.exe);;Bash scripts (*.sh);;Batch scripts (*.bat);;All files (*)");
+    if (filePath.length() == 0)
+    {
+        return;
+    }
+
+    this->serverProcess_->start(filePath);
 }
 
 void MainWindow::onActStopServer()
