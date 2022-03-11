@@ -2,20 +2,20 @@
 
 #include <QtCore>
 
+#include "interfaces/ICommandSender.hpp"
 #include "interfaces/IConnection.hpp"
 #include "pan_protocol/pan_protocol_lib.h"
 #include "util/SocketUtil.hpp"
 
-class PanguConnection : public QObject, IConnection
+class PanguConnection : public QObject, IConnection, ICommandSender
 {
     Q_OBJECT
 
 public:
-    PanguConnection(QObject *parent, const QString &serverName = "localhost",
-                    const int &serverPort = 10363);
+    PanguConnection(QObject *parent);
     ~PanguConnection() override;
 
-    ConnectionErr connect() override;
+    ConnectionErr connect(const QString &address, const int &port) override;
     ConnectionErr disconnect() override;
 
     ConnectionErr sendCommand(std::unique_ptr<ParsedCommand> &command,
@@ -24,8 +24,5 @@ public:
     ConnectionErr sendCommand(std::unique_ptr<ParsedCommand> &command) override;
 
 private:
-    QString serverName_;
-    int serverPort_;
-
     SOCKET sock_;
 };

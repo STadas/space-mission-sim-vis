@@ -54,36 +54,37 @@ MainWindow::~MainWindow()
 
 void MainWindow::createSignalConnections()
 {
-    connect(this->previewWorker_, qOverload<CommandErr>(&PreviewWorker::error),
-            this, &MainWindow::onCommandError);
+    QObject::connect(this->previewWorker_,
+                     qOverload<CommandErr>(&PreviewWorker::error), this,
+                     &MainWindow::onCommandError);
 
-    connect(this->previewWorker_,
-            qOverload<ConnectionErr>(&PreviewWorker::error), this,
-            &MainWindow::onConnectionError);
+    QObject::connect(this->previewWorker_,
+                     qOverload<ConnectionErr>(&PreviewWorker::error), this,
+                     &MainWindow::onConnectionError);
 
-    connect(this->previewWorker_, &PreviewWorker::askLine, this,
-            &MainWindow::onAskLine);
+    QObject::connect(this->previewWorker_, &PreviewWorker::askLine, this,
+                     &MainWindow::onAskLine);
 
-    connect(this->previewWorker_, &PreviewWorker::multiLineDone, this,
-            &MainWindow::onMultiLineDone);
+    QObject::connect(this->previewWorker_, &PreviewWorker::multiLineDone, this,
+                     &MainWindow::onMultiLineDone);
 
-    connect(this->previewWorker_, &PreviewWorker::changePreview, this,
-            &MainWindow::onChangePreview);
+    QObject::connect(this->previewWorker_, &PreviewWorker::changePreview, this,
+                     &MainWindow::onChangePreview);
 
-    connect(this->progressBar_, &ProgressBar::valueChanged, this,
-            &MainWindow::onPBarChanged);
+    QObject::connect(this->progressBar_, &ProgressBar::valueChanged, this,
+                     &MainWindow::onPBarChanged);
 
-    connect(this->progressBar_, &ProgressBar::sliderReleased, this,
-            &MainWindow::onPBarReleased);
+    QObject::connect(this->progressBar_, &ProgressBar::sliderReleased, this,
+                     &MainWindow::onPBarReleased);
 
-    connect(this->previewWorker_, &PreviewWorker::imgIndicesUpdated, this,
-            &MainWindow::onImgIndicesUpdated);
+    QObject::connect(this->previewWorker_, &PreviewWorker::imgIndicesUpdated,
+                     this, &MainWindow::onImgIndicesUpdated);
 
-    connect(this->editor_->document(), &QTextDocument::contentsChanged, this,
-            &MainWindow::onEditorContentChanged);
+    QObject::connect(this->editor_->document(), &QTextDocument::contentsChanged,
+                     this, &MainWindow::onEditorContentChanged);
 
-    connect(this->serverProcess_, &PanguServerProcess::output, this,
-            [=](QString text) {});
+    QObject::connect(this->serverProcess_, &PanguServerProcess::output, this,
+                     [=](QString text) {});
 }
 
 void MainWindow::createMenus()
@@ -107,58 +108,58 @@ void MainWindow::createActions()
     this->actFileNew_->setShortcuts(QKeySequence::New);
     this->actFileNew_->setStatusTip("Start editing a new file");
     this->fileMenu_->addAction(actFileNew_);
-    connect(this->actFileNew_, &QAction::triggered, this,
-            &MainWindow::onActFileNew);
+    QObject::connect(this->actFileNew_, &QAction::triggered, this,
+                     &MainWindow::onActFileNew);
 
     this->actFileOpen_ = new QAction("Open file", this);
     this->actFileOpen_->setShortcuts(QKeySequence::Open);
     this->actFileOpen_->setStatusTip("Open a file to edit");
     this->fileMenu_->addAction(actFileOpen_);
-    connect(this->actFileOpen_, &QAction::triggered, this,
-            &MainWindow::onActFileOpen);
+    QObject::connect(this->actFileOpen_, &QAction::triggered, this,
+                     &MainWindow::onActFileOpen);
 
     this->actFileSaveAs_ = new QAction("Save as", this);
     this->actFileSaveAs_->setShortcuts(QKeySequence::SaveAs);
     this->actFileSaveAs_->setStatusTip("Save as a new file");
     this->fileMenu_->addAction(actFileSaveAs_);
-    connect(this->actFileSaveAs_, &QAction::triggered, this,
-            &MainWindow::onActFileSaveAs);
+    QObject::connect(this->actFileSaveAs_, &QAction::triggered, this,
+                     &MainWindow::onActFileSaveAs);
 
     this->actFileSave_ = new QAction("Save", this);
     this->actFileSave_->setShortcuts(QKeySequence::Save);
     this->actFileSave_->setStatusTip("Save the currently opened file");
     this->fileMenu_->addAction(actFileSave_);
-    connect(this->actFileSave_, &QAction::triggered, this,
-            &MainWindow::onActFileSave);
+    QObject::connect(this->actFileSave_, &QAction::triggered, this,
+                     &MainWindow::onActFileSave);
 
     this->actActiveLineExec_ = new QAction("Execute line", this);
     this->actActiveLineExec_->setStatusTip(
         "Execute the command in the currently active line");
     this->commandsMenu_->addAction(this->actActiveLineExec_);
-    connect(this->actActiveLineExec_, &QAction::triggered, this,
-            &MainWindow::onActActiveLineExec);
+    QObject::connect(this->actActiveLineExec_, &QAction::triggered, this,
+                     &MainWindow::onActActiveLineExec);
 
     this->actMultiLineStart_ = new QAction("Step through lines", this);
     this->actMultiLineStart_->setStatusTip(
         "Step through and execute all commands (with delay) starting with the "
         "currently active line");
     this->commandsMenu_->addAction(this->actMultiLineStart_);
-    connect(this->actMultiLineStart_, &QAction::triggered, this,
-            &MainWindow::onActMultiLineStart);
+    QObject::connect(this->actMultiLineStart_, &QAction::triggered, this,
+                     &MainWindow::onActMultiLineStart);
 
     this->actMultiLineStop_ = new QAction("Stop stepping", this);
     this->actMultiLineStop_->setStatusTip(
         "Stop the currently active command stepping");
     this->commandsMenu_->addAction(this->actMultiLineStop_);
-    connect(this->actMultiLineStop_, &QAction::triggered, this,
-            &MainWindow::onActMultiLineStop);
+    QObject::connect(this->actMultiLineStop_, &QAction::triggered, this,
+                     &MainWindow::onActMultiLineStop);
 
     this->actCommScan_ = new QAction("Scan all commands", this);
     this->actCommScan_->setStatusTip("Scan all commands to update components "
                                      "like the simulation progress bar");
     this->commandsMenu_->addAction(this->actCommScan_);
-    connect(this->actCommScan_, &QAction::triggered, this,
-            &MainWindow::onActCommScan);
+    QObject::connect(this->actCommScan_, &QAction::triggered, this,
+                     &MainWindow::onActCommScan);
 
     this->actToggleAutoCommScan_ = new QAction("Auto command scanning", this);
     this->actToggleAutoCommScan_->setStatusTip(
@@ -167,43 +168,43 @@ void MainWindow::createActions()
     this->actToggleAutoCommScan_->setCheckable(true);
     this->actToggleAutoCommScan_->setChecked(false);
     this->commandsMenu_->addAction(this->actToggleAutoCommScan_);
-    connect(this->actToggleAutoCommScan_, &QAction::triggered, this,
-            &MainWindow::onActToggleAutoCommScan);
+    QObject::connect(this->actToggleAutoCommScan_, &QAction::triggered, this,
+                     &MainWindow::onActToggleAutoCommScan);
 
     this->actStartServer_ = new QAction("Start server", this);
     this->actStartServer_->setStatusTip("Start a server to send commands to");
     this->serverMenu_->addAction(this->actStartServer_);
-    connect(this->actStartServer_, &QAction::triggered, this,
-            &MainWindow::onActStartServer);
+    QObject::connect(this->actStartServer_, &QAction::triggered, this,
+                     &MainWindow::onActStartServer);
 
     this->actStopServer_ = new QAction("Stop server", this);
     this->actStopServer_->setStatusTip(
         "Disconnect and stop the currently used server. This likely will not "
         "work if you are starting it from a script file.");
     this->serverMenu_->addAction(this->actStopServer_);
-    connect(this->actStopServer_, &QAction::triggered, this,
-            &MainWindow::onActStopServer);
+    QObject::connect(this->actStopServer_, &QAction::triggered, this,
+                     &MainWindow::onActStopServer);
 
     this->actConnectToServer_ = new QAction("Connect to server", this);
     this->actConnectToServer_->setStatusTip(
         "Connect to the currently used server");
     this->serverMenu_->addAction(this->actConnectToServer_);
-    connect(this->actConnectToServer_, &QAction::triggered, this,
-            &MainWindow::onActConnectToServer);
+    QObject::connect(this->actConnectToServer_, &QAction::triggered, this,
+                     &MainWindow::onActConnectToServer);
 
     this->actDisconnectFromServer_ =
         new QAction("Disconnect from server", this);
     this->actDisconnectFromServer_->setStatusTip(
         "Disconnect from the currently used server without stopping it");
     this->serverMenu_->addAction(this->actDisconnectFromServer_);
-    connect(this->actDisconnectFromServer_, &QAction::triggered, this,
-            &MainWindow::onActDisconnectFromServer);
+    QObject::connect(this->actDisconnectFromServer_, &QAction::triggered, this,
+                     &MainWindow::onActDisconnectFromServer);
 
     this->actOpenSettings_ = new QAction("Settings", this);
     this->actOpenSettings_->setStatusTip("Open the settings window");
     this->toolsMenu_->addAction(this->actOpenSettings_);
-    connect(this->actOpenSettings_, &QAction::triggered, this,
-            &MainWindow::onActOpenSettings);
+    QObject::connect(this->actOpenSettings_, &QAction::triggered, this,
+                     &MainWindow::onActOpenSettings);
 }
 
 void MainWindow::onActFileNew()
@@ -310,18 +311,19 @@ void MainWindow::onActStartServer()
 
 void MainWindow::onActStopServer()
 {
-    this->previewWorker_->connection()->disconnect();
+    emit this->previewWorker_->disconnect();
     this->serverProcess_->stop();
 }
 
 void MainWindow::onActConnectToServer()
 {
-    this->previewWorker_->connection()->connect();
+    emit this->previewWorker_->connect(this->settings_->serverAddress.value(),
+                                       this->settings_->serverPort.value());
 }
 
 void MainWindow::onActDisconnectFromServer()
 {
-    this->previewWorker_->connection()->disconnect();
+    emit this->previewWorker_->disconnect();
 }
 
 void MainWindow::onActOpenSettings()

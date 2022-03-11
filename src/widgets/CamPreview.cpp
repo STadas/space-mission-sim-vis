@@ -5,6 +5,7 @@ CamPreview::CamPreview(QWidget *parent)
     , imgLabel_(new QLabel(this))
 {
     QLayout *layout = new VBoxLayout(this);
+    this->imgLabel_->setAlignment(Qt::AlignCenter);
     this->imgLabel_->setSizePolicy(QSizePolicy::Expanding,
                                    QSizePolicy::Expanding);
     this->imgLabel_->setMinimumSize(1, 1);

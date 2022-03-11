@@ -16,10 +16,10 @@ QCheckBox *SettingsPage::createCheckBox(BoolSetting &setting,
 {
     QCheckBox *checkbox = new QCheckBox(text, this);
 
-    connect(checkbox, &QCheckBox::toggled, this,
-            [&setting](const bool &newVal) {
-                setting.setValue(newVal);
-            });
+    QObject::connect(checkbox, &QCheckBox::toggled, this,
+                     [&setting](const bool &newVal) {
+                         setting.setValue(newVal);
+                     });
 
     return checkbox;
 }
@@ -29,10 +29,10 @@ QLineEdit *SettingsPage::createLineEdit(QStringSetting &setting)
     QLineEdit *lineEdit = new QLineEdit(setting.value(), this);
     lineEdit->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
 
-    connect(lineEdit, &QLineEdit::textChanged, this,
-            [&setting](const QString &newText) {
-                setting.setValue(newText);
-            });
+    QObject::connect(lineEdit, &QLineEdit::textChanged, this,
+                     [&setting](const QString &newText) {
+                         setting.setValue(newText);
+                     });
 
     return lineEdit;
 }
@@ -44,11 +44,11 @@ QLineEdit *SettingsPage::createLineEdit(IntSetting &setting, const int &min,
     lineEdit->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
     lineEdit->setValidator(new QIntValidator(min, max, lineEdit));
 
-    connect(lineEdit, &QLineEdit::textChanged, this,
-            [&setting, &lineEdit](const QString &newText) {
-                if (lineEdit->hasAcceptableInput())
-                    setting.setValue(newText.toInt());
-            });
+    QObject::connect(lineEdit, &QLineEdit::textChanged, this,
+                     [&setting, &lineEdit](const QString &newText) {
+                         if (lineEdit->hasAcceptableInput())
+                             setting.setValue(newText.toInt());
+                     });
 
     return lineEdit;
 }
@@ -61,11 +61,11 @@ QLineEdit *SettingsPage::createLineEdit(DoubleSetting &setting,
     lineEdit->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
     lineEdit->setValidator(new QDoubleValidator(min, max, decimals, lineEdit));
 
-    connect(lineEdit, &QLineEdit::textChanged, this,
-            [&setting, &lineEdit](const QString &newText) {
-                if (lineEdit->hasAcceptableInput())
-                    setting.setValue(newText.toDouble());
-            });
+    QObject::connect(lineEdit, &QLineEdit::textChanged, this,
+                     [&setting, &lineEdit](const QString &newText) {
+                         if (lineEdit->hasAcceptableInput())
+                             setting.setValue(newText.toDouble());
+                     });
 
     return lineEdit;
 }
@@ -79,13 +79,13 @@ QWidget *SettingsPage::createLineEditBrowse(QStringSetting &setting,
 
     QLineEdit *lineEdit = new QLineEdit(setting.value(), browseWrapper);
     lineEdit->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
-    connect(lineEdit, &QLineEdit::textChanged, this,
-            [&setting](const QString &newText) {
-                setting.setValue(newText);
-            });
+    QObject::connect(lineEdit, &QLineEdit::textChanged, this,
+                     [&setting](const QString &newText) {
+                         setting.setValue(newText);
+                     });
 
     QPushButton *browseButton = new QPushButton("Browse", browseWrapper);
-    connect(browseButton, &QPushButton::clicked, this, [=] {
+    QObject::connect(browseButton, &QPushButton::clicked, this, [=] {
         QString filePath =
             QFileDialog::getOpenFileName(this, caption, dir, filter);
 

@@ -3,16 +3,17 @@
 MessageController::MessageController(QObject *parent)
     : QObject(parent)
 {
-    connect(this, qOverload<CommandErr, QWidget *>(&MessageController::error),
-            this,
-            qOverload<CommandErr, QWidget *>(&MessageController::onError));
+    QObject::connect(
+        this, qOverload<CommandErr, QWidget *>(&MessageController::error), this,
+        qOverload<CommandErr, QWidget *>(&MessageController::onError));
 
-    connect(
+    QObject::connect(
         this, qOverload<ConnectionErr, QWidget *>(&MessageController::error),
         this, qOverload<ConnectionErr, QWidget *>(&MessageController::onError));
 
-    connect(this, qOverload<FileErr, QWidget *>(&MessageController::error),
-            this, qOverload<FileErr, QWidget *>(&MessageController::onError));
+    QObject::connect(
+        this, qOverload<FileErr, QWidget *>(&MessageController::error), this,
+        qOverload<FileErr, QWidget *>(&MessageController::onError));
 }
 
 MessageController::~MessageController()

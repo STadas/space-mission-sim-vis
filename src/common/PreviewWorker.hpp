@@ -7,9 +7,10 @@
 #include "common/PanguParser.hpp"
 #include "enums/CommandErr.hpp"
 #include "enums/ConnectionErr.hpp"
+#include "interfaces/IConnection.hpp"
 #include "util/ThreadUtil.hpp"
 
-class PreviewWorker : public QObject
+class PreviewWorker : public QObject, IConnection
 {
     Q_OBJECT
 
@@ -18,8 +19,6 @@ public:
     ~PreviewWorker();
 
     void setCancelled(const bool &cancelled);
-
-    PanguConnection *connection();
 
     QSemaphore *previewLock() const;
     std::vector<int> imgIndices() const;
@@ -52,7 +51,13 @@ signals:
     void lineDone();
     void multiLineDone();
 
+    ConnectionErr connect(const QString &address, const int &port) override;
+    ConnectionErr disconnect() override;
+
 private slots:
+    ConnectionErr onConnect(const QString &address, const int &port);
+    ConnectionErr onDisconnect();
+
     void onGiveLine(QString lineStr, int currLine, int toLine, int msDelay);
 
     void onStopMultiLine();

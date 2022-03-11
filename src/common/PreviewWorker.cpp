@@ -7,14 +7,18 @@ PreviewWorker::PreviewWorker()
     , previewLock_(new QSemaphore(1))
     , isCancelled_(false)
 {
-    this->connection_->connect();
-
-    connect(this, &PreviewWorker::giveLine, this, &PreviewWorker::onGiveLine);
-    connect(this, &PreviewWorker::doMultiLine, this, &PreviewWorker::askLine);
-    connect(this, &PreviewWorker::stopMultiLine, this,
-            &PreviewWorker::onStopMultiLine);
-    connect(this, &PreviewWorker::updateImgIndices, this,
-            &PreviewWorker::onUpdateImgIndices);
+    QObject::connect(this, &PreviewWorker::giveLine, this,
+                     &PreviewWorker::onGiveLine);
+    QObject::connect(this, &PreviewWorker::doMultiLine, this,
+                     &PreviewWorker::askLine);
+    QObject::connect(this, &PreviewWorker::stopMultiLine, this,
+                     &PreviewWorker::onStopMultiLine);
+    QObject::connect(this, &PreviewWorker::updateImgIndices, this,
+                     &PreviewWorker::onUpdateImgIndices);
+    QObject::connect(this, &PreviewWorker::connect, this,
+                     &PreviewWorker::onConnect);
+    QObject::connect(this, &PreviewWorker::disconnect, this,
+                     &PreviewWorker::onDisconnect);
 }
 
 PreviewWorker::~PreviewWorker()
@@ -24,11 +28,6 @@ PreviewWorker::~PreviewWorker()
 void PreviewWorker::setCancelled(const bool &cancelled)
 {
     this->isCancelled_ = cancelled;
-}
-
-PanguConnection *PreviewWorker::connection()
-{
-    return this->connection_;
 }
 
 QSemaphore *PreviewWorker::previewLock() const
@@ -69,6 +68,16 @@ void PreviewWorker::linePreReturn(int currLine, int toLine, int msDelay,
     emit lineDone();
     this->previewLock()->release();
     emit this->askLine(currLine + 1, toLine, msDelay);
+}
+
+ConnectionErr PreviewWorker::onConnect(const QString &address, const int &port)
+{
+    return this->connection_->connect(address, port);
+}
+
+ConnectionErr PreviewWorker::onDisconnect()
+{
+    return this->connection_->disconnect();
 }
 
 void PreviewWorker::onGiveLine(QString lineStr, int currLine, int toLine,

@@ -27,13 +27,13 @@ SettingsDialog::SettingsDialog(QWidget *parent, Settings *const settings)
 
     this->okButton = new QPushButton("Ok", this);
     buttonsWrapper->layout()->addWidget(this->okButton);
-    connect(this->okButton, &QPushButton::clicked, this,
-            &SettingsDialog::onOkClicked);
+    QObject::connect(this->okButton, &QPushButton::clicked, this,
+                     &SettingsDialog::onOkClicked);
 
     this->cancelButton = new QPushButton("Cancel", this);
     buttonsWrapper->layout()->addWidget(this->cancelButton);
-    connect(this->cancelButton, &QPushButton::clicked, this,
-            &SettingsDialog::onCancelClicked);
+    QObject::connect(this->cancelButton, &QPushButton::clicked, this,
+                     &SettingsDialog::onCancelClicked);
 
     this->createPages();
     this->pageSelect_->setFixedWidth(
@@ -47,8 +47,8 @@ SettingsDialog::SettingsDialog(QWidget *parent, Settings *const settings)
 
 void SettingsDialog::createPages()
 {
-    connect(this->pageSelect_, &QListWidget::currentRowChanged, this,
-            &SettingsDialog::onCurrentChanged);
+    QObject::connect(this->pageSelect_, &QListWidget::currentRowChanged, this,
+                     &SettingsDialog::onCurrentChanged);
 
     QWidget *serverPage = new ServerPage(this, this->settings_);
     QAction *actServerPage = new QAction("Server", this);

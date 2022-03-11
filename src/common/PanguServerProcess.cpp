@@ -4,8 +4,8 @@ PanguServerProcess::PanguServerProcess(QObject *parent)
     : QObject(parent)
     , process_(new QProcess(this))
 {
-    connect(this->process_, &QProcess::readyRead, this,
-            &PanguServerProcess::onReadyRead);
+    QObject::connect(this->process_, &QProcess::readyRead, this,
+                     &PanguServerProcess::onReadyRead);
 }
 
 PanguServerProcess::~PanguServerProcess()

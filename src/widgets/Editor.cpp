@@ -5,7 +5,7 @@ Editor::Editor(QWidget *parent)
 {
     this->setLineWrapMode(QPlainTextEdit::NoWrap);
 
-    connect(this, &QPlainTextEdit::cursorPositionChanged, this, [=] {
+    QObject::connect(this, &QPlainTextEdit::cursorPositionChanged, this, [=] {
         if (!this->isReadOnly())
         {
             this->highlightCurrentLine();
