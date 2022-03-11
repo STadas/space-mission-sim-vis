@@ -10,7 +10,7 @@ class PanguServerProcess : public QObject, IServerProcess
 
 public:
     PanguServerProcess(QObject *parent);
-    ~PanguServerProcess();
+    ~PanguServerProcess() override;
 
     void start(const QString &pathStr, const QStringList &args = {}) override;
     void stop() override;

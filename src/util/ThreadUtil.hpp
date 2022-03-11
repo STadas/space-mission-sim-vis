@@ -8,5 +8,7 @@ public:
     static bool isGuiThread();
 
 private:
-    ThreadUtil(){};
+    ThreadUtil()
+    {
+    }
 };

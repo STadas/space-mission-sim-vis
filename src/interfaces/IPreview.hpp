@@ -3,7 +3,9 @@
 class IPreview
 {
 public:
-    ~IPreview(){};
+    ~IPreview()
+    {
+    }
 
     virtual void showPreview(unsigned char *data,
                              const unsigned long &size) = 0;

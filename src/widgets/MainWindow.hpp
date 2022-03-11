@@ -9,7 +9,9 @@
 #include "common/PanguServerProcess.hpp"
 #include "common/PreviewWorker.hpp"
 #include "common/VBoxLayout.hpp"
+#include "common/settings/Settings.hpp"
 #include "widgets/CamPreview.hpp"
+#include "widgets/dialogs/SettingsDialog.hpp"
 
 class MainWindow : public QMainWindow
 {
@@ -33,6 +35,8 @@ private:
 
     PanguServerProcess *serverProcess_;
 
+    Settings *const settings_;
+
     QMenu *fileMenu_;
     QMenu *toolsMenu_;
     QMenu *commandsMenu_;
@@ -55,6 +59,8 @@ private:
     QAction *actConnectToServer_;
     QAction *actDisconnectFromServer_;
 
+    QAction *actOpenSettings_;
+
     void createMenus();
     void createActions();
     void createSignalConnections();
@@ -76,6 +82,8 @@ private slots:
     void onActStopServer();
     void onActConnectToServer();
     void onActDisconnectFromServer();
+
+    void onActOpenSettings();
 
     void onCommandError(CommandErr err);
     void onConnectionError(ConnectionErr err);

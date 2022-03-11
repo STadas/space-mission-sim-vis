@@ -8,7 +8,9 @@
 class IConnection
 {
 public:
-    virtual ~IConnection(){};
+    virtual ~IConnection()
+    {
+    }
 
     virtual ConnectionErr connect() = 0;
     virtual ConnectionErr disconnect() = 0;

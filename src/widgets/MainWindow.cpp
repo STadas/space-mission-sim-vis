@@ -1,5 +1,4 @@
 #include "MainWindow.hpp"
-#include "common/PanguServerProcess.hpp"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -11,7 +10,10 @@ MainWindow::MainWindow(QWidget *parent)
     , previewWorker_(new PreviewWorker)  // no parent so it can moveToThread
     , previewWorkerThread_(new QThread(this))
     , serverProcess_(new PanguServerProcess(this))
+    , settings_(new Settings(this))
 {
+    this->settings_->load();
+
     /* As weird as this is, it needs to be done for us to be able to use the
      * enums with signals and slots. Potential for a generated source code
      * file? */
@@ -82,7 +84,6 @@ void MainWindow::createSignalConnections()
 
     connect(this->serverProcess_, &PanguServerProcess::output, this,
             [=](QString text) {
-                qDebug() << text;
             });
 }
 
@@ -198,6 +199,12 @@ void MainWindow::createActions()
     this->serverMenu_->addAction(this->actDisconnectFromServer_);
     connect(this->actDisconnectFromServer_, &QAction::triggered, this,
             &MainWindow::onActDisconnectFromServer);
+
+    this->actOpenSettings_ = new QAction("Settings", this);
+    this->actOpenSettings_->setStatusTip("Open the settings window");
+    this->toolsMenu_->addAction(this->actOpenSettings_);
+    connect(this->actOpenSettings_, &QAction::triggered, this,
+            &MainWindow::onActOpenSettings);
 }
 
 void MainWindow::onActFileNew()
@@ -297,13 +304,9 @@ void MainWindow::onActToggleAutoCommScan()
 
 void MainWindow::onActStartServer()
 {
-    QString filePath = QFileDialog::getOpenFileName(this, "Open file", "", "Executables (*.exe);;Bash scripts (*.sh);;Batch scripts (*.bat);;All files (*)");
-    if (filePath.length() == 0)
-    {
-        return;
-    }
-
-    this->serverProcess_->start(filePath);
+    this->serverProcess_->start(
+        this->settings_->serverPath.value(),
+        StringUtil::split(this->settings_->serverFlags.value()));
 }
 
 void MainWindow::onActStopServer()
@@ -320,6 +323,12 @@ void MainWindow::onActConnectToServer()
 void MainWindow::onActDisconnectFromServer()
 {
     this->previewWorker_->connection()->disconnect();
+}
+
+void MainWindow::onActOpenSettings()
+{
+    SettingsDialog *settingsDialog = new SettingsDialog(this, this->settings_);
+    settingsDialog->show();
 }
 
 void MainWindow::onCommandError(CommandErr err)
