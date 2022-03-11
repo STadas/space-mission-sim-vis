@@ -118,7 +118,7 @@ void PreviewWorker::onUpdateImgIndices(const QString &str)
 {
     /* TODO: Some kind of progress bar in the statusbar would be good for large
      * files */
-    std::vector<QString> lines = StringUtil::split(str, "\\n");
+    QStringList lines = StringUtil::split(str, "\\n");
     std::vector<int> newImgIndices;
     int lineNum = 0;
 

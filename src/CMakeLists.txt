@@ -3,6 +3,8 @@ set(EXECUTABLE_PROJECT "${PROJECT_NAME}")
 
 # src
 set(SOURCE_PROJECT
+        common/HBoxLayout.cpp
+        common/HBoxLayout.hpp
         common/MessageController.cpp
         common/MessageController.hpp
         common/PanguConnection.cpp
@@ -17,6 +19,11 @@ set(SOURCE_PROJECT
         common/ParsedCommand.hpp
         common/VBoxLayout.cpp
         common/VBoxLayout.hpp
+
+        common/settings/SettingManager.cpp
+        common/settings/SettingManager.hpp
+        common/settings/Settings.cpp
+        common/settings/Settings.hpp
 
         util/FileUtil.cpp
         util/FileUtil.hpp
@@ -35,6 +42,14 @@ set(SOURCE_PROJECT
         widgets/Editor.hpp
         widgets/ProgressBar.cpp
         widgets/ProgressBar.hpp
+
+        widgets/dialogs/SettingsDialog.cpp
+        widgets/dialogs/SettingsDialog.hpp
+
+        widgets/settingspages/ServerPage.cpp
+        widgets/settingspages/ServerPage.hpp
+        widgets/settingspages/SettingsPage.cpp
+        widgets/settingspages/SettingsPage.hpp
         )
 
 source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${SOURCE_PROJECT})

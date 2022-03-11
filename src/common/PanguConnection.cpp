@@ -82,12 +82,12 @@ ConnectionErr PanguConnection::sendCommand(
         if (command->name() == "start")
         {
             panguErr = pan_net_set_viewpoint_by_degrees_d_TX(
-                this->sock_, std::get<double>(*command->args()[0]),
-                std::get<double>(*command->args()[1]),
-                std::get<double>(*command->args()[2]),
-                std::get<double>(*command->args()[3]),
-                std::get<double>(*command->args()[4]),
-                std::get<double>(*command->args()[5]));
+                this->sock_, std::get<double>(command->args()[0]),
+                std::get<double>(command->args()[1]),
+                std::get<double>(command->args()[2]),
+                std::get<double>(command->args()[3]),
+                std::get<double>(command->args()[4]),
+                std::get<double>(command->args()[5]));
 
             if (panguErr)
             {
@@ -100,13 +100,13 @@ ConnectionErr PanguConnection::sendCommand(
         if (command->name() == "quaternion")
         {
             panguErr = pan_net_set_viewpoint_by_quaternion_d_TX(
-                this->sock_, std::get<double>(*command->args()[0]),
-                std::get<double>(*command->args()[1]),
-                std::get<double>(*command->args()[2]),
-                std::get<double>(*command->args()[3]),
-                std::get<double>(*command->args()[4]),
-                std::get<double>(*command->args()[5]),
-                std::get<double>(*command->args()[6]));
+                this->sock_, std::get<double>(command->args()[0]),
+                std::get<double>(command->args()[1]),
+                std::get<double>(command->args()[2]),
+                std::get<double>(command->args()[3]),
+                std::get<double>(command->args()[4]),
+                std::get<double>(command->args()[5]),
+                std::get<double>(command->args()[6]));
 
             if (panguErr)
             {

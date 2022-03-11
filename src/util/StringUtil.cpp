@@ -1,10 +1,9 @@
 #include "StringUtil.hpp"
 
-std::vector<QString> StringUtil::split(const QString &str,
-                                       const QString &regexStr)
+QStringList StringUtil::split(const QString &str, const QString &regexStr)
 {
     std::string stdStr = str.toStdString();
-    std::vector<QString> res{};
+    QStringList res{};
 
     /* https://stackoverflow.com/a/16752826 */
     /* https://stackoverflow.com/a/42310788 */
@@ -14,7 +13,7 @@ std::vector<QString> StringUtil::split(const QString &str,
 
     for (; strIt != end; strIt++)
     {
-        res.push_back(QString::fromStdString(*strIt));
+        res.append(QString::fromStdString(*strIt));
     }
     return res;
 }
