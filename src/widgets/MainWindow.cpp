@@ -83,8 +83,7 @@ void MainWindow::createSignalConnections()
             &MainWindow::onEditorContentChanged);
 
     connect(this->serverProcess_, &PanguServerProcess::output, this,
-            [=](QString text) {
-            });
+            [=](QString text) {});
 }
 
 void MainWindow::createMenus()
