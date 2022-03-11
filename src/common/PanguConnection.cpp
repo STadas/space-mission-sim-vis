@@ -1,10 +1,7 @@
 #include "PanguConnection.hpp"
 
-PanguConnection::PanguConnection(QObject *parent, const QString &serverName,
-                                 const int &serverPort)
+PanguConnection::PanguConnection(QObject *parent)
     : QObject(parent)
-    , serverName_(serverName)
-    , serverPort_(serverPort)
 {
 }
 
@@ -12,7 +9,7 @@ PanguConnection::~PanguConnection()
 {
 }
 
-ConnectionErr PanguConnection::connect()
+ConnectionErr PanguConnection::connect(const QString &address, const int &port)
 {
     /* Modified example provided with PANGU */
 
@@ -29,7 +26,7 @@ ConnectionErr PanguConnection::connect()
     }
 #endif
 
-    addr = SocketUtil::hostNameToAddr(this->serverName_);
+    addr = SocketUtil::hostNameToAddr(address);
     this->sock_ = socket(AF_INET, SOCK_STREAM, 0);
 
     if (this->sock_ == -1)
@@ -39,7 +36,7 @@ ConnectionErr PanguConnection::connect()
 
     saddr.sin_family = AF_INET;
     saddr.sin_addr.s_addr = addr;
-    saddr.sin_port = htons(this->serverPort_);
+    saddr.sin_port = htons(port);
     saddr_len = sizeof(struct sockaddr_in);
 
     if (::connect(this->sock_, (struct sockaddr *)&saddr, saddr_len) == -1)
@@ -82,12 +79,12 @@ ConnectionErr PanguConnection::sendCommand(
         if (command->name() == "start")
         {
             panguErr = pan_net_set_viewpoint_by_degrees_d_TX(
-                this->sock_, std::get<double>(*command->args()[0]),
-                std::get<double>(*command->args()[1]),
-                std::get<double>(*command->args()[2]),
-                std::get<double>(*command->args()[3]),
-                std::get<double>(*command->args()[4]),
-                std::get<double>(*command->args()[5]));
+                this->sock_, std::get<double>(command->args()[0]),
+                std::get<double>(command->args()[1]),
+                std::get<double>(command->args()[2]),
+                std::get<double>(command->args()[3]),
+                std::get<double>(command->args()[4]),
+                std::get<double>(command->args()[5]));
 
             if (panguErr)
             {
@@ -100,13 +97,13 @@ ConnectionErr PanguConnection::sendCommand(
         if (command->name() == "quaternion")
         {
             panguErr = pan_net_set_viewpoint_by_quaternion_d_TX(
-                this->sock_, std::get<double>(*command->args()[0]),
-                std::get<double>(*command->args()[1]),
-                std::get<double>(*command->args()[2]),
-                std::get<double>(*command->args()[3]),
-                std::get<double>(*command->args()[4]),
-                std::get<double>(*command->args()[5]),
-                std::get<double>(*command->args()[6]));
+                this->sock_, std::get<double>(command->args()[0]),
+                std::get<double>(command->args()[1]),
+                std::get<double>(command->args()[2]),
+                std::get<double>(command->args()[3]),
+                std::get<double>(command->args()[4]),
+                std::get<double>(command->args()[5]),
+                std::get<double>(command->args()[6]));
 
             if (panguErr)
             {

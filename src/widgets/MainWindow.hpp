@@ -6,9 +6,12 @@
 
 #include "Editor.hpp"
 #include "common/MessageController.hpp"
+#include "common/PanguServerProcess.hpp"
 #include "common/PreviewWorker.hpp"
 #include "common/VBoxLayout.hpp"
+#include "common/settings/Settings.hpp"
 #include "widgets/CamPreview.hpp"
+#include "widgets/dialogs/SettingsDialog.hpp"
 
 class MainWindow : public QMainWindow
 {
@@ -20,7 +23,7 @@ public:
 
 private:
     Editor *editor_;
-    CamPreview *preview_;
+    CamPreview *camPreview_;
     ProgressBar *progressBar_;
 
     bool autoCommScan_;
@@ -28,11 +31,16 @@ private:
     MessageController *messageController_;
 
     PreviewWorker *previewWorker_;
-
     QThread *previewWorkerThread_;
+
+    PanguServerProcess *serverProcess_;
+
+    Settings *const settings_;
 
     QMenu *fileMenu_;
     QMenu *toolsMenu_;
+    QMenu *commandsMenu_;
+    QMenu *serverMenu_;
 
     QAction *actFileNew_;
     QAction *actFileOpen_;
@@ -43,16 +51,50 @@ private:
     QAction *actMultiLineStart_;
     QAction *actMultiLineStop_;
 
-    QAction *actCommScan;
+    QAction *actCommScan_;
     QAction *actToggleAutoCommScan_;
+
+    QAction *actStartServer_;
+    QAction *actStopServer_;
+    QAction *actConnectToServer_;
+    QAction *actDisconnectFromServer_;
+
+    QAction *actOpenSettings_;
 
     void createMenus();
     void createActions();
     void createSignalConnections();
 
 private slots:
-    void newFile();
-    void openFile();
-    void saveFileAs();
-    void saveFile();
+    void onActFileNew();
+    void onActFileOpen();
+    void onActFileSave();
+    void onActFileSaveAs();
+
+    void onActActiveLineExec();
+    void onActMultiLineStart();
+    void onActMultiLineStop();
+
+    void onActCommScan();
+    void onActToggleAutoCommScan();
+
+    void onActStartServer();
+    void onActStopServer();
+    void onActConnectToServer();
+    void onActDisconnectFromServer();
+
+    void onActOpenSettings();
+
+    void onCommandError(CommandErr err);
+    void onConnectionError(ConnectionErr err);
+
+    void onAskLine(int fromLine, int toLine, int msDelay);
+    void onMultiLineDone();
+    void onChangePreview(unsigned char *data, const unsigned long &size);
+
+    void onPBarChanged(int imgIndex);
+    void onPBarReleased();
+    void onImgIndicesUpdated();
+
+    void onEditorContentChanged();
 };

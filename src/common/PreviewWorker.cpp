@@ -6,16 +6,19 @@ PreviewWorker::PreviewWorker()
     , parser_(new PanguParser(this))
     , previewLock_(new QSemaphore(1))
     , isCancelled_(false)
-    , processingPreview_(false)
 {
-    this->connection_->connect();
-
-    connect(this, &PreviewWorker::giveLine, this, &PreviewWorker::onGiveLine);
-    connect(this, &PreviewWorker::doMultiLine, this, &PreviewWorker::askLine);
-    connect(this, &PreviewWorker::stopMultiLine, this,
-            &PreviewWorker::onStopMultiLine);
-    connect(this, &PreviewWorker::updateImgIndices, this,
-            &PreviewWorker::onUpdateImgIndices);
+    QObject::connect(this, &PreviewWorker::giveLine, this,
+                     &PreviewWorker::onGiveLine);
+    QObject::connect(this, &PreviewWorker::doMultiLine, this,
+                     &PreviewWorker::askLine);
+    QObject::connect(this, &PreviewWorker::stopMultiLine, this,
+                     &PreviewWorker::onStopMultiLine);
+    QObject::connect(this, &PreviewWorker::updateImgIndices, this,
+                     &PreviewWorker::onUpdateImgIndices);
+    QObject::connect(this, &PreviewWorker::connect, this,
+                     &PreviewWorker::onConnect);
+    QObject::connect(this, &PreviewWorker::disconnect, this,
+                     &PreviewWorker::onDisconnect);
 }
 
 PreviewWorker::~PreviewWorker()
@@ -35,30 +38,6 @@ QSemaphore *PreviewWorker::previewLock() const
 std::vector<int> PreviewWorker::imgIndices() const
 {
     return this->imgIndices_;
-}
-
-void PreviewWorker::onUpdateImgIndices(const QString &str)
-{
-    /* TODO: Some kind of progress bar in the statusbar would be good for large
-     * files */
-    std::vector<QString> lines = StringUtil::split(str, "\\n");
-    std::vector<int> newImgIndices;
-    int lineNum = 0;
-
-    for (auto &line : lines)
-    {
-        std::unique_ptr<ParsedCommand> parsedCommand;
-        CommandErr err = this->parser_->parse(line, parsedCommand);
-
-        if (err == CommandErr::OK && parsedCommand->expectsImg())
-        {
-            newImgIndices.push_back(lineNum);
-        }
-
-        lineNum++;
-    }
-    this->imgIndices_ = newImgIndices;
-    emit this->imgIndicesUpdated();
 }
 
 void PreviewWorker::linePreReturn(int currLine, int toLine, int msDelay,
@@ -89,6 +68,16 @@ void PreviewWorker::linePreReturn(int currLine, int toLine, int msDelay,
     emit lineDone();
     this->previewLock()->release();
     emit this->askLine(currLine + 1, toLine, msDelay);
+}
+
+ConnectionErr PreviewWorker::onConnect(const QString &address, const int &port)
+{
+    return this->connection_->connect(address, port);
+}
+
+ConnectionErr PreviewWorker::onDisconnect()
+{
+    return this->connection_->disconnect();
 }
 
 void PreviewWorker::onGiveLine(QString lineStr, int currLine, int toLine,
@@ -132,4 +121,28 @@ void PreviewWorker::onGiveLine(QString lineStr, int currLine, int toLine,
 void PreviewWorker::onStopMultiLine()
 {
     this->setCancelled(true);
+}
+
+void PreviewWorker::onUpdateImgIndices(const QString &str)
+{
+    /* TODO: Some kind of progress bar in the statusbar would be good for large
+     * files */
+    QStringList lines = StringUtil::split(str, "\\n");
+    std::vector<int> newImgIndices;
+    int lineNum = 0;
+
+    for (auto &line : lines)
+    {
+        std::unique_ptr<ParsedCommand> parsedCommand;
+        CommandErr err = this->parser_->parse(line, parsedCommand);
+
+        if (err == CommandErr::OK && parsedCommand->expectsImg())
+        {
+            newImgIndices.push_back(lineNum);
+        }
+
+        lineNum++;
+    }
+    this->imgIndices_ = newImgIndices;
+    emit this->imgIndicesUpdated();
 }

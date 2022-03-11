@@ -12,8 +12,8 @@ PanguParser::~PanguParser()
 CommandErr PanguParser::parse(const QString &strCommand,
                               std::unique_ptr<ParsedCommand> &parsedCommand)
 {
-    std::vector<QString> words = StringUtil::split(strCommand, "[ \\t]+");
-    std::vector<std::shared_ptr<Arg>> args{};
+    QStringList words = StringUtil::split(strCommand, "[ \\t]+");
+    std::vector<Arg> args{};
 
     if (words.size() == 0 || (words.size() == 1 && words[0].length() == 0))
         return CommandErr::EMPTY;
@@ -31,7 +31,7 @@ CommandErr PanguParser::parse(const QString &strCommand,
             if (!StringUtil::isNumeric(it))
                 return CommandErr::BAD_ARG_TYPE;
 
-            args.push_back(std::make_shared<Arg>(std::stod(it.toStdString())));
+            args.push_back(Arg(std::stod(it.toStdString())));
         }
 
         parsedCommand = std::make_unique<ParsedCommand>(cmdName, true, args);
@@ -49,7 +49,7 @@ CommandErr PanguParser::parse(const QString &strCommand,
             if (!StringUtil::isNumeric(it))
                 return CommandErr::BAD_ARG_TYPE;
 
-            args.push_back(std::make_shared<Arg>(std::stod(it.toStdString())));
+            args.push_back(Arg(std::stod(it.toStdString())));
         }
 
         parsedCommand = std::make_unique<ParsedCommand>(cmdName, true, args);

@@ -6,7 +6,9 @@
 class IParser
 {
 public:
-    ~IParser(){};
+    ~IParser()
+    {
+    }
 
     virtual CommandErr parse(const QString &strCommand,
                              std::unique_ptr<ParsedCommand> &parsedCommand) = 0;

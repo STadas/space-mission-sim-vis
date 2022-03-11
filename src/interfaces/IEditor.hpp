@@ -5,7 +5,9 @@
 class IEditor
 {
 public:
-    virtual ~IEditor(){};
+    virtual ~IEditor()
+    {
+    }
 
     virtual bool isModified() = 0;
     virtual QString activeLineText() = 0;

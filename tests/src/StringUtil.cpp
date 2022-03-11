@@ -6,7 +6,7 @@ TEST(StringUtilTest, SplitSpaceEmpty)
 {
     const QString str = "";
 
-    std::vector<QString> res = StringUtil::split(str);
+    QStringList res = StringUtil::split(str);
 
     ASSERT_EQ(res.size(), 1);
     ASSERT_EQ(res[0], "");
@@ -16,7 +16,7 @@ TEST(StringUtilTest, SplitSpaceOneSpace)
 {
     const QString str = " ";
 
-    std::vector<QString> res = StringUtil::split(str);
+    QStringList res = StringUtil::split(str);
 
     ASSERT_EQ(res.size(), 1);
     ASSERT_EQ(res[0], "");
@@ -26,7 +26,7 @@ TEST(StringUtilTest, SplitSpaceTwoSpaces)
 {
     const QString str = "  ";
 
-    std::vector<QString> res = StringUtil::split(str);
+    QStringList res = StringUtil::split(str);
 
     ASSERT_EQ(res.size(), 2);
     ASSERT_EQ(res[0], "");
@@ -37,7 +37,7 @@ TEST(StringUtilTest, SplitSpaceOneWord)
 {
     const QString str = "foo";
 
-    std::vector<QString> res = StringUtil::split(str);
+    QStringList res = StringUtil::split(str);
 
     ASSERT_EQ(res.size(), 1);
     ASSERT_EQ(res[0], "foo");
@@ -47,7 +47,7 @@ TEST(StringUtilTest, SplitSpaceOneWordOneSpace)
 {
     const QString str = "foo ";
 
-    std::vector<QString> res = StringUtil::split(str);
+    QStringList res = StringUtil::split(str);
 
     ASSERT_EQ(res.size(), 1);
     ASSERT_EQ(res[0], "foo");
@@ -57,7 +57,7 @@ TEST(StringUtilTest, SplitSpaceOneSpaceOneWord)
 {
     const QString str = " foo";
 
-    std::vector<QString> res = StringUtil::split(str);
+    QStringList res = StringUtil::split(str);
 
     ASSERT_EQ(res.size(), 2);
     ASSERT_EQ(res[0], "");
@@ -68,7 +68,7 @@ TEST(StringUtilTest, SplitSeparatorTwoWords)
 {
     const QString str = "foo bar";
 
-    std::vector<QString> res = StringUtil::split(str);
+    QStringList res = StringUtil::split(str);
 
     ASSERT_EQ(res.size(), 2);
     ASSERT_EQ(res[0], "foo");
@@ -79,7 +79,7 @@ TEST(StringUtilTest, SplitSeparatorFourWords)
 {
     const QString str = "foo bar baz qux";
 
-    std::vector<QString> res = StringUtil::split(str);
+    QStringList res = StringUtil::split(str);
 
     ASSERT_EQ(res.size(), 4);
     ASSERT_EQ(res[0], "foo");

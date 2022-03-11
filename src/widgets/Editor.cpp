@@ -5,7 +5,7 @@ Editor::Editor(QWidget *parent)
 {
     this->setLineWrapMode(QPlainTextEdit::NoWrap);
 
-    connect(this, &QPlainTextEdit::cursorPositionChanged, this, [=] {
+    QObject::connect(this, &QPlainTextEdit::cursorPositionChanged, this, [=] {
         if (!this->isReadOnly())
         {
             this->highlightCurrentLine();
@@ -33,6 +33,7 @@ int Editor::load()
 {
     QFileDevice::FileError err = QFileDevice::FileError::NoError;
 
+    //TODO: starting path in dialog should be same as currently open file's if applicable
     QString filePath = QFileDialog::getOpenFileName(
         this, "Open file", "", "Flight files (*.fli);;All files (*)");
     if (filePath.length() == 0)
@@ -83,6 +84,7 @@ int Editor::save()
 
 int Editor::saveAs()
 {
+    //TODO: starting path in dialog should be same as currently open file's if applicable
     QString filePath = QFileDialog::getSaveFileName(
         this, "Save file as", "", "Flight files (*.fli);;All files (*)");
     if (filePath.length() == 0)
