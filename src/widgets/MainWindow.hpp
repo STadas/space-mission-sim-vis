@@ -66,6 +66,7 @@ private:
     void createSignalConnections();
 
 private slots:
+    /* on action */
     void onActFileNew();
     void onActFileOpen();
     void onActFileSave();
@@ -85,12 +86,13 @@ private slots:
 
     void onActOpenSettings();
 
+    /* on other signal */
+    void onLineStarted(const int &lineNum);
     void onCommandError(CommandErr err);
     void onConnectionError(ConnectionErr err);
 
-    void onAskLine(int fromLine, int toLine, int msDelay);
     void onMultiLineDone();
-    void onChangePreview(unsigned char *data, const unsigned long &size);
+    void onChangePreview(QByteArray data, const unsigned long &size);
 
     void onPBarChanged(int imgIndex);
     void onPBarReleased();

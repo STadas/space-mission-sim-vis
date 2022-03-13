@@ -54,6 +54,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::createSignalConnections()
 {
+    QObject::connect(this->previewWorker_, &PreviewWorker::lineStarted, this,
+                     &MainWindow::onLineStarted);
+
     QObject::connect(this->previewWorker_,
                      qOverload<CommandErr>(&PreviewWorker::error), this,
                      &MainWindow::onCommandError);
@@ -62,10 +65,7 @@ void MainWindow::createSignalConnections()
                      qOverload<ConnectionErr>(&PreviewWorker::error), this,
                      &MainWindow::onConnectionError);
 
-    QObject::connect(this->previewWorker_, &PreviewWorker::askLine, this,
-                     &MainWindow::onAskLine);
-
-    QObject::connect(this->previewWorker_, &PreviewWorker::multiLineDone, this,
+    QObject::connect(this->previewWorker_, &PreviewWorker::textProcessed, this,
                      &MainWindow::onMultiLineDone);
 
     QObject::connect(this->previewWorker_, &PreviewWorker::changePreview, this,
@@ -261,7 +261,7 @@ void MainWindow::onActActiveLineExec()
     if (!this->previewWorker_->previewLock()->available())
         return;
 
-    emit this->previewWorker_->giveLine(this->editor_->activeLineText());
+    emit this->previewWorker_->processText(this->editor_->activeLineText());
 }
 
 void MainWindow::onActMultiLineStart()
@@ -277,14 +277,14 @@ void MainWindow::onActMultiLineStart()
 
     this->editor_->setReadOnly(true);
 
-    emit this->previewWorker_->doMultiLine(
-        this->editor_->textCursor().blockNumber(),
-        this->editor_->document()->lineCount(), msDelay);
+    emit this->previewWorker_->processText(
+        this->editor_->toPlainText(), msDelay,
+        this->editor_->textCursor().blockNumber());
 }
 
 void MainWindow::onActMultiLineStop()
 {
-    emit this->previewWorker_->stopMultiLine();
+    emit this->previewWorker_->cancel();
 }
 
 void MainWindow::onActCommScan()
@@ -332,6 +332,11 @@ void MainWindow::onActOpenSettings()
     settingsDialog->show();
 }
 
+void MainWindow::onLineStarted(const int &lineNum)
+{
+    this->editor_->goToLine(lineNum);
+}
+
 void MainWindow::onCommandError(CommandErr err)
 {
     emit this->messageController_->error(err, this);
@@ -342,42 +347,23 @@ void MainWindow::onConnectionError(ConnectionErr err)
     emit this->messageController_->error(err, this);
 }
 
-void MainWindow::onAskLine(int fromLine, int toLine, int msDelay)
-{
-    this->editor_->goToLine(fromLine);
-    emit this->previewWorker_->giveLine(this->editor_->activeLineText(),
-                                        fromLine, toLine, msDelay);
-
-    if (this->progressBar_->value() != fromLine)
-    {
-        auto indices = this->previewWorker_->imgIndices();
-        auto it = std::find(indices.begin(), indices.end(), fromLine);
-        if (it != indices.end())
-        {
-            this->progressBar_->blockSignals(true);
-            this->progressBar_->setValue(it - indices.begin());
-            this->progressBar_->blockSignals(false);
-        }
-    }
-}
-
 void MainWindow::onMultiLineDone()
 {
     this->editor_->setReadOnly(false);
 }
 
-void MainWindow::onChangePreview(unsigned char *data, const unsigned long &size)
+void MainWindow::onChangePreview(QByteArray data, const unsigned long &size)
 {
     this->camPreview_->showPreview(data, size);
 }
 
 void MainWindow::onPBarChanged(int imgIndex)
 {
-    this->previewWorker_->setCancelled(true);
+    this->previewWorker_->cancel();
     if (this->previewWorker_->previewLock()->available())
     {
-        emit this->previewWorker_->askLine(
-            this->previewWorker_->imgIndices()[imgIndex]);
+        this->editor_->goToLine(this->previewWorker_->imgIndices()[imgIndex]);
+        emit this->previewWorker_->processText(this->editor_->activeLineText());
     }
     else
     {
@@ -387,9 +373,10 @@ void MainWindow::onPBarChanged(int imgIndex)
 
 void MainWindow::onPBarReleased()
 {
-    this->previewWorker_->setCancelled(true);
-    emit this->previewWorker_->askLine(
+    this->previewWorker_->cancel();
+    this->editor_->goToLine(
         this->previewWorker_->imgIndices()[this->progressBar_->value()]);
+    emit this->previewWorker_->processText(this->editor_->activeLineText());
 }
 
 void MainWindow::onImgIndicesUpdated()
