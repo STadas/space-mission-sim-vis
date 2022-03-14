@@ -109,7 +109,8 @@ void PreviewWorker::onProcessText(const QString &text, const int &msLineDelay,
             // If the command itself took longer to execute than the specified
             // delay, don't sleep.
             unsigned int msDiff = startTime.msecsTo(QTime::currentTime());
-            QThread::currentThread()->msleep(std::max<int>(msLineDelay - msDiff, 0));
+            QThread::currentThread()->msleep(
+                std::max<int>(msLineDelay - msDiff, 0));
         }
     }
 
