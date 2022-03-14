@@ -74,11 +74,14 @@ int Editor::save()
         return this->saveAs();
     }
 
-    auto err = FileUtil::writeFile(this->toPlainText(), this->defaultSavePath_);
-    if (err == QFileDevice::FileError::NoError)
+    auto err = FileUtil::writeFile(this->defaultSavePath_, this->toPlainText());
+    if (err != QFileDevice::FileError::NoError)
     {
-        this->document()->setModified(false);
+        return err;
     }
+
+    this->document()->setModified(false);
+
     return err;
 }
 
