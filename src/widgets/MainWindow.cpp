@@ -270,7 +270,7 @@ void MainWindow::onActMultiLineStart()
         return;
 
     bool ok;
-    int msDelay = QInputDialog::getInt(this, "Command delay", "Delay (ms)",
+    int msDelay = QInputDialog::getInt(this, "Minimum delay", "Delay (ms)",
                                        1000, 0, INT32_MAX, 100, &ok);
     if (!ok)
         return;
