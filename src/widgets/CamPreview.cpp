@@ -18,13 +18,12 @@ CamPreview::~CamPreview()
 {
 }
 
-void CamPreview::showPreview(unsigned char *data, const unsigned long &size)
+void CamPreview::showPreview(QByteArray data, const unsigned long &size)
 {
     QSize oldSize = this->size();
 
-    this->pm_.loadFromData(QByteArray((char *)data, size), "PNG");
+    this->pm_.loadFromData(data, "PNG");
     this->imgLabel_->setPixmap(this->pm_);
-    delete data;
 
     QSize newSize = this->size();
 

@@ -4,10 +4,9 @@
 #include <QtWidgets>
 
 #include "common/VBoxLayout.hpp"
-#include "interfaces/IPreview.hpp"
 #include "widgets/ProgressBar.hpp"
 
-class CamPreview : public QWidget, IPreview
+class CamPreview : public QWidget
 {
     Q_OBJECT
 
@@ -15,7 +14,7 @@ public:
     CamPreview(QWidget *parent = nullptr);
     ~CamPreview() override;
 
-    void showPreview(unsigned char *data, const unsigned long &size) override;
+    void showPreview(QByteArray data, const unsigned long &size);
 
     bool eventFilter(QObject *object, QEvent *event) override;
 
