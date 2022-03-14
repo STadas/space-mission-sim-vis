@@ -52,6 +52,8 @@ void PreviewWorker::onProcessText(const QString &text, const int &msLineDelay,
 
     for (int i = start; i < lines.size(); i++)
     {
+        QTime startTime = QTime::currentTime();
+
         QString &line = lines[i];
 
         if (lines.size() > 1)
@@ -64,8 +66,14 @@ void PreviewWorker::onProcessText(const QString &text, const int &msLineDelay,
         {
             emit this->error(commandErr);
 
-            if (commandErr != CommandErr::EMPTY)
+            if (commandErr == CommandErr::EMPTY)
+            {
+                continue;
+            }
+            else
+            {
                 break;
+            }
         }
 
         unsigned char *img = nullptr;
@@ -96,8 +104,13 @@ void PreviewWorker::onProcessText(const QString &text, const int &msLineDelay,
         if (this->isCancelled_)
             break;
 
-        if (commandErr != CommandErr::EMPTY && lines.size() > 1)
-            QThread::currentThread()->msleep(msLineDelay);
+        if (commandErr != CommandErr::EMPTY && i < lines.size() - 1)
+        {
+            // If the command itself took longer to execute than the specified
+            // delay, don't sleep.
+            unsigned int msDiff = startTime.msecsTo(QTime::currentTime());
+            QThread::currentThread()->msleep(std::max<int>(msLineDelay - msDiff, 0));
+        }
     }
 
     emit this->textProcessed();
