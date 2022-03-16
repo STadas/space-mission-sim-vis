@@ -66,7 +66,7 @@ void MainWindow::createSignalConnections()
                      &MainWindow::onConnectionError);
 
     QObject::connect(this->previewWorker_, &PreviewWorker::commandsProcessed,
-                     this, &MainWindow::onTextProcessed);
+                     this, &MainWindow::onCommandsProcessed);
 
     QObject::connect(this->previewWorker_, &PreviewWorker::changePreview, this,
                      &MainWindow::onChangePreview);
@@ -346,7 +346,7 @@ void MainWindow::onConnectionError(ConnectionErr err)
     emit this->messageController_->error(err, this);
 }
 
-void MainWindow::onTextProcessed()
+void MainWindow::onCommandsProcessed()
 {
     this->editor_->setReadOnly(false);
 }
