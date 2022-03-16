@@ -302,12 +302,6 @@ void MainWindow::onActStartServer()
         StringUtil::split(this->settings_->serverFlags.value()));
 }
 
-void MainWindow::onActStopServer()
-{
-    emit this->previewWorker_->disconnect();
-    this->serverProcess_->stop();
-}
-
 void MainWindow::onActConnectToServer()
 {
     emit this->previewWorker_->connect(this->settings_->serverAddress.value(),

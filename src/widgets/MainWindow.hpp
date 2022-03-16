@@ -80,7 +80,6 @@ private slots:
     void onActToggleAutoCommScan();
 
     void onActStartServer();
-    void onActStopServer();
     void onActConnectToServer();
     void onActDisconnectFromServer();
 
