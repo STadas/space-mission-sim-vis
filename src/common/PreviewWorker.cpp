@@ -11,10 +11,8 @@ PreviewWorker::PreviewWorker()
                      &PreviewWorker::onConnect);
     QObject::connect(this, &PreviewWorker::disconnect, this,
                      &PreviewWorker::onDisconnect);
-    QObject::connect(this, &PreviewWorker::processText, this,
-                     &PreviewWorker::onProcessText);
-    QObject::connect(this, &PreviewWorker::cancel, this,
-                     &PreviewWorker::onCancel);
+    QObject::connect(this, &PreviewWorker::processCommands, this,
+                     &PreviewWorker::onProcessCommands);
     QObject::connect(this, &PreviewWorker::updateImgIndices, this,
                      &PreviewWorker::onUpdateImgIndices);
 }
@@ -43,14 +41,18 @@ ConnectionErr PreviewWorker::onDisconnect()
     return this->connection_->disconnect();
 }
 
-void PreviewWorker::onProcessText(const QString &text, const int &msLineDelay,
-                                  const int &start)
+void PreviewWorker::onProcessCommands(const QString &text, const int &start,
+                                      const int &msLineDelay)
 {
     this->previewLock_->acquire();
 
     QStringList lines = StringUtil::split(text, "\\n");
 
-    for (int i = start; i < lines.size(); i++)
+    int end = lines.size();
+    if (end == 1)
+        end = start + 1;
+
+    for (int i = start; i < end; i++)
     {
         QTime startTime = QTime::currentTime();
 
@@ -67,13 +69,9 @@ void PreviewWorker::onProcessText(const QString &text, const int &msLineDelay,
             emit this->error(commandErr);
 
             if (commandErr == CommandErr::EMPTY)
-            {
                 continue;
-            }
             else
-            {
                 break;
-            }
         }
 
         unsigned char *img = nullptr;
@@ -114,12 +112,12 @@ void PreviewWorker::onProcessText(const QString &text, const int &msLineDelay,
         }
     }
 
-    emit this->textProcessed();
+    emit this->commandsProcessed();
     this->isCancelled_ = false;
     this->previewLock()->release();
 }
 
-void PreviewWorker::onCancel()
+void PreviewWorker::cancelStepping()
 {
     if (!this->previewLock_->available())
     {

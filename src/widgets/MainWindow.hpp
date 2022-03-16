@@ -80,7 +80,6 @@ private slots:
     void onActToggleAutoCommScan();
 
     void onActStartServer();
-    void onActStopServer();
     void onActConnectToServer();
     void onActDisconnectFromServer();
 
@@ -91,7 +90,7 @@ private slots:
     void onCommandError(CommandErr err);
     void onConnectionError(ConnectionErr err);
 
-    void onMultiLineDone();
+    void onCommandsProcessed();
     void onChangePreview(QByteArray data, const unsigned long &size);
 
     void onPBarChanged(int imgIndex);
