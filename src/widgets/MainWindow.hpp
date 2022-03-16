@@ -91,7 +91,7 @@ private slots:
     void onCommandError(CommandErr err);
     void onConnectionError(ConnectionErr err);
 
-    void onMultiLineDone();
+    void onTextProcessed();
     void onChangePreview(QByteArray data, const unsigned long &size);
 
     void onPBarChanged(int imgIndex);

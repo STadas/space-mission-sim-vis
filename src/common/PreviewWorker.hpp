@@ -20,13 +20,14 @@ public:
 
     QSemaphore *previewLock() const;
     std::vector<int> imgIndices() const;
+    void cancelStepping();
 
 private:
     PanguConnection *connection_;
     PanguParser *parser_;
 
     QSemaphore *previewLock_;
-    bool isCancelled_;
+    std::atomic<bool> isCancelled_;
     std::vector<int> imgIndices_;
 
 signals:
@@ -36,13 +37,12 @@ signals:
     void error(CommandErr err);
     void error(ConnectionErr err);
 
-    void processText(const QString &text, const int &msLineDelay = 0,
-                     const int &start = 0);
+    void processCommands(const QString &text, const int &start = 0,
+                         const int &msLineDelay = 0);
     void lineStarted(const int &lineNum);
     void changePreview(QByteArray byteArr, unsigned long size);
-    void cancel();
 
-    void textProcessed();
+    void commandsProcessed();
 
     void updateImgIndices(const QString &str);
     void imgIndicesUpdated();
@@ -51,10 +51,8 @@ private slots:
     ConnectionErr onConnect(const QString &address, const int &port);
     ConnectionErr onDisconnect();
 
-    void onProcessText(const QString &text, const int &msLineDelay = 0,
-                       const int &start = 0);
-
-    void onCancel();
+    void onProcessCommands(const QString &text, const int &start = 0,
+                           const int &msLineDelay = 0);
 
     void onUpdateImgIndices(const QString &str);
 };
