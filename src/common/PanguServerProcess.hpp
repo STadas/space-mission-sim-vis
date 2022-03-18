@@ -2,9 +2,9 @@
 
 #include <QtCore>
 
-#include "interfaces/IServerProcess.hpp"
+#include "interfaces/IProcess.hpp"
 
-class PanguServerProcess : public QObject, IServerProcess
+class PanguServerProcess : public QObject, IProcess
 {
     Q_OBJECT
 

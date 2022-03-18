@@ -2,6 +2,7 @@
 
 MessageController::MessageController(QObject *parent)
     : QObject(parent)
+    , messageOpen_(false)
 {
     QObject::connect(
         this, qOverload<CommandErr, QWidget *>(&MessageController::error), this,
@@ -20,36 +21,57 @@ MessageController::~MessageController()
 {
 }
 
+void MessageController::showCritical(QWidget *parent, const QString &title,
+                                     const QString &text)
+{
+    if (messageOpen_)
+        return;
+
+    this->messageOpen_ = true;
+
+    QMessageBox *mBox = new QMessageBox(parent);
+
+    mBox->setModal(false);
+    mBox->setIconPixmap(
+        parent->style()->standardPixmap(QStyle::SP_MessageBoxCritical));
+    mBox->setWindowTitle(title);
+    mBox->setText(text);
+    mBox->addButton(QMessageBox::Ok);
+    QObject::connect(mBox, &QMessageBox::buttonClicked, this, [=] {
+        this->messageOpen_ = false;
+    });
+
+    mBox->show();
+}
+
 void MessageController::onError(CommandErr err, QWidget *parent)
 {
     QString windowTitle = "Syntax error";
     switch (err)
     {
         case CommandErr::NOT_IMPLEMENTED: {
-            QMessageBox::critical(
-                parent, windowTitle,
-                "No such command implemented. Please check your "
-                "syntax and try again.");
+            this->showCritical(parent, windowTitle,
+                               "No such command implemented. Please check your "
+                               "syntax and try again.");
             break;
         }
         case CommandErr::BAD_ARG_COUNT: {
-            QMessageBox::critical(
+            this->showCritical(
                 parent, windowTitle,
                 "Invalid amount of arguments for command. Please "
                 "check your syntax and try again.");
             break;
         }
         case CommandErr::BAD_ARG_TYPE: {
-            QMessageBox::critical(
-                parent, windowTitle,
-                "Invalid argument type for command. Please check"
-                "your syntax and try again.");
+            this->showCritical(parent, windowTitle,
+                               "Invalid argument type for command. Please check"
+                               "your syntax and try again.");
             break;
         }
         case CommandErr::UNKNOWN: {
-            QMessageBox::critical(parent, windowTitle,
-                                  "Unknown syntax error. Please check your "
-                                  "settings and syntax and try again.");
+            this->showCritical(parent, windowTitle,
+                               "Unknown syntax error. Please check your "
+                               "settings and syntax and try again.");
             break;
         }
         case CommandErr::EMPTY: {
@@ -73,7 +95,7 @@ void MessageController::onError(ConnectionErr err, QWidget *parent)
             break;
         }
         case ConnectionErr::BAD_DATA: {
-            QMessageBox::critical(
+            this->showCritical(
                 parent, windowTitle,
                 "There was an error when getting the preview image. Please "
                 "check "
@@ -81,7 +103,7 @@ void MessageController::onError(ConnectionErr err, QWidget *parent)
             break;
         }
         default: {
-            QMessageBox::critical(
+            this->showCritical(
                 parent, windowTitle,
                 "There was an error when sending the command to the server. "
                 "Please check your settings and the status of the server.");
@@ -95,13 +117,13 @@ void MessageController::onError(FileErr err, QWidget *parent)
     switch (err)
     {
         case FileErr::OPEN_FAIL: {
-            QMessageBox::critical(parent, "Open file",
-                                  "There was an error opening the file.");
+            this->showCritical(parent, "Open file",
+                               "There was an error opening the file.");
             break;
         }
         case FileErr::SAVE_FAIL: {
-            QMessageBox::critical(parent, "Save file as",
-                                  "There was an error saving the file.");
+            this->showCritical(parent, "Save file as",
+                               "There was an error saving the file.");
             break;
         }
         default: {

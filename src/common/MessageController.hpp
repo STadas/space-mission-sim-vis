@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QtConcurrent>
 #include <QtCore>
 #include <QtWidgets>
 #include "enums/CommandErr.hpp"
@@ -16,6 +17,11 @@ public:
     ~MessageController();
 
     QMessageBox::StandardButton question(FileQuestion qst, QWidget *parent);
+
+private:
+    bool messageOpen_;
+    void showCritical(QWidget *parent, const QString &title,
+                      const QString &text);
 
 signals:
     void error(CommandErr err, QWidget *parent = nullptr);

@@ -4,7 +4,6 @@
 #include <QtWidgets>
 
 #include "common/VBoxLayout.hpp"
-#include "widgets/ProgressBar.hpp"
 
 class CamPreview : public QWidget
 {
