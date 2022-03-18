@@ -2,10 +2,10 @@
 
 #include <QtCore>
 
-class IServerProcess
+class IProcess
 {
 public:
-    ~IServerProcess()
+    ~IProcess()
     {
     }
 
