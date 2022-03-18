@@ -21,7 +21,8 @@ MessageController::~MessageController()
 {
 }
 
-void MessageController::showCritical(QWidget *parent, const QString &title, const QString &text)
+void MessageController::showCritical(QWidget *parent, const QString &title,
+                                     const QString &text)
 {
     if (messageOpen_)
         return;
@@ -31,7 +32,8 @@ void MessageController::showCritical(QWidget *parent, const QString &title, cons
     QMessageBox *mBox = new QMessageBox(parent);
 
     mBox->setModal(false);
-    mBox->setIconPixmap(parent->style()->standardPixmap(QStyle::SP_MessageBoxCritical));
+    mBox->setIconPixmap(
+        parent->style()->standardPixmap(QStyle::SP_MessageBoxCritical));
     mBox->setWindowTitle(title);
     mBox->setText(text);
     mBox->addButton(QMessageBox::Ok);
@@ -48,10 +50,9 @@ void MessageController::onError(CommandErr err, QWidget *parent)
     switch (err)
     {
         case CommandErr::NOT_IMPLEMENTED: {
-            this->showCritical(
-                parent, windowTitle,
-                "No such command implemented. Please check your "
-                "syntax and try again.");
+            this->showCritical(parent, windowTitle,
+                               "No such command implemented. Please check your "
+                               "syntax and try again.");
             break;
         }
         case CommandErr::BAD_ARG_COUNT: {
@@ -62,16 +63,15 @@ void MessageController::onError(CommandErr err, QWidget *parent)
             break;
         }
         case CommandErr::BAD_ARG_TYPE: {
-            this->showCritical(
-                parent, windowTitle,
-                "Invalid argument type for command. Please check"
-                "your syntax and try again.");
+            this->showCritical(parent, windowTitle,
+                               "Invalid argument type for command. Please check"
+                               "your syntax and try again.");
             break;
         }
         case CommandErr::UNKNOWN: {
             this->showCritical(parent, windowTitle,
-                                  "Unknown syntax error. Please check your "
-                                  "settings and syntax and try again.");
+                               "Unknown syntax error. Please check your "
+                               "settings and syntax and try again.");
             break;
         }
         case CommandErr::EMPTY: {
@@ -118,12 +118,12 @@ void MessageController::onError(FileErr err, QWidget *parent)
     {
         case FileErr::OPEN_FAIL: {
             this->showCritical(parent, "Open file",
-                                  "There was an error opening the file.");
+                               "There was an error opening the file.");
             break;
         }
         case FileErr::SAVE_FAIL: {
             this->showCritical(parent, "Save file as",
-                                  "There was an error saving the file.");
+                               "There was an error saving the file.");
             break;
         }
         default: {

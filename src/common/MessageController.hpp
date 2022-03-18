@@ -20,7 +20,8 @@ public:
 
 private:
     bool messageOpen_;
-    void showCritical(QWidget *parent, const QString &title, const QString &text);
+    void showCritical(QWidget *parent, const QString &title,
+                      const QString &text);
 
 signals:
     void error(CommandErr err, QWidget *parent = nullptr);
