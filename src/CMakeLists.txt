@@ -17,6 +17,8 @@ set(SOURCE_PROJECT
         common/PreviewWorker.hpp
         common/ParsedCommand.cpp
         common/ParsedCommand.hpp
+        common/Resources.cpp
+        common/Resources.hpp
         common/VBoxLayout.cpp
         common/VBoxLayout.hpp
 
@@ -40,6 +42,8 @@ set(SOURCE_PROJECT
         widgets/MainWindow.hpp
         widgets/Editor.cpp
         widgets/Editor.hpp
+        widgets/PlaybackInterface.cpp
+        widgets/PlaybackInterface.hpp
         widgets/ProgressBar.cpp
         widgets/ProgressBar.hpp
 
@@ -50,6 +54,8 @@ set(SOURCE_PROJECT
         widgets/settingspages/ServerPage.hpp
         widgets/settingspages/SettingsPage.cpp
         widgets/settingspages/SettingsPage.hpp
+
+        ${CMAKE_SOURCE_DIR}/resources/resources.qrc
         )
 
 source_group(TREE ${CMAKE_SOURCE_DIR} FILES ${SOURCE_PROJECT})

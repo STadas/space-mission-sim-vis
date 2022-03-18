@@ -8,9 +8,11 @@
 #include "common/MessageController.hpp"
 #include "common/PanguServerProcess.hpp"
 #include "common/PreviewWorker.hpp"
+#include "common/Resources.hpp"
 #include "common/VBoxLayout.hpp"
 #include "common/settings/Settings.hpp"
 #include "widgets/CamPreview.hpp"
+#include "widgets/PlaybackInterface.hpp"
 #include "widgets/dialogs/SettingsDialog.hpp"
 
 class MainWindow : public QMainWindow
@@ -24,6 +26,7 @@ public:
 private:
     Editor *editor_;
     CamPreview *camPreview_;
+    PlaybackInterface *playbackInterface_;
     ProgressBar *progressBar_;
 
     bool autoCommScan_;
@@ -36,20 +39,22 @@ private:
     PanguServerProcess *serverProcess_;
 
     Settings *const settings_;
+    Resources *const resources_;
 
     QMenu *fileMenu_;
     QMenu *toolsMenu_;
     QMenu *commandsMenu_;
     QMenu *serverMenu_;
 
-    QAction *actFileNew_;
-    QAction *actFileOpen_;
-    QAction *actFileSave_;
-    QAction *actFileSaveAs_;
+    QAction *actNewFile_;
+    QAction *actOpenFile_;
+    QAction *actSaveFile_;
+    QAction *actSaveFileAs_;
 
-    QAction *actActiveLineExec_;
-    QAction *actMultiLineStart_;
-    QAction *actMultiLineStop_;
+    QAction *actExecCurrentLine_;
+    QAction *actExecPreviousLine_;
+    QAction *actExecNextLine_;
+    QAction *actToggleMultiLine_;
 
     QAction *actCommScan_;
     QAction *actToggleAutoCommScan_;
@@ -61,20 +66,23 @@ private:
 
     QAction *actOpenSettings_;
 
-    void createMenus();
-    void createActions();
-    void createSignalConnections();
+    void initSignalConnections();
+    void initActions();
+    void initMenus();
+    void initToolBars();
+    void initPlayBackInterface();
 
 private slots:
     /* on action */
-    void onActFileNew();
-    void onActFileOpen();
-    void onActFileSave();
-    void onActFileSaveAs();
+    void onActNewFile();
+    void onActOpenFile();
+    void onActSaveFile();
+    void onActSaveFileAs();
 
-    void onActActiveLineExec();
-    void onActMultiLineStart();
-    void onActMultiLineStop();
+    void onActExecCurrentLine();
+    void onActExecPreviousLine();
+    void onActExecNextLine();
+    void onActToggleMultiLine();
 
     void onActCommScan();
     void onActToggleAutoCommScan();
