@@ -1,12 +1,14 @@
 #include "SettingsDialog.hpp"
-#include <qlistwidget.h>
 
-SettingsDialog::SettingsDialog(QWidget *parent, Settings *const settings)
-    : QDialog(parent)
+SettingsDialog::SettingsDialog(QWidget *parent, Settings *const settings,
+                               Resources *const resources)
+    : Dialog(parent)
     , pageSelect_(new QListWidget(this))
     , pages_(new QStackedWidget(this))
     , settings_(settings)
+    , resources_(resources)
 {
+    this->setAttribute(Qt::WA_DeleteOnClose, true);
     this->setWindowTitle("Settings");
 
     this->setLayout(new QVBoxLayout);
@@ -43,6 +45,23 @@ SettingsDialog::SettingsDialog(QWidget *parent, Settings *const settings)
     {
         this->pageSelect_->setCurrentRow(0);
     }
+
+    this->load();
+}
+
+SettingsDialog::~SettingsDialog()
+{
+}
+
+void SettingsDialog::save()
+{
+    this->settings_->geometrySettingsDialog.setValue(this->saveGeometry());
+}
+
+void SettingsDialog::load()
+{
+    if (this->settings_->geometrySettingsDialog.value() != QByteArray())
+        this->restoreGeometry(this->settings_->geometrySettingsDialog.value());
 }
 
 void SettingsDialog::createPages()
@@ -51,14 +70,15 @@ void SettingsDialog::createPages()
                      &SettingsDialog::onCurrentChanged);
 
     QWidget *serverPage = new ServerPage(this, this->settings_);
-    QAction *actServerPage = new QAction("Server", this);
+    QAction *actServerPage =
+        new QAction(this->resources_->iconDisplay, "Server", this);
     this->addPage(actServerPage, serverPage);
 }
 
 void SettingsDialog::addPage(QAction *action, QWidget *page)
 {
     this->pages_->addWidget(page);
-    QListWidgetItem *item = new QListWidgetItem(action->text());
+    QListWidgetItem *item = new QListWidgetItem(action->icon(), action->text());
     item->setTextAlignment(Qt::AlignCenter);
     this->pageSelect_->addItem(item);
 }

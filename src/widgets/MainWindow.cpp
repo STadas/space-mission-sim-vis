@@ -35,25 +35,52 @@ MainWindow::MainWindow(QWidget *parent)
     this->centralWidget()->layout()->addWidget(this->editor_);
 
     //TODO: refactor this to make it easier to add and remove other elements
-    QDockWidget *dockPreview = new QDockWidget("Camera Preview", this);
-    dockPreview->setWidget(this->camPreview_);
-    this->addDockWidget(Qt::RightDockWidgetArea, dockPreview);
+    QDockWidget *dockCamPreview = new QDockWidget("Camera Preview", this);
+    dockCamPreview->setObjectName("dockCamPreview");
+    dockCamPreview->setWidget(this->camPreview_);
+    this->addDockWidget(Qt::RightDockWidgetArea, dockCamPreview);
 
-    QDockWidget *dockProgressBar = new QDockWidget("Playback Controls", this);
-    dockProgressBar->setWidget(this->playbackInterface_);
-    this->addDockWidget(Qt::RightDockWidgetArea, dockProgressBar);
+    QDockWidget *dockPlaybackControls =
+        new QDockWidget("Playback Controls", this);
+    dockPlaybackControls->setObjectName("dockPlaybackControls");
+    dockPlaybackControls->setWidget(this->playbackInterface_);
+    this->addDockWidget(Qt::RightDockWidgetArea, dockPlaybackControls);
 
     this->initSignalConnections();
     this->initActions();
     this->initMenus();
     this->initToolBars();
     this->initPlayBackInterface();
+
+    this->load();
 }
 
 MainWindow::~MainWindow()
 {
     this->previewWorkerThread_->quit();
     this->previewWorkerThread_->wait();
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    this->save();
+    this->settings_->save();
+    QMainWindow::closeEvent(event);
+}
+
+void MainWindow::save()
+{
+    this->settings_->geometryMainWindow.setValue(this->saveGeometry());
+    this->settings_->stateMainWindow.setValue(this->saveState());
+}
+
+void MainWindow::load()
+{
+    if (this->settings_->geometryMainWindow.value() != QByteArray())
+        this->restoreGeometry(this->settings_->geometryMainWindow.value());
+
+    if (this->settings_->stateMainWindow.value() != QByteArray())
+        this->restoreState(this->settings_->stateMainWindow.value());
 }
 
 void MainWindow::initSignalConnections()
@@ -230,12 +257,14 @@ void MainWindow::initToolBars()
 {
     QToolBar *fileToolBar = new QToolBar(this);
     this->addToolBar(fileToolBar);
+    fileToolBar->setObjectName("fileToolBar");
     fileToolBar->addAction(this->actNewFile_);
     fileToolBar->addAction(this->actOpenFile_);
     fileToolBar->addAction(this->actSaveFile_);
 
     QToolBar *commandToolBar = new QToolBar(this);
     this->addToolBar(commandToolBar);
+    commandToolBar->setObjectName("commandToolBar");
     commandToolBar->addAction(this->actToggleAutoCommScan_);
     commandToolBar->addAction(this->actCommScan_);
     commandToolBar->addAction(this->actExecCurrentLine_);
@@ -245,6 +274,7 @@ void MainWindow::initToolBars()
 
     QToolBar *serverToolBar = new QToolBar(this);
     this->addToolBar(serverToolBar);
+    serverToolBar->setObjectName("serverToolBar");
     serverToolBar->addAction(this->actStartServer_);
     serverToolBar->addAction(this->actConnectToServer_);
     serverToolBar->addAction(this->actDisconnectFromServer_);
@@ -404,7 +434,8 @@ void MainWindow::onActDisconnectFromServer()
 
 void MainWindow::onActOpenSettings()
 {
-    SettingsDialog *settingsDialog = new SettingsDialog(this, this->settings_);
+    SettingsDialog *settingsDialog =
+        new SettingsDialog(this, this->settings_, this->resources_);
     settingsDialog->show();
 }
 
