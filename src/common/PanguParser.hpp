@@ -5,7 +5,7 @@
 #include "interfaces/IParser.hpp"
 #include "util/StringUtil.hpp"
 
-class PanguParser : public QObject, IParser
+class PanguParser : public QObject, public IParser
 {
     Q_OBJECT
 

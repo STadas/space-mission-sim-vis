@@ -4,7 +4,7 @@
 
 #include "interfaces/IProcess.hpp"
 
-class PanguServerProcess : public QObject, IProcess
+class PanguServerProcess : public QObject, public IProcess
 {
     Q_OBJECT
 

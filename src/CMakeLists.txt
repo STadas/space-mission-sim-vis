@@ -47,6 +47,8 @@ set(SOURCE_PROJECT
         widgets/ProgressBar.cpp
         widgets/ProgressBar.hpp
 
+        widgets/dialogs/Dialog.cpp
+        widgets/dialogs/Dialog.hpp
         widgets/dialogs/SettingsDialog.cpp
         widgets/dialogs/SettingsDialog.hpp
 

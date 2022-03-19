@@ -4,7 +4,7 @@
 
 #include "interfaces/ISavableLoadable.hpp"
 
-class SettingManager : public QObject, ISavableLoadable
+class SettingManager : public QObject, public ISavableLoadable
 {
     Q_OBJECT
 

@@ -5,7 +5,7 @@
 #include "interfaces/IEditor.hpp"
 #include "util/FileUtil.hpp"
 
-class Editor : public QPlainTextEdit, IEditor
+class Editor : public QPlainTextEdit, public IEditor
 {
     Q_OBJECT
 

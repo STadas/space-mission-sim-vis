@@ -12,8 +12,9 @@ using FloatSetting = GenericSetting<float>;
 using DoubleSetting = GenericSetting<double>;
 using StringSetting = GenericSetting<std::string>;
 using QStringSetting = GenericSetting<QString>;
+using QByteArraySetting = GenericSetting<QByteArray>;
 
-class Settings : public QObject, ISavableLoadable
+class Settings : public QObject, public ISavableLoadable
 {
     Q_OBJECT
 
@@ -32,4 +33,11 @@ public:
     QStringSetting serverAddress = {"server/address", "localhost",
                                     this->manager_};
     IntSetting serverPort = {"server/port", 10363, this->manager_};
+
+    QByteArraySetting stateMainWindow = {
+        "rect/MainWindowState", {}, this->manager_};
+    QByteArraySetting geometryMainWindow = {
+        "rect/MainWindowGeometry", {}, this->manager_};
+    QByteArraySetting geometrySettingsDialog = {
+        "rect/SettingsDialog", {}, this->manager_};
 };

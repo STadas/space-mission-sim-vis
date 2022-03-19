@@ -10,7 +10,7 @@
 #include "interfaces/IConnection.hpp"
 #include "util/ThreadUtil.hpp"
 
-class PreviewWorker : public QObject, IConnection
+class PreviewWorker : public QObject, public IConnection
 {
     Q_OBJECT
 

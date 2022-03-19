@@ -4,18 +4,19 @@
 #include <QtCore>
 #include <QtWidgets>
 
-#include "Editor.hpp"
 #include "common/MessageController.hpp"
 #include "common/PanguServerProcess.hpp"
 #include "common/PreviewWorker.hpp"
 #include "common/Resources.hpp"
 #include "common/VBoxLayout.hpp"
 #include "common/settings/Settings.hpp"
+#include "interfaces/ISavableLoadable.hpp"
 #include "widgets/CamPreview.hpp"
+#include "widgets/Editor.hpp"
 #include "widgets/PlaybackInterface.hpp"
 #include "widgets/dialogs/SettingsDialog.hpp"
 
-class MainWindow : public QMainWindow
+class MainWindow : public QMainWindow, public ISavableLoadable
 {
     Q_OBJECT
 
@@ -23,7 +24,18 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+    void closeEvent(QCloseEvent *event) override;
+
 private:
+    void save() override;
+    void load() override;
+
+    void initSignalConnections();
+    void initActions();
+    void initMenus();
+    void initToolBars();
+    void initPlayBackInterface();
+
     Editor *editor_;
     CamPreview *camPreview_;
     PlaybackInterface *playbackInterface_;
@@ -65,12 +77,6 @@ private:
     QAction *actDisconnectFromServer_;
 
     QAction *actOpenSettings_;
-
-    void initSignalConnections();
-    void initActions();
-    void initMenus();
-    void initToolBars();
-    void initPlayBackInterface();
 
 private slots:
     /* on action */
