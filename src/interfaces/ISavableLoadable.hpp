@@ -3,7 +3,7 @@
 #include "interfaces/ILoadable.hpp"
 #include "interfaces/ISavable.hpp"
 
-class ISavableLoadable : public ISavable, ILoadable
+class ISavableLoadable : public ISavable, public ILoadable
 {
 public:
     ISavableLoadable()

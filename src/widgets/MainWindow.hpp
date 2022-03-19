@@ -15,7 +15,7 @@
 #include "widgets/PlaybackInterface.hpp"
 #include "widgets/dialogs/SettingsDialog.hpp"
 
-class MainWindow : public QMainWindow
+class MainWindow : public QMainWindow, public SavableWidget
 {
     Q_OBJECT
 

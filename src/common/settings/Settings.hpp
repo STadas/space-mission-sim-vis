@@ -13,7 +13,7 @@ using DoubleSetting = GenericSetting<double>;
 using StringSetting = GenericSetting<std::string>;
 using QStringSetting = GenericSetting<QString>;
 
-class Settings : public QObject, ISavableLoadable
+class Settings : public QObject, public ISavableLoadable
 {
     Q_OBJECT
 

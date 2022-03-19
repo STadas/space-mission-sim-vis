@@ -3,7 +3,7 @@
 #include <QtCore>
 #include <QtWidgets>
 
-class Resources : QObject
+class Resources : public QObject
 {
     Q_OBJECT
 
