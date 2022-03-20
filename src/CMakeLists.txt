@@ -52,6 +52,8 @@ set(SOURCE_PROJECT
         widgets/dialogs/SettingsDialog.cpp
         widgets/dialogs/SettingsDialog.hpp
 
+        widgets/settingspages/EditorPage.cpp
+        widgets/settingspages/EditorPage.hpp
         widgets/settingspages/ServerPage.cpp
         widgets/settingspages/ServerPage.hpp
         widgets/settingspages/SettingsPage.cpp

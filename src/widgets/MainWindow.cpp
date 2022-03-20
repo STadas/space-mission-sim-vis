@@ -2,8 +2,9 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
+    , settings_(new Settings(this))
+    , resources_(new Resources(this))
     , camPreview_(new CamPreview(this))
-    , editor_(new Editor(this))
     , playbackInterface_(new PlaybackInterface(this))
     , progressBar_(this->playbackInterface_->progressBar_)
     , autoCommScan_(false)
@@ -11,10 +12,9 @@ MainWindow::MainWindow(QWidget *parent)
     , previewWorker_(new PreviewWorker)  // no parent so it can moveToThread
     , previewWorkerThread_(new QThread(this))
     , serverProcess_(new PanguServerProcess(this))
-    , settings_(new Settings(this))
-    , resources_(new Resources(this))
 {
     this->settings_->load();
+    this->editor_ = new Editor(this, this->settings_);
 
     /* As weird as this is, it needs to be done for us to be able to use the
      * enums with signals and slots. Potential for a generated source code

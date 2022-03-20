@@ -2,6 +2,7 @@
 
 #include <QtWidgets>
 
+#include "common/settings/Settings.hpp"
 #include "interfaces/IEditor.hpp"
 #include "util/FileUtil.hpp"
 
@@ -10,7 +11,7 @@ class Editor : public QPlainTextEdit, public IEditor
     Q_OBJECT
 
 public:
-    Editor(QWidget *parent);
+    Editor(QWidget *parent, Settings *const settings);
     ~Editor() override;
 
     bool isModified() override;
@@ -26,6 +27,7 @@ public:
 
 private:
     QString defaultSavePath_{};
+    Settings *const settings_;
 
     void highlightCurrentLine();
 };
