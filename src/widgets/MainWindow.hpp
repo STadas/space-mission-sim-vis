@@ -41,6 +41,9 @@ private:
     PlaybackInterface *playbackInterface_;
     ProgressBar *progressBar_;
 
+    QDockWidget *dockCamPreview_;
+    QDockWidget *dockPlaybackInterface_;
+
     bool autoCommScan_;
 
     MessageController *messageController_;
@@ -57,6 +60,7 @@ private:
     QMenu *toolsMenu_;
     QMenu *commandsMenu_;
     QMenu *serverMenu_;
+    QMenu *viewMenu_;
 
     QAction *actNewFile_;
     QAction *actOpenFile_;
@@ -78,6 +82,9 @@ private:
 
     QAction *actOpenSettings_;
 
+    QAction *actToggleCamPreview_;
+    QAction *actTogglePlaybackInterface_;
+
 private slots:
     /* on action */
     void onActNewFile();
@@ -88,16 +95,19 @@ private slots:
     void onActExecCurrentLine();
     void onActExecPreviousLine();
     void onActExecNextLine();
-    void onActToggleMultiLine();
+    void onActToggleMultiLine(bool on);
 
     void onActCommScan();
-    void onActToggleAutoCommScan();
+    void onActToggleAutoCommScan(bool on);
 
     void onActStartServer();
     void onActConnectToServer();
     void onActDisconnectFromServer();
 
     void onActOpenSettings();
+
+    void onActToggleCamPreview(bool on);
+    void onActTogglePlaybackInterface(bool on);
 
     /* on other signal */
     void onLineStarted(const int &lineNum);

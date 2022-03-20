@@ -35,16 +35,15 @@ MainWindow::MainWindow(QWidget *parent)
     this->centralWidget()->layout()->addWidget(this->editor_);
 
     //TODO: refactor this to make it easier to add and remove other elements
-    QDockWidget *dockCamPreview = new QDockWidget("Camera Preview", this);
-    dockCamPreview->setObjectName("dockCamPreview");
-    dockCamPreview->setWidget(this->camPreview_);
-    this->addDockWidget(Qt::RightDockWidgetArea, dockCamPreview);
+    this->dockCamPreview_ = new QDockWidget("Camera Preview", this);
+    this->dockCamPreview_->setObjectName("dockCamPreview");
+    this->dockCamPreview_->setWidget(this->camPreview_);
+    this->addDockWidget(Qt::RightDockWidgetArea, this->dockCamPreview_);
 
-    QDockWidget *dockPlaybackControls =
-        new QDockWidget("Playback Controls", this);
-    dockPlaybackControls->setObjectName("dockPlaybackControls");
-    dockPlaybackControls->setWidget(this->playbackInterface_);
-    this->addDockWidget(Qt::RightDockWidgetArea, dockPlaybackControls);
+    this->dockPlaybackInterface_ = new QDockWidget("Playback Controls", this);
+    this->dockPlaybackInterface_->setObjectName("dockPlaybackInterface");
+    this->dockPlaybackInterface_->setWidget(this->playbackInterface_);
+    this->addDockWidget(Qt::RightDockWidgetArea, this->dockPlaybackInterface_);
 
     this->initSignalConnections();
     this->initActions();
@@ -174,7 +173,9 @@ void MainWindow::initActions()
         "Step through and execute all commands (with delay) starting with the "
         "currently active line");
     this->actToggleMultiLine_->setIcon(this->resources_->iconPlaybackStart);
-    QObject::connect(this->actToggleMultiLine_, &QAction::triggered, this,
+    this->actToggleMultiLine_->setCheckable(true);
+    this->actToggleMultiLine_->setChecked(false);
+    QObject::connect(this->actToggleMultiLine_, &QAction::toggled, this,
                      &MainWindow::onActToggleMultiLine);
 
     this->actCommScan_ = new QAction("Scan all commands", this);
@@ -189,10 +190,10 @@ void MainWindow::initActions()
     this->actToggleAutoCommScan_->setStatusTip(
         "Toggle automatic scanning of all commands when editing to update "
         "components like the playback progress bar");
+    this->actToggleAutoCommScan_->setIcon(this->resources_->iconRecurring);
     this->actToggleAutoCommScan_->setCheckable(true);
     this->actToggleAutoCommScan_->setChecked(false);
-    this->actToggleAutoCommScan_->setIcon(this->resources_->iconRecurring);
-    QObject::connect(this->actToggleAutoCommScan_, &QAction::triggered, this,
+    QObject::connect(this->actToggleAutoCommScan_, &QAction::toggled, this,
                      &MainWindow::onActToggleAutoCommScan);
 
     this->actStartServer_ = new QAction("Start server", this);
@@ -222,35 +223,72 @@ void MainWindow::initActions()
     this->actOpenSettings_->setIcon(this->resources_->iconConfigure);
     QObject::connect(this->actOpenSettings_, &QAction::triggered, this,
                      &MainWindow::onActOpenSettings);
+
+    this->actToggleCamPreview_ = new QAction("Camera preview", this);
+    this->actToggleCamPreview_->setStatusTip(
+        "Toggle visibility of the camera preview");
+    this->actToggleCamPreview_->setCheckable(true);
+    this->actToggleCamPreview_->setChecked(this->dockCamPreview_->isVisible());
+    QObject::connect(this->actToggleCamPreview_, &QAction::toggled, this,
+                     &MainWindow::onActToggleCamPreview);
+    QObject::connect(this->dockCamPreview_, &QDockWidget::visibilityChanged,
+                     this->actToggleCamPreview_, &QAction::setChecked);
+
+    this->actTogglePlaybackInterface_ = new QAction("Playback interface", this);
+    this->actTogglePlaybackInterface_->setStatusTip(
+        "Toggle visibility of the playback interface");
+    this->actTogglePlaybackInterface_->setCheckable(true);
+    this->actTogglePlaybackInterface_->setChecked(
+        this->dockPlaybackInterface_->isVisible());
+    QObject::connect(this->actTogglePlaybackInterface_, &QAction::toggled, this,
+                     &MainWindow::onActTogglePlaybackInterface);
+    QObject::connect(this->dockPlaybackInterface_,
+                     &QDockWidget::visibilityChanged,
+                     this->actTogglePlaybackInterface_, &QAction::setChecked);
 }
 
 void MainWindow::initMenus()
 {
     this->fileMenu_ = new QMenu("File", this);
     this->menuBar()->addMenu(this->fileMenu_);
-    this->fileMenu_->addAction(actNewFile_);
-    this->fileMenu_->addAction(actOpenFile_);
-    this->fileMenu_->addAction(actSaveFile_);
-    this->fileMenu_->addAction(actSaveFileAs_);
+    this->fileMenu_->addActions({
+        this->actNewFile_,
+        this->actOpenFile_,
+        this->actSaveFile_,
+        this->actSaveFileAs_,
+    });
 
     this->toolsMenu_ = new QMenu("Tools", this);
     this->menuBar()->addMenu(this->toolsMenu_);
-    this->toolsMenu_->addAction(this->actOpenSettings_);
+    this->toolsMenu_->addActions({
+        this->actOpenSettings_,
+    });
 
     this->commandsMenu_ = new QMenu("Commands", this);
     this->toolsMenu_->addMenu(this->commandsMenu_);
-    this->commandsMenu_->addAction(this->actExecCurrentLine_);
-    this->commandsMenu_->addAction(this->actExecPreviousLine_);
-    this->commandsMenu_->addAction(this->actExecNextLine_);
-    this->commandsMenu_->addAction(this->actToggleMultiLine_);
-    this->commandsMenu_->addAction(this->actCommScan_);
-    this->commandsMenu_->addAction(this->actToggleAutoCommScan_);
+    this->commandsMenu_->addActions({
+        this->actExecCurrentLine_,
+        this->actExecPreviousLine_,
+        this->actExecNextLine_,
+        this->actToggleMultiLine_,
+        this->actCommScan_,
+        this->actToggleAutoCommScan_,
+    });
 
     this->serverMenu_ = new QMenu("Server", this);
     this->toolsMenu_->addMenu(this->serverMenu_);
-    this->serverMenu_->addAction(this->actStartServer_);
-    this->serverMenu_->addAction(this->actConnectToServer_);
-    this->serverMenu_->addAction(this->actDisconnectFromServer_);
+    this->serverMenu_->addActions({
+        this->actStartServer_,
+        this->actConnectToServer_,
+        this->actDisconnectFromServer_,
+    });
+
+    this->viewMenu_ = new QMenu("View", this);
+    this->menuBar()->addMenu(this->viewMenu_);
+    this->viewMenu_->addActions({
+        this->actToggleCamPreview_,
+        this->actTogglePlaybackInterface_,
+    });
 }
 
 void MainWindow::initToolBars()
@@ -372,31 +410,39 @@ void MainWindow::onActExecNextLine()
     emit this->previewWorker_->processCommands(this->editor_->activeLineText());
 }
 
-void MainWindow::onActToggleMultiLine()
+void MainWindow::onActToggleMultiLine(bool on)
 {
-    if (!this->previewWorker_->previewLock()->available())
+    if (on)
     {
-        this->previewWorker_->cancelStepping();
-        return;
+        bool ok;
+        int msDelay = QInputDialog::getInt(this, "Minimum delay", "Delay (ms)",
+                                           1000, 0, INT32_MAX, 100, &ok);
+        if (!ok)
+        {
+            this->actToggleMultiLine_->setChecked(false);
+            return;
+        }
+
+        this->actToggleMultiLine_->setText("Stop stepping");
+        this->actToggleMultiLine_->setStatusTip(
+            "Stop the currently active command stepping");
+        this->actToggleMultiLine_->setIcon(
+            this->style()->standardIcon(QStyle::SP_MediaPause));
+
+        this->editor_->setReadOnly(true);
+
+        emit this->previewWorker_->processCommands(
+            this->editor_->toPlainText(), this->editor_->textCursor().blockNumber(),
+            msDelay);
     }
-
-    this->actToggleMultiLine_->setText("Stop stepping");
-    this->actToggleMultiLine_->setStatusTip(
-        "Stop the currently active command stepping");
-    this->actToggleMultiLine_->setIcon(
-        this->style()->standardIcon(QStyle::SP_MediaPause));
-
-    bool ok;
-    int msDelay = QInputDialog::getInt(this, "Minimum delay", "Delay (ms)",
-                                       1000, 0, INT32_MAX, 100, &ok);
-    if (!ok)
-        return;
-
-    this->editor_->setReadOnly(true);
-
-    emit this->previewWorker_->processCommands(
-        this->editor_->toPlainText(), this->editor_->textCursor().blockNumber(),
-        msDelay);
+    else
+    {
+        if (!this->previewWorker_->previewLock()->available())
+        {
+            this->previewWorker_->cancelStepping();
+            return;
+        }
+    }
 }
 
 void MainWindow::onActCommScan()
@@ -404,10 +450,10 @@ void MainWindow::onActCommScan()
     emit this->previewWorker_->updateImgIndices(this->editor_->toPlainText());
 }
 
-void MainWindow::onActToggleAutoCommScan()
+void MainWindow::onActToggleAutoCommScan(bool on)
 {
-    this->autoCommScan_ = this->actToggleAutoCommScan_->isChecked();
-    if (this->actToggleAutoCommScan_->isChecked())
+    this->autoCommScan_ = on;
+    if (on)
     {
         emit this->previewWorker_->updateImgIndices(
             this->editor_->toPlainText());
@@ -437,6 +483,22 @@ void MainWindow::onActOpenSettings()
     SettingsDialog *settingsDialog =
         new SettingsDialog(this, this->settings_, this->resources_);
     settingsDialog->show();
+}
+
+void MainWindow::onActToggleCamPreview(bool on)
+{
+    if (on)
+        this->dockCamPreview_->show();
+    else
+        this->dockCamPreview_->hide();
+}
+
+void MainWindow::onActTogglePlaybackInterface(bool on)
+{
+    if (on)
+        this->dockPlaybackInterface_->show();
+    else
+        this->dockPlaybackInterface_->hide();
 }
 
 void MainWindow::onLineStarted(const int &lineNum)
@@ -481,6 +543,7 @@ void MainWindow::onCommandsProcessed()
         "currently active line");
     this->actToggleMultiLine_->setIcon(
         this->style()->standardIcon(QStyle::SP_MediaPlay));
+    this->actToggleMultiLine_->setChecked(false);
 }
 
 void MainWindow::onChangePreview(QByteArray data, const unsigned long &size)
