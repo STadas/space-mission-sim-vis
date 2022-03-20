@@ -432,8 +432,8 @@ void MainWindow::onActToggleMultiLine(bool on)
         this->editor_->setReadOnly(true);
 
         emit this->previewWorker_->processCommands(
-            this->editor_->toPlainText(), this->editor_->textCursor().blockNumber(),
-            msDelay);
+            this->editor_->toPlainText(),
+            this->editor_->textCursor().blockNumber(), msDelay);
     }
     else
     {
