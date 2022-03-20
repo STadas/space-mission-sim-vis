@@ -593,7 +593,7 @@ void MainWindow::onImgIndicesUpdated()
 
 void MainWindow::onEditorContentChanged()
 {
-    if (autoCommScan_)
+    if (this->autoCommScan_)
         emit this->previewWorker_->updateImgIndices(
             this->editor_->toPlainText());
 }
