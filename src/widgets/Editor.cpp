@@ -1,7 +1,8 @@
 #include "Editor.hpp"
 
-Editor::Editor(QWidget *parent)
+Editor::Editor(QWidget *parent, Settings *const settings)
     : QPlainTextEdit(parent)
+    , settings_(settings)
 {
     this->setLineWrapMode(QPlainTextEdit::NoWrap);
 
@@ -125,7 +126,7 @@ void Editor::highlightCurrentLine()
     QTextEdit::ExtraSelection selection;
 
     //TODO: could have a setting for the color
-    QColor lineColor = QColor(Qt::yellow).lighter(128);
+    QColor lineColor = QColor(this->settings_->currLineHighlightColor.value());
 
     selection.format.setBackground(lineColor);
     selection.format.setProperty(QTextFormat::FullWidthSelection, true);

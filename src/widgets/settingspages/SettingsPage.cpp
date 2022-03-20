@@ -45,7 +45,7 @@ QLineEdit *SettingsPage::createLineEdit(IntSetting &setting, const int &min,
     lineEdit->setValidator(new QIntValidator(min, max, lineEdit));
 
     QObject::connect(lineEdit, &QLineEdit::textChanged, this,
-                     [&setting, &lineEdit](const QString &newText) {
+                     [&setting, lineEdit](const QString &newText) {
                          if (lineEdit->hasAcceptableInput())
                              setting.setValue(newText.toInt());
                      });
@@ -62,7 +62,7 @@ QLineEdit *SettingsPage::createLineEdit(DoubleSetting &setting,
     lineEdit->setValidator(new QDoubleValidator(min, max, decimals, lineEdit));
 
     QObject::connect(lineEdit, &QLineEdit::textChanged, this,
-                     [&setting, &lineEdit](const QString &newText) {
+                     [&setting, lineEdit](const QString &newText) {
                          if (lineEdit->hasAcceptableInput())
                              setting.setValue(newText.toDouble());
                      });
@@ -75,16 +75,16 @@ QWidget *SettingsPage::createLineEditBrowse(QStringSetting &setting,
                                             const QString &dir,
                                             const QString &filter)
 {
-    QWidget *browseWrapper = new QWidget(this);
+    QWidget *wrapper = new QWidget(this);
 
-    QLineEdit *lineEdit = new QLineEdit(setting.value(), browseWrapper);
+    QLineEdit *lineEdit = new QLineEdit(setting.value(), wrapper);
     lineEdit->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
     QObject::connect(lineEdit, &QLineEdit::textChanged, this,
                      [&setting](const QString &newText) {
                          setting.setValue(newText);
                      });
 
-    QPushButton *browseButton = new QPushButton("Browse", browseWrapper);
+    QPushButton *browseButton = new QPushButton("Browse", wrapper);
     QObject::connect(browseButton, &QPushButton::clicked, this, [=] {
         QString filePath =
             QFileDialog::getOpenFileName(this, caption, dir, filter);
@@ -97,9 +97,36 @@ QWidget *SettingsPage::createLineEditBrowse(QStringSetting &setting,
         lineEdit->setText(filePath);
     });
 
-    browseWrapper->setLayout(new HBoxLayout);
-    browseWrapper->layout()->addWidget(lineEdit);
-    browseWrapper->layout()->addWidget(browseButton);
+    wrapper->setLayout(new HBoxLayout);
+    wrapper->layout()->addWidget(lineEdit);
+    wrapper->layout()->addWidget(browseButton);
 
-    return browseWrapper;
+    return wrapper;
+}
+
+QPushButton *SettingsPage::createColorPicker(QStringSetting &setting,
+                                             const QString &btnText)
+{
+    QPushButton *colorButton = new QPushButton(btnText, this);
+
+    colorButton->setAutoFillBackground(true);
+    colorButton->setFlat(true);
+    QPalette pal = colorButton->palette();
+    pal.setColor(QPalette::Button, setting.value());
+    colorButton->setPalette(pal);
+
+    QColorDialog *colorDialog = new QColorDialog(setting.value(), this);
+    QObject::connect(colorDialog, &QColorDialog::colorSelected, this,
+                     [&setting, colorButton](const QColor &color) {
+                         setting.setValue(color.name());
+
+                         QPalette pal = colorButton->palette();
+                         pal.setColor(QPalette::Button, color);
+                         colorButton->setPalette(pal);
+                     });
+
+    QObject::connect(colorButton, &QPushButton::clicked, colorDialog,
+                     &QColorDialog::show);
+
+    return colorButton;
 }

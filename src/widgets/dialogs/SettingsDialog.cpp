@@ -69,10 +69,11 @@ void SettingsDialog::createPages()
     QObject::connect(this->pageSelect_, &QListWidget::currentRowChanged, this,
                      &SettingsDialog::onCurrentChanged);
 
-    QWidget *serverPage = new ServerPage(this, this->settings_);
-    QAction *actServerPage =
-        new QAction(this->resources_->iconDisplay, "Server", this);
-    this->addPage(actServerPage, serverPage);
+    this->addPage(new QAction(this->resources_->iconDisplay, "Server", this),
+                  new ServerPage(this, this->settings_));
+
+    this->addPage(new QAction(this->resources_->iconEditor, "Editor", this),
+                  new EditorPage(this, this->settings_));
 }
 
 void SettingsDialog::addPage(QAction *action, QWidget *page)

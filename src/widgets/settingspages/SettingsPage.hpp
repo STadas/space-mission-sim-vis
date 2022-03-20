@@ -27,4 +27,7 @@ protected:
     QWidget *createLineEditBrowse(QStringSetting &setting,
                                   const QString &caption, const QString &dir,
                                   const QString &filter);
+
+    QPushButton *createColorPicker(QStringSetting &setting,
+                                   const QString &btnText = "");
 };

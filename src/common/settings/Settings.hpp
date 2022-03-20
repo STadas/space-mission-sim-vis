@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QtCore>
+#include <QtWidgets>
 
 #include "common/settings/GenericSetting.hpp"
 #include "common/settings/SettingManager.hpp"
@@ -40,4 +41,7 @@ public:
         "rect/MainWindowGeometry", {}, this->manager_};
     QByteArraySetting geometrySettingsDialog = {
         "rect/SettingsDialog", {}, this->manager_};
+
+    QStringSetting currLineHighlightColor = {"editor/currLineHightlightColor",
+                                             "#ffff00", this->manager_};
 };

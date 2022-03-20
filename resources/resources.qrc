@@ -19,5 +19,7 @@
     <file alias="network-disconnect">breeze-icons/network-disconnect.svg</file>
 
     <file alias="configure">breeze-icons/configure.svg</file>
+
+    <file alias="editor">breeze-icons/story-editor.svg</file>
   </qresource>
 </RCC>

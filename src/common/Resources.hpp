@@ -30,4 +30,6 @@ public:
     QIcon iconNetworkDisconnect = QIcon(":/icons/network-disconnect");
 
     QIcon iconConfigure = QIcon(":/icons/configure");
+
+    QIcon iconEditor = QIcon(":/icons/editor");
 };

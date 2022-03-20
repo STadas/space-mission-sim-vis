@@ -36,6 +36,9 @@ private:
     void initToolBars();
     void initPlayBackInterface();
 
+    Settings *const settings_;
+    Resources *const resources_;
+
     Editor *editor_;
     CamPreview *camPreview_;
     PlaybackInterface *playbackInterface_;
@@ -52,9 +55,6 @@ private:
     QThread *previewWorkerThread_;
 
     PanguServerProcess *serverProcess_;
-
-    Settings *const settings_;
-    Resources *const resources_;
 
     QMenu *fileMenu_;
     QMenu *toolsMenu_;
