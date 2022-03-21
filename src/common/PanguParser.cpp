@@ -19,7 +19,8 @@ PanguParser::~PanguParser()
 ParseResult PanguParser::parse(const QString &strCommand)
 {
     QString strippedCommand = strCommand.split(QRegExp("#+"))[0];
-    QStringList words = strippedCommand.split(QRegExp("[ \\t]+"));
+    QStringList words =
+        strippedCommand.split(QRegExp("[ \\t]+"), Qt::SkipEmptyParts);
 
     if (words.size() == 0 || (words.size() == 1 && words[0].size() == 0))
         return CommandErr::EMPTY;
