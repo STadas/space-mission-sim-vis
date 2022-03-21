@@ -46,7 +46,7 @@ void PreviewWorker::onProcessCommands(const QString &text, const int &start,
 {
     this->previewLock_->acquire();
 
-    QStringList lines = StringUtil::split(text, "\\n");
+    QStringList lines = text.split(QRegExp("\\n"));
 
     int end = lines.size();
     if (end == 1)
@@ -56,53 +56,54 @@ void PreviewWorker::onProcessCommands(const QString &text, const int &start,
     {
         QTime startTime = QTime::currentTime();
 
-        QString &line = lines[i];
-
         if (lines.size() > 1)
             emit this->lineStarted(i);
 
-        std::unique_ptr<ParsedCommand> parsedCommand;
-        CommandErr commandErr = this->parser_->parse(line, parsedCommand);
+        ParseResult parsed = this->parser_->parse(lines[i]);
 
-        if (commandErr != CommandErr::OK)
+        if (parsed.err != CommandErr::OK)
         {
-            emit this->error(commandErr);
+            emit this->error(parsed.err);
 
-            if (commandErr == CommandErr::EMPTY)
+            if (parsed.err == CommandErr::EMPTY)
                 continue;
             else
                 break;
+        }
+        if (!parsed.command.has_value())
+        {
+            emit this->error(CommandErr::UNKNOWN);
+            break;
         }
 
         unsigned char *img = nullptr;
         unsigned long size{};
         ConnectionErr connectionErr =
-            this->connection_->sendCommand(parsedCommand, img, size);
+            this->connection_->sendCommand(parsed.command.value(), img, size);
 
         if (connectionErr != ConnectionErr::OK)
         {
             emit this->error(connectionErr);
+            if (img != nullptr)
+                delete img;
             break;
         }
 
-        if (!parsedCommand->expectsImg() && img != nullptr)
+        if (!parsed.command->expectsImg() && img != nullptr)
             delete img;
 
-        if (parsedCommand->expectsImg() && img == nullptr)
+        if (parsed.command->expectsImg())
         {
-            emit this->error(ConnectionErr::BAD_DATA);
-            break;
+            QByteArray data(reinterpret_cast<char *>(img), size);
+            delete img;
+
+            emit this->changePreview(data, size);
         }
-
-        QByteArray data(reinterpret_cast<char *>(img), size);
-        delete img;
-
-        emit this->changePreview(data, size);
 
         if (this->isCancelled_)
             break;
 
-        if (commandErr != CommandErr::EMPTY && i < lines.size() - 1)
+        if (parsed.err != CommandErr::EMPTY && i < lines.size() - 1)
         {
             // If the command itself took longer to execute than the specified
             // delay, don't sleep.
@@ -129,16 +130,16 @@ void PreviewWorker::onUpdateImgIndices(const QString &str)
 {
     /* TODO: Some kind of progress bar in the statusbar would be good for large
      * files */
-    QStringList lines = StringUtil::split(str, "\\n");
+    QStringList lines = str.split(QRegExp("\\n"));
+
     std::vector<int> newImgIndices;
     int lineNum = 0;
 
     for (auto &line : lines)
     {
-        std::unique_ptr<ParsedCommand> parsedCommand;
-        CommandErr err = this->parser_->parse(line, parsedCommand);
+        ParseResult parsed = this->parser_->parse(line);
 
-        if (err == CommandErr::OK && parsedCommand->expectsImg())
+        if (parsed.err == CommandErr::OK && parsed.command->expectsImg())
         {
             newImgIndices.push_back(lineNum);
         }

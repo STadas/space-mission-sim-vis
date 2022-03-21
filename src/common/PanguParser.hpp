@@ -12,6 +12,13 @@ class PanguParser : public QObject, public IParser
 public:
     PanguParser(QObject *parent = nullptr);
     ~PanguParser();
-    CommandErr parse(const QString &strCommand,
-                     std::unique_ptr<ParsedCommand> &parsedCommand) override;
+    ParseResult parse(const QString &strCommand) override;
+
+    enum class CommandName {
+        Start,
+        Quaternion,
+        Update,
+        Pause,
+    };
+    static std::map<QString, CommandName> commandMap;
 };

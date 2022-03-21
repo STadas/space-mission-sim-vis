@@ -1,15 +1,33 @@
-start    0 -600 600    0 -45  0
-start    0 -590 590    0 -45  2
-start    0 -580 580    0 -45  4
-start    0 -570 570    0 -45  6
-start    0 -560 560    0 -45  8
-start    0 -550 550    0 -45 10
-start    0 -540 540    0 -45 12
-start    0 -530 530    0 -45 14
-start    0 -520 520    0 -45 16
-start    0 -510 510    0 -45 18
-start    0 -500 500    0 -45 20
+# Camera starts above model and flies in towards it changing roll by 2 degrees
+# each step. Note that we are DEFINING the position and attitude at each stage.
+# If we omit the "start" keyword then we would be defining the CHANGE in
+# position and altitude for each step.
+start	0 -600 600	0 -45  0
+start	0 -590 590	0 -45  2
+start	0 -580 580	0 -45  4
+start	0 -570 570	0 -45  6
+start	0 -560 560	0 -45  8
+start	0 -550 550	0 -45 10
+start	0 -540 540	0 -45 12
+start	0 -530 530	0 -45 14
+start	0 -520 520	0 -45 16
+start	0 -510 510	0 -45 18
+start	0 -500 500	0 -45 20
 
+# Pause for a couple of seconds.
+pause 2
+
+# Change to a position directly over the origin facing down and swing the
+# camera to the left (positive yaw). This can only be done naturally using
+# quaternions in the viewer since the natural way with yaw/pitch/roll is to
+# pitch then yaw (opposite to the viewer). Otherwise it could require lots
+# of calculations to achieve this effect.
+#    start position = (0, 0, 600), yaw = 0, pitch = -90, roll = 0
+#    Yaw by 0.2 degrees each time.
+#    Initial quaternion:  q0 = [0, 1 0, 0]
+#    Yaw quaternion:      q1 = [0, 0.999998, 0, -0.00174533, 0]
+# The quaternion for a frame is given by the product q0*q1*q1...*q1
+# where there are N q1 terms for the Nth frame (counting from 0).
 quaternion      0 0 600        0 1        0  0
 quaternion      0 0 600        0 0.999998 0 -0.00174533
 quaternion      0 0 600        0 0.999994 0 -0.00349065
