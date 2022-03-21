@@ -123,8 +123,8 @@ ConnectionErr PanguConnection::sendCommand(ParsedCommand &command)
             }
 
             case PanguParser::CommandName::Pause: {
-                QThread::currentThread()->sleep(
-                    std::get<double>(command.args()[0]));
+                QThread::currentThread()->msleep(
+                    1000 * std::get<double>(command.args()[0]));
                 return ConnectionErr::OK;
             }
         }
