@@ -245,6 +245,39 @@ void MainWindow::initActions()
     QObject::connect(this->dockPlaybackInterface_,
                      &QDockWidget::visibilityChanged,
                      this->actTogglePlaybackInterface_, &QAction::setChecked);
+
+    this->actUndo_ = new QAction("Undo", this);
+    this->actUndo_->setStatusTip("Undo the latest edit in the editor");
+    this->actUndo_->setIcon(this->resources_->iconEditUndo);
+    QObject::connect(this->actUndo_, &QAction::triggered, this->editor_,
+                     &QPlainTextEdit::undo);
+
+    this->actRedo_ = new QAction("Redo", this);
+    this->actRedo_->setStatusTip("Redo the latest edit in the editor");
+    this->actRedo_->setIcon(this->resources_->iconEditRedo);
+    QObject::connect(this->actRedo_, &QAction::triggered, this->editor_,
+                     &QPlainTextEdit::redo);
+
+    this->actCut_ = new QAction("Cut", this);
+    this->actCut_->setStatusTip(
+        "Cut the currently selected text in the editor");
+    this->actCut_->setIcon(this->resources_->iconEditCut);
+    QObject::connect(this->actCut_, &QAction::triggered, this->editor_,
+                     &QPlainTextEdit::cut);
+
+    this->actCopy_ = new QAction("Copy", this);
+    this->actCopy_->setStatusTip(
+        "Copy the currently selected text in the editor");
+    this->actCopy_->setIcon(this->resources_->iconEditCopy);
+    QObject::connect(this->actCopy_, &QAction::triggered, this->editor_,
+                     &QPlainTextEdit::copy);
+
+    this->actPaste_ = new QAction("Paste", this);
+    this->actPaste_->setStatusTip(
+        "Paste text from the clipboard under the editor cursor");
+    this->actPaste_->setIcon(this->resources_->iconEditPaste);
+    QObject::connect(this->actPaste_, &QAction::triggered, this->editor_,
+                     &QPlainTextEdit::paste);
 }
 
 void MainWindow::initMenus()
@@ -253,9 +286,32 @@ void MainWindow::initMenus()
     this->menuBar()->addMenu(this->fileMenu_);
     this->fileMenu_->addActions({
         this->actNewFile_,
+    });
+    this->fileMenu_->addSeparator();
+    this->fileMenu_->addActions({
         this->actOpenFile_,
+    });
+    this->fileMenu_->addSeparator();
+    this->fileMenu_->addActions({
         this->actSaveFile_,
         this->actSaveFileAs_,
+    });
+
+    this->editMenu_ = new QMenu("Edit", this);
+    this->menuBar()->addMenu(this->editMenu_);
+    this->editMenu_->addActions({
+        this->actUndo_,
+        this->actRedo_,
+        this->actCut_,
+        this->actCopy_,
+        this->actPaste_,
+    });
+
+    this->viewMenu_ = new QMenu("View", this);
+    this->menuBar()->addMenu(this->viewMenu_);
+    this->viewMenu_->addActions({
+        this->actToggleCamPreview_,
+        this->actTogglePlaybackInterface_,
     });
 
     this->toolsMenu_ = new QMenu("Tools", this);
@@ -271,6 +327,9 @@ void MainWindow::initMenus()
         this->actExecPreviousLine_,
         this->actExecNextLine_,
         this->actToggleMultiLine_,
+    });
+    this->commandsMenu_->addSeparator();
+    this->commandsMenu_->addActions({
         this->actCommScan_,
         this->actToggleAutoCommScan_,
     });
@@ -281,13 +340,6 @@ void MainWindow::initMenus()
         this->actStartServer_,
         this->actConnectToServer_,
         this->actDisconnectFromServer_,
-    });
-
-    this->viewMenu_ = new QMenu("View", this);
-    this->menuBar()->addMenu(this->viewMenu_);
-    this->viewMenu_->addActions({
-        this->actToggleCamPreview_,
-        this->actTogglePlaybackInterface_,
     });
 }
 

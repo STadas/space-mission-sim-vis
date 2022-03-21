@@ -57,15 +57,25 @@ private:
     PanguServerProcess *serverProcess_;
 
     QMenu *fileMenu_;
+    QMenu *editMenu_;
+    QMenu *viewMenu_;
     QMenu *toolsMenu_;
     QMenu *commandsMenu_;
     QMenu *serverMenu_;
-    QMenu *viewMenu_;
 
     QAction *actNewFile_;
     QAction *actOpenFile_;
     QAction *actSaveFile_;
     QAction *actSaveFileAs_;
+
+    QAction *actUndo_;
+    QAction *actRedo_;
+    QAction *actCut_;
+    QAction *actCopy_;
+    QAction *actPaste_;
+
+    QAction *actToggleCamPreview_;
+    QAction *actTogglePlaybackInterface_;
 
     QAction *actExecCurrentLine_;
     QAction *actExecPreviousLine_;
@@ -81,9 +91,6 @@ private:
     QAction *actDisconnectFromServer_;
 
     QAction *actOpenSettings_;
-
-    QAction *actToggleCamPreview_;
-    QAction *actTogglePlaybackInterface_;
 
 private slots:
     /* on action */

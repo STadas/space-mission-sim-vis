@@ -5,6 +5,12 @@
     <file alias="document-save">breeze-icons/document-save.svg</file>
     <file alias="document-save-as">breeze-icons/document-save-as.svg</file>
 
+    <file alias="edit-undo">breeze-icons/edit-undo.svg</file>
+    <file alias="edit-redo">breeze-icons/edit-redo.svg</file>
+    <file alias="edit-cut">breeze-icons/edit-cut.svg</file>
+    <file alias="edit-copy">breeze-icons/edit-copy.svg</file>
+    <file alias="edit-paste">breeze-icons/edit-paste.svg</file>
+
     <file alias="scan">breeze-icons/document-scan.svg</file>
     <file alias="recurring">breeze-icons/task-recurring.svg</file>
 

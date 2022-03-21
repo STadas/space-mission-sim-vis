@@ -3,9 +3,8 @@
 ServerPage::ServerPage(QWidget *parent, Settings *const settings)
     : SettingsPage(parent, settings)
 {
-    QFormLayout *form = new QFormLayout;
+    QFormLayout *form = new QFormLayout(this);
     form->setMargin(0);
-    this->setLayout(form);
 
     form->addRow("Server executable path",
                  this->createLineEditBrowse(

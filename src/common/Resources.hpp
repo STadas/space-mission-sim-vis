@@ -16,6 +16,12 @@ public:
     QIcon iconDocumentSave = QIcon(":/icons/document-save");
     QIcon iconDocumentSaveAs = QIcon(":/icons/document-save-as");
 
+    QIcon iconEditUndo = QIcon(":/icons/edit-undo");
+    QIcon iconEditRedo = QIcon(":/icons/edit-redo");
+    QIcon iconEditCut = QIcon(":/icons/edit-cut");
+    QIcon iconEditCopy = QIcon(":/icons/edit-copy");
+    QIcon iconEditPaste = QIcon(":/icons/edit-paste");
+
     QIcon iconScan = QIcon(":/icons/scan");
     QIcon iconRecurring = QIcon(":/icons/recurring");
 
