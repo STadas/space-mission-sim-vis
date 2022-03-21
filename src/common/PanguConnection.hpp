@@ -2,11 +2,11 @@
 
 #include <QtCore>
 
+#include "common/PanguParser.hpp"
 #include "interfaces/ICommandSender.hpp"
 #include "interfaces/IConnection.hpp"
 #include "pan_protocol/pan_protocol_lib.h"
 #include "util/SocketUtil.hpp"
-#include "common/PanguParser.hpp"
 
 class PanguConnection : public QObject,
                         public IConnection,

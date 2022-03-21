@@ -1,10 +1,10 @@
 #include "PanguParser.hpp"
 
 std::map<QString, PanguParser::CommandName> PanguParser::commandMap = {
-        {"start", CommandName::Start},
-        {"quaternion", CommandName::Quaternion},
-        {"update", CommandName::Update},
-        {"pause", CommandName::Pause},
+    {"start", CommandName::Start},
+    {"quaternion", CommandName::Quaternion},
+    {"update", CommandName::Update},
+    {"pause", CommandName::Pause},
 };
 
 PanguParser::PanguParser(QObject *parent)

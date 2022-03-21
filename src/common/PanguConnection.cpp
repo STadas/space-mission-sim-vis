@@ -81,12 +81,11 @@ ConnectionErr PanguConnection::sendCommand(ParsedCommand &command)
     try
     {
         char *panguErr;
-        switch(PanguParser::commandMap[command.name()])
+        switch (PanguParser::commandMap[command.name()])
         {
             case PanguParser::CommandName::Start: {
                 panguErr = pan_net_set_viewpoint_by_degrees_d_TX(
-                    this->sock_,
-                    std::get<double>(command.args()[0]),
+                    this->sock_, std::get<double>(command.args()[0]),
                     std::get<double>(command.args()[1]),
                     std::get<double>(command.args()[2]),
                     std::get<double>(command.args()[3]),
