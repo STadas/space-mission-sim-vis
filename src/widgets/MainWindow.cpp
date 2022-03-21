@@ -189,7 +189,7 @@ void MainWindow::initActions()
         new QAction("Toggle auto command scanning", this);
     this->actToggleAutoCommScan_->setStatusTip(
         "Toggle automatic scanning of all commands when editing to update "
-        "components like the playback progress bar");
+        "components like the playback progress bar (slow with large files!)");
     this->actToggleAutoCommScan_->setIcon(this->resources_->iconRecurring);
     this->actToggleAutoCommScan_->setCheckable(true);
     this->actToggleAutoCommScan_->setChecked(false);
@@ -516,7 +516,7 @@ void MainWindow::onActStartServer()
 {
     this->serverProcess_->start(
         this->settings_->serverPath.value(),
-        StringUtil::split(this->settings_->serverFlags.value()));
+        this->settings_->serverFlags.value().split(" "));
 }
 
 void MainWindow::onActConnectToServer()

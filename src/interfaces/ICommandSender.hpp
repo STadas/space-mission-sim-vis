@@ -12,9 +12,8 @@ public:
     {
     }
 
-    virtual ConnectionErr sendCommand(
-        std::unique_ptr<ParsedCommand> &command) = 0;
-    virtual ConnectionErr sendCommand(std::unique_ptr<ParsedCommand> &command,
+    virtual ConnectionErr sendCommand(ParsedCommand &command) = 0;
+    virtual ConnectionErr sendCommand(ParsedCommand &command,
                                       unsigned char *&img,
                                       unsigned long &size) = 0;
 };

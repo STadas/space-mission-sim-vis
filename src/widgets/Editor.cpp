@@ -20,12 +20,12 @@ Editor::~Editor()
 {
 }
 
-bool Editor::isModified()
+bool Editor::isModified() const
 {
     return this->document()->isModified();
 }
 
-QString Editor::activeLineText()
+QString Editor::activeLineText() const
 {
     return this->textCursor().block().text();
 }

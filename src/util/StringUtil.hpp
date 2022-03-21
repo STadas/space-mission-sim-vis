@@ -7,7 +7,6 @@
 class StringUtil
 {
 public:
-    static QStringList split(const QString &str, const QString &regexStr = " ");
     static bool isNumeric(const QString &str);
 
 private:

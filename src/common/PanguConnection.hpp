@@ -2,6 +2,7 @@
 
 #include <QtCore>
 
+#include "common/PanguParser.hpp"
 #include "interfaces/ICommandSender.hpp"
 #include "interfaces/IConnection.hpp"
 #include "pan_protocol/pan_protocol_lib.h"
@@ -20,10 +21,9 @@ public:
     ConnectionErr connect(const QString &address, const int &port) override;
     ConnectionErr disconnect() override;
 
-    ConnectionErr sendCommand(std::unique_ptr<ParsedCommand> &command,
-                              unsigned char *&img,
+    ConnectionErr sendCommand(ParsedCommand &command, unsigned char *&img,
                               unsigned long &size) override;
-    ConnectionErr sendCommand(std::unique_ptr<ParsedCommand> &command) override;
+    ConnectionErr sendCommand(ParsedCommand &command) override;
 
 private:
     SOCKET sock_;

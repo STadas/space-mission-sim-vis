@@ -14,8 +14,8 @@ public:
     Editor(QWidget *parent, Settings *const settings);
     ~Editor() override;
 
-    bool isModified() override;
-    QString activeLineText() override;
+    bool isModified() const override;
+    QString activeLineText() const override;
     void goToLine(int lineNum) override;
 
     int save() override;
