@@ -9,7 +9,7 @@
       "cxx": "cl",
       "archiver": "7z a",
       "generators": "Visual Studio 17 2022",
-      "qt_version": "5.7",
+      "qt_version": "5.12.8",
       "asset_mimetype": "application/zip"
     },
     {
@@ -21,7 +21,7 @@
       "cxx": "g++",
       "archiver": "7z a",
       "generators": "Ninja",
-      "qt_version": "5.7",
+      "qt_version": "5.12.8",
       "asset_mimetype": "application/zip"
     },
     {
@@ -33,7 +33,7 @@
       "cxx": "clang++",
       "archiver": "7z a",
       "generators": "Ninja",
-      "qt_version": "5.7",
+      "qt_version": "5.12.8",
       "asset_mimetype": "application/zip"
     }
   ]
