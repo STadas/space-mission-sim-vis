@@ -638,7 +638,9 @@ void MainWindow::onImgIndicesUpdated()
     }
     else
     {
+        this->progressBar_->blockSignals(true);
         this->progressBar_->setMaximum(0);
+        this->progressBar_->blockSignals(false);
         this->progressBar_->setEnabled(false);
     }
 }
