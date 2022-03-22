@@ -1,4 +1,4 @@
 #!/bin/bash
 
-export DESTDIR=instdir 
+export DESTDIR=instdir
 cmake --install build
