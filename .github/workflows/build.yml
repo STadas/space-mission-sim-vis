@@ -91,7 +91,7 @@ jobs:
       - name: CMake install
         shell: bash
         run: |
-          export DISTDIR=instdir
+          export DESTDIR=instdir
           cmake --install build --strip
 
       - name: Pack artifact
