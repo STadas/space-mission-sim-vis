@@ -76,7 +76,7 @@ jobs:
           mkdir instdir
           cmake \
             -DCMAKE_BUILD_TYPE=${{ matrix.config.build_type }} \
-            -DCMAKE_INSTALL_PREFIX=instdir \
+            -DCMAKE_INSTALL_PREFIX=/usr \
             -S . \
             -B build \
             -G "${{ matrix.config.generators }}"
@@ -91,6 +91,7 @@ jobs:
       - name: CMake install
         shell: bash
         run: |
+          export DISTDIR=instdir
           cmake --install build --strip
 
       - name: Pack artifact
