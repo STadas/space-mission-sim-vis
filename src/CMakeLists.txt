@@ -159,6 +159,9 @@ if (BUILD_APP)
                 LIBRARY DESTINATION lib
                 ARCHIVE DESTINATION lib/static
                 )
+        set(LINUXDEPLOY_COMMAND "bash ${CMAKE_SOURCE_DIR}/tools/linuxdeployqt.sh")
+        message(${LINUXDEPLOY_COMMAND})
+        install(CODE "execute_process(COMMAND ${LINUXDEPLOY_COMMAND})")
     endif ()
 endif()
 
