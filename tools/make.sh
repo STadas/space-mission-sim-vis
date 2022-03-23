@@ -17,7 +17,7 @@ else
     cmake \
         -S . \
         -B build \
-        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DCMAKE_INSTALL_PREFIX=instdir/usr \
         && cmake \
             --build build \
             --config Release \
