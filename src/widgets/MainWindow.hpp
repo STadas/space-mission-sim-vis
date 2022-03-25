@@ -12,6 +12,7 @@
 #include "common/settings/Settings.hpp"
 #include "interfaces/ISavableLoadable.hpp"
 #include "widgets/CamPreview.hpp"
+#include "widgets/CoordPreview.hpp"
 #include "widgets/Editor.hpp"
 #include "widgets/PlaybackInterface.hpp"
 #include "widgets/dialogs/SettingsDialog.hpp"
@@ -40,10 +41,13 @@ private:
     Resources *const resources_;
 
     Editor *editor_;
+
+    CoordPreview *coordPreview_;
     CamPreview *camPreview_;
     PlaybackInterface *playbackInterface_;
     ProgressBar *progressBar_;
 
+    QDockWidget *dockCoordPreview_;
     QDockWidget *dockCamPreview_;
     QDockWidget *dockPlaybackInterface_;
 
@@ -74,6 +78,7 @@ private:
     QAction *actCopy_;
     QAction *actPaste_;
 
+    QAction *actToggleCoordPreview_;
     QAction *actToggleCamPreview_;
     QAction *actTogglePlaybackInterface_;
 
@@ -113,6 +118,7 @@ private slots:
 
     void onActOpenSettings();
 
+    void onActToggleCoordPreview(bool on);
     void onActToggleCamPreview(bool on);
     void onActTogglePlaybackInterface(bool on);
 

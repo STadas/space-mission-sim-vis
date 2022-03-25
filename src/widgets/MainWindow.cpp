@@ -4,6 +4,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , settings_(new Settings(this))
     , resources_(new Resources(this))
+    , coordPreview_(new CoordPreview(this))
     , camPreview_(new CamPreview(this))
     , playbackInterface_(new PlaybackInterface(this))
     , progressBar_(this->playbackInterface_->progressBar_)
@@ -34,7 +35,11 @@ MainWindow::MainWindow(QWidget *parent)
     this->centralWidget()->setLayout(new VBoxLayout);
     this->centralWidget()->layout()->addWidget(this->editor_);
 
-    //TODO: refactor this to make it easier to add and remove other elements
+    this->dockCoordPreview_ = new QDockWidget("Coordinates Preview", this);
+    this->dockCoordPreview_->setObjectName("dockCoordPreview");
+    this->dockCoordPreview_->setWidget(this->coordPreview_);
+    this->addDockWidget(Qt::RightDockWidgetArea, this->dockCoordPreview_);
+
     this->dockCamPreview_ = new QDockWidget("Camera Preview", this);
     this->dockCamPreview_->setObjectName("dockCamPreview");
     this->dockCamPreview_->setWidget(this->camPreview_);
@@ -224,6 +229,17 @@ void MainWindow::initActions()
     QObject::connect(this->actOpenSettings_, &QAction::triggered, this,
                      &MainWindow::onActOpenSettings);
 
+    this->actToggleCoordPreview_ = new QAction("Coordinates preview", this);
+    this->actToggleCoordPreview_->setStatusTip(
+        "Toggle visibility of the coordinates preview");
+    this->actToggleCoordPreview_->setCheckable(true);
+    this->actToggleCoordPreview_->setChecked(
+        this->dockCoordPreview_->isVisible());
+    QObject::connect(this->actToggleCoordPreview_, &QAction::toggled, this,
+                     &MainWindow::onActToggleCoordPreview);
+    QObject::connect(this->dockCoordPreview_, &QDockWidget::visibilityChanged,
+                     this->actToggleCoordPreview_, &QAction::setChecked);
+
     this->actToggleCamPreview_ = new QAction("Camera preview", this);
     this->actToggleCamPreview_->setStatusTip(
         "Toggle visibility of the camera preview");
@@ -310,6 +326,7 @@ void MainWindow::initMenus()
     this->viewMenu_ = new QMenu("View", this);
     this->menuBar()->addMenu(this->viewMenu_);
     this->viewMenu_->addActions({
+        this->actToggleCoordPreview_,
         this->actToggleCamPreview_,
         this->actTogglePlaybackInterface_,
     });
@@ -535,6 +552,14 @@ void MainWindow::onActOpenSettings()
     SettingsDialog *settingsDialog =
         new SettingsDialog(this, this->settings_, this->resources_);
     settingsDialog->show();
+}
+
+void MainWindow::onActToggleCoordPreview(bool on)
+{
+    if (on)
+        this->dockCoordPreview_->show();
+    else
+        this->dockCoordPreview_->hide();
 }
 
 void MainWindow::onActToggleCamPreview(bool on)

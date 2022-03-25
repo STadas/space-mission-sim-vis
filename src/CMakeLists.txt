@@ -38,6 +38,8 @@ set(SOURCE_PROJECT
 
         widgets/CamPreview.cpp
         widgets/CamPreview.hpp
+        widgets/CoordPreview.cpp
+        widgets/CoordPreview.hpp
         widgets/MainWindow.cpp
         widgets/MainWindow.hpp
         widgets/Editor.cpp
@@ -92,6 +94,9 @@ target_link_libraries(${LIBRARY_PROJECT}
         Qt5::Widgets
         Qt5::Gui
         Qt5::Concurrent
+        Qt5::3DCore
+        Qt5::3DExtras
+        Qt5::3DRender
 
         Threads::Threads
         )
