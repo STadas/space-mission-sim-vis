@@ -85,34 +85,6 @@ CoordPreview::CoordPreview(QWidget *parent)
     auto *pointsEntity = new Qt3DCore::QEntity(rootEntity);
     pointsEntity->addComponent(pointsMesh);
     pointsEntity->addComponent(material);
-
-    HBoxLayout *hLayout = new HBoxLayout();
-    layout->addLayout(hLayout);
-
-    QPushButton *testButton = new QPushButton("Toggle shape", this);
-    testButton->setCheckable(true);
-    testButton->setChecked(false);
-    QObject::connect(testButton, &QPushButton::toggled, this, [=](bool on) {
-        if (on)
-        {
-            this->updatePoints({
-                {-1, -1, -1},
-                {-1, -1, 1},
-                {1, -1, 1},
-                {1, -1, -1},
-                {-1, 1, -1},
-                {-1, 1, 1},
-                {1, 1, 1},
-                {1, 1, -1},
-            });
-        }
-        else
-        {
-            this->updatePoints({});
-        }
-    });
-
-    hLayout->addWidget(testButton);
 }
 
 CoordPreview::~CoordPreview()
