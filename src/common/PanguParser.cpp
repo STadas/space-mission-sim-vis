@@ -49,7 +49,11 @@ ParseResult PanguParser::parse(const QString &strCommand)
                 args.push_back(Arg(it.toDouble()));
             }
 
-            return {CommandErr::OK, ParsedCommand(cmdName, true, args)};
+            return {CommandErr::OK,
+                    ParsedCommand(cmdName, args, true,
+                                  QVector3D(std::get<double>(args[0]),
+                                            std::get<double>(args[1]),
+                                            std::get<double>(args[2])))};
         }
 
         case CommandName::Quaternion: {
@@ -64,14 +68,18 @@ ParseResult PanguParser::parse(const QString &strCommand)
                 args.push_back(Arg(it.toDouble()));
             }
 
-            return {CommandErr::OK, ParsedCommand(cmdName, true, args)};
+            return {CommandErr::OK,
+                    ParsedCommand(cmdName, args, true,
+                                  QVector3D(std::get<double>(args[0]),
+                                            std::get<double>(args[1]),
+                                            std::get<double>(args[2])))};
         }
 
         case CommandName::Update: {
             if (words.size() != 0)
                 return CommandErr::BAD_ARG_COUNT;
 
-            return {CommandErr::OK, ParsedCommand(cmdName, true, args)};
+            return {CommandErr::OK, ParsedCommand(cmdName, args, true)};
         }
 
         case CommandName::Pause: {
@@ -83,7 +91,7 @@ ParseResult PanguParser::parse(const QString &strCommand)
 
             args.push_back(Arg(words[0].toDouble()));
 
-            return {CommandErr::OK, ParsedCommand(cmdName, false, args)};
+            return {CommandErr::OK, ParsedCommand(cmdName, args, false)};
         }
 
         default: {

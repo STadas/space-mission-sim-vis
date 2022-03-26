@@ -668,6 +668,7 @@ void MainWindow::onImgIndicesUpdated()
         this->progressBar_->blockSignals(false);
         this->progressBar_->setEnabled(false);
     }
+    this->coordPreview_->updatePoints(this->previewWorker_->camPositions());
 }
 
 void MainWindow::onEditorContentChanged()

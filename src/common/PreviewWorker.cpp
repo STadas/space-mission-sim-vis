@@ -26,9 +26,14 @@ QSemaphore *PreviewWorker::previewLock() const
     return this->previewLock_;
 }
 
-std::vector<int> PreviewWorker::imgIndices() const
+QList<unsigned int> PreviewWorker::imgIndices() const
 {
     return this->imgIndices_;
+}
+
+QList<QVector3D> PreviewWorker::camPositions() const
+{
+    return this->camPositions_;
 }
 
 ConnectionErr PreviewWorker::onConnect(const QString &address, const int &port)
@@ -132,8 +137,10 @@ void PreviewWorker::onUpdateImgIndices(const QString &str)
      * files */
     QStringList lines = str.split(QRegExp("\\n"));
 
-    std::vector<int> newImgIndices;
+    QList<unsigned int> newImgIndices;
+    QList<QVector3D> newCamPositions;
     int lineNum = 0;
+    QVector3D lastCamPos = {0, 0, 0};
 
     for (auto &line : lines)
     {
@@ -142,10 +149,19 @@ void PreviewWorker::onUpdateImgIndices(const QString &str)
         if (parsed.err == CommandErr::OK && parsed.command->expectsImg())
         {
             newImgIndices.push_back(lineNum);
+
+            if (parsed.command->hasCamPos())
+            {
+                newCamPositions.push_back(parsed.command->camPos());
+                lastCamPos = parsed.command->camPos();
+            }
+            else
+                newCamPositions.push_back(lastCamPos);
         }
 
         lineNum++;
     }
     this->imgIndices_ = newImgIndices;
+    this->camPositions_ = newCamPositions;
     emit this->imgIndicesUpdated();
 }

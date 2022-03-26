@@ -19,7 +19,8 @@ public:
     ~PreviewWorker();
 
     QSemaphore *previewLock() const;
-    std::vector<int> imgIndices() const;
+    QList<unsigned int> imgIndices() const;
+    QList<QVector3D> camPositions() const;
     void cancelStepping();
 
 private:
@@ -28,7 +29,8 @@ private:
 
     QSemaphore *previewLock_;
     std::atomic<bool> isCancelled_;
-    std::vector<int> imgIndices_;
+    QList<unsigned int> imgIndices_;
+    QList<QVector3D> camPositions_;
 
 signals:
     ConnectionErr connect(const QString &address, const int &port) override;
