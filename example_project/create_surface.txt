@@ -1,0 +1,16 @@
+identifier          PANGU: New Surface Parameters File
+output_filename     surface.dem
+output_type         pangu
+fractal_algorithm   perlin     ; flat, midpoint, additional, spectral, perlin, simplex
+
+size                1024  512
+horiz_res           2
+perlin_num_octaves  10
+perlin_frequency    0.4
+perlin_lacunarity   2
+perlin_persistance  0.5
+perlin_min_height   -10.0
+perlin_max_height   10.0
+
+seed_random         true
+seed                10

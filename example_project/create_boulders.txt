@@ -1,0 +1,20 @@
+identifier                  PANGU: Boulder List Generation File
+seed_random                 true
+seed                        5
+absolute_numbers            true
+num_boulders                50000
+area_size                   2000  2000
+area_offset                 500  0
+
+generate_general            true
+generate_crater_related     false
+
+boulder_list                boulder_list.txt
+boulder_model               boulder_model.txt
+boulder_depth_dist          boulder_depth_dist.txt
+boulder_size_frequency      boulder_size_freq_dist.txt
+
+add_regions                 true
+region_descriptor           regions.txt
+base_surface_type           pangu
+base_info_filename          surface.dem.txt

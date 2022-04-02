@@ -1,0 +1,7 @@
+identifier          PANGU: Create Distribution Parameters File
+output_filename     boulder_size_freq_dist.txt
+distribution_type   boulder_size
+number_of_points    100
+log_graph           true
+range               0.5  20
+power_law[0]        0.001  -3.0  0.5  20

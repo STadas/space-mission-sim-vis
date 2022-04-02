@@ -1,0 +1,26 @@
+identifier             PANGU: Crater List Generation File
+seed_random            true
+seed                   20
+
+absolute_numbers       false
+
+min_diameter           0.5
+max_diameter           500
+
+area_size              4128  2048  
+area_offset            0  0
+
+crater_list            crater_list.txt
+crater_size_frequency  crater_size_freq_dist.txt
+crater_age_dist        crater_age_dist.txt
+crater_model           crater_model.txt
+crater_decay           crater_decay.txt
+
+add_regions            true
+region_descriptor      regions.txt
+
+minimum_pixel_size     3
+filter                 false
+
+base_info_filename     surface.dem.txt
+base_surface_type      pangu

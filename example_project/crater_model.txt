@@ -1,0 +1,6 @@
+identifier	PANGU: Crater Properties File
+depth_constant	0.199
+depth_power		0.995
+rim_constant	0.052
+rim_power		0.93
+
