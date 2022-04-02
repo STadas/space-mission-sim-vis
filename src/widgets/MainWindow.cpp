@@ -664,8 +664,7 @@ void MainWindow::onPBarReleased()
     this->previewWorker_->cancelStepping();
 
     unsigned int idx = this->progressBar_->value();
-    CamPoint camPoint =
-        this->previewWorker_->camPoints()[idx];
+    CamPoint camPoint = this->previewWorker_->camPoints()[idx];
 
     this->coordsPreview_->updateActive(idx);
     this->editor_->goToLine(camPoint.lineNum());

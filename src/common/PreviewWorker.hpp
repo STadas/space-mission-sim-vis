@@ -3,9 +3,9 @@
 #include <QtConcurrent>
 #include <QtCore>
 
+#include "common/CamPoint.hpp"
 #include "common/PanguConnection.hpp"
 #include "common/PanguParser.hpp"
-#include "common/CamPoint.hpp"
 #include "enums/CommandErr.hpp"
 #include "enums/ConnectionErr.hpp"
 #include "interfaces/IConnection.hpp"
