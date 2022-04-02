@@ -25,5 +25,6 @@ void PanguServerProcess::stop()
 
 void PanguServerProcess::onReadyRead()
 {
-    emit this->output(this->process_->readAll());
+    QString out = this->process_->readAll();
+    emit this->output(out);
 }

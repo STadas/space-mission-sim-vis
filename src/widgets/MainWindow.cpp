@@ -4,7 +4,6 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , settings_(new Settings(this))
     , resources_(new Resources(this))
-    , coordPreview_(new CoordPreview(this))
     , camPreview_(new CamPreview(this))
     , playbackInterface_(new PlaybackInterface(this))
     , progressBar_(this->playbackInterface_->progressBar_)
@@ -16,6 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     this->settings_->load();
     this->editor_ = new Editor(this, this->settings_);
+    this->coordsPreview_ = new CoordsPreview(this, this->settings_);
 
     /* As weird as this is, it needs to be done for us to be able to use the
      * enums with signals and slots. Potential for a generated source code
@@ -35,10 +35,10 @@ MainWindow::MainWindow(QWidget *parent)
     this->centralWidget()->setLayout(new VBoxLayout);
     this->centralWidget()->layout()->addWidget(this->editor_);
 
-    this->dockCoordPreview_ = new QDockWidget("Coordinates Preview", this);
-    this->dockCoordPreview_->setObjectName("dockCoordPreview");
-    this->dockCoordPreview_->setWidget(this->coordPreview_);
-    this->addDockWidget(Qt::RightDockWidgetArea, this->dockCoordPreview_);
+    this->dockCoordsPreview_ = new QDockWidget("Coordinates Preview", this);
+    this->dockCoordsPreview_->setObjectName("dockCoordsPreview");
+    this->dockCoordsPreview_->setWidget(this->coordsPreview_);
+    this->addDockWidget(Qt::RightDockWidgetArea, this->dockCoordsPreview_);
 
     this->dockCamPreview_ = new QDockWidget("Camera Preview", this);
     this->dockCamPreview_->setObjectName("dockCamPreview");
@@ -112,8 +112,8 @@ void MainWindow::initSignalConnections()
     QObject::connect(this->progressBar_, &ProgressBar::sliderReleased, this,
                      &MainWindow::onPBarReleased);
 
-    QObject::connect(this->previewWorker_, &PreviewWorker::imgIndicesUpdated,
-                     this, &MainWindow::onImgIndicesUpdated);
+    QObject::connect(this->previewWorker_, &PreviewWorker::camPointsUpdated,
+                     this, &MainWindow::onCamPointsUpdated);
 
     QObject::connect(this->editor_->document(), &QTextDocument::contentsChanged,
                      this, &MainWindow::onEditorContentChanged);
@@ -229,16 +229,16 @@ void MainWindow::initActions()
     QObject::connect(this->actOpenSettings_, &QAction::triggered, this,
                      &MainWindow::onActOpenSettings);
 
-    this->actToggleCoordPreview_ = new QAction("Coordinates preview", this);
-    this->actToggleCoordPreview_->setStatusTip(
+    this->actToggleCoordsPreview_ = new QAction("Coordinates preview", this);
+    this->actToggleCoordsPreview_->setStatusTip(
         "Toggle visibility of the coordinates preview");
-    this->actToggleCoordPreview_->setCheckable(true);
-    this->actToggleCoordPreview_->setChecked(
-        this->dockCoordPreview_->isVisible());
-    QObject::connect(this->actToggleCoordPreview_, &QAction::toggled, this,
-                     &MainWindow::onActToggleCoordPreview);
-    QObject::connect(this->dockCoordPreview_, &QDockWidget::visibilityChanged,
-                     this->actToggleCoordPreview_, &QAction::setChecked);
+    this->actToggleCoordsPreview_->setCheckable(true);
+    this->actToggleCoordsPreview_->setChecked(
+        this->dockCoordsPreview_->isVisible());
+    QObject::connect(this->actToggleCoordsPreview_, &QAction::toggled, this,
+                     &MainWindow::onActToggleCoordsPreview);
+    QObject::connect(this->dockCoordsPreview_, &QDockWidget::visibilityChanged,
+                     this->actToggleCoordsPreview_, &QAction::setChecked);
 
     this->actToggleCamPreview_ = new QAction("Camera preview", this);
     this->actToggleCamPreview_->setStatusTip(
@@ -326,7 +326,7 @@ void MainWindow::initMenus()
     this->viewMenu_ = new QMenu("View", this);
     this->menuBar()->addMenu(this->viewMenu_);
     this->viewMenu_->addActions({
-        this->actToggleCoordPreview_,
+        this->actToggleCoordsPreview_,
         this->actToggleCamPreview_,
         this->actTogglePlaybackInterface_,
     });
@@ -401,7 +401,7 @@ void MainWindow::onActNewFile()
     if (this->editor_->isModified())
     {
         QMessageBox::StandardButton answer =
-            this->messageController_->question(FileQuestion::FILE_NEW, this);
+            this->messageController_->question(FileQuestion::FileNew, this);
         if (answer == QMessageBox::No)
         {
             return;
@@ -416,7 +416,7 @@ void MainWindow::onActOpenFile()
     if (this->editor_->isModified())
     {
         QMessageBox::StandardButton answer =
-            this->messageController_->question(FileQuestion::FILE_OPEN, this);
+            this->messageController_->question(FileQuestion::FileOpen, this);
         if (answer == QMessageBox::No)
         {
             return;
@@ -425,7 +425,7 @@ void MainWindow::onActOpenFile()
 
     if (this->editor_->load())
     {
-        emit this->messageController_->error(FileErr::OPEN_FAIL, this);
+        emit this->messageController_->error(FileErr::OpenFail, this);
     };
 }
 
@@ -433,7 +433,7 @@ void MainWindow::onActSaveFileAs()
 {
     if (this->editor_->saveAs())
     {
-        emit this->messageController_->error(FileErr::SAVE_FAIL, this);
+        emit this->messageController_->error(FileErr::SaveFail, this);
     }
 }
 
@@ -441,7 +441,7 @@ void MainWindow::onActSaveFile()
 {
     if (this->editor_->save())
     {
-        emit this->messageController_->error(FileErr::SAVE_FAIL, this);
+        emit this->messageController_->error(FileErr::SaveFail, this);
     }
 }
 
@@ -484,6 +484,8 @@ void MainWindow::onActToggleMultiLine(bool on)
     if (on)
     {
         bool ok;
+        /* TODO: dont always ask for it, have a setting for it and maybe ask for
+         * first time in the session*/
         int msDelay = QInputDialog::getInt(this, "Minimum delay", "Delay (ms)",
                                            1000, 0, INT32_MAX, 100, &ok);
         if (!ok)
@@ -516,7 +518,7 @@ void MainWindow::onActToggleMultiLine(bool on)
 
 void MainWindow::onActCommScan()
 {
-    emit this->previewWorker_->updateImgIndices(this->editor_->toPlainText());
+    emit this->previewWorker_->updateCamPoints(this->editor_->toPlainText());
 }
 
 void MainWindow::onActToggleAutoCommScan(bool on)
@@ -524,7 +526,7 @@ void MainWindow::onActToggleAutoCommScan(bool on)
     this->autoCommScan_ = on;
     if (on)
     {
-        emit this->previewWorker_->updateImgIndices(
+        emit this->previewWorker_->updateCamPoints(
             this->editor_->toPlainText());
     }
 }
@@ -554,12 +556,12 @@ void MainWindow::onActOpenSettings()
     settingsDialog->show();
 }
 
-void MainWindow::onActToggleCoordPreview(bool on)
+void MainWindow::onActToggleCoordsPreview(bool on)
 {
     if (on)
-        this->dockCoordPreview_->show();
+        this->dockCoordsPreview_->show();
     else
-        this->dockCoordPreview_->hide();
+        this->dockCoordsPreview_->hide();
 }
 
 void MainWindow::onActToggleCamPreview(bool on)
@@ -582,21 +584,29 @@ void MainWindow::onLineStarted(const int &lineNum)
 {
     this->editor_->goToLine(lineNum);
 
-    /* progress bar stuff */
-    if (this->previewWorker_->imgIndices().size() == 0)
+    if (this->previewWorker_->camPoints().size() == 0)
         return;
 
-    int currPBarLineNum =
-        this->previewWorker_->imgIndices()[this->progressBar_->value()];
-    if (currPBarLineNum != lineNum)
+    CamPoint camPoint =
+        this->previewWorker_->camPoints()[this->progressBar_->value()];
+    if (camPoint.lineNum() != lineNum)
     {
-        auto indices = this->previewWorker_->imgIndices();
-        auto it = std::find(indices.begin(), indices.end(), lineNum);
-        if (it != indices.end())
+        /* try to find cam point by line number */
+        auto camPoints = this->previewWorker_->camPoints();
+        auto it = std::find_if(camPoints.begin(), camPoints.end(),
+                               [lineNum](const CamPoint &point) {
+                                   return point.lineNum() == lineNum;
+                               });
+
+        /* update progress bar and coords vis if found */
+        if (it != camPoints.end())
         {
+            unsigned int activeIdx = it - camPoints.begin();
             this->progressBar_->blockSignals(true);
-            this->progressBar_->setValue(it - indices.begin());
+            this->progressBar_->setValue(activeIdx);
             this->progressBar_->blockSignals(false);
+
+            this->coordsPreview_->updateActive(activeIdx);
         }
     }
 }
@@ -628,19 +638,24 @@ void MainWindow::onChangePreview(QByteArray data, const unsigned long &size)
     this->camPreview_->showPreview(data, size);
 }
 
-void MainWindow::onPBarChanged(int imgIndex)
+void MainWindow::onPBarChanged(int idx)
 {
     this->previewWorker_->cancelStepping();
 
+    CamPoint camPoint = this->previewWorker_->camPoints()[idx];
+
     if (this->previewWorker_->previewLock()->available())
     {
-        this->editor_->goToLine(this->previewWorker_->imgIndices()[imgIndex]);
+        this->editor_->goToLine(camPoint.lineNum());
+        this->coordsPreview_->updateActive(idx);
+
         emit this->previewWorker_->processCommands(
             this->editor_->activeLineText());
     }
     else
     {
-        this->editor_->goToLine(this->previewWorker_->imgIndices()[imgIndex]);
+        this->editor_->goToLine(camPoint.lineNum());
+        this->coordsPreview_->updateActive(idx);
     }
 }
 
@@ -648,18 +663,22 @@ void MainWindow::onPBarReleased()
 {
     this->previewWorker_->cancelStepping();
 
-    this->editor_->goToLine(
-        this->previewWorker_->imgIndices()[this->progressBar_->value()]);
+    unsigned int idx = this->progressBar_->value();
+    CamPoint camPoint =
+        this->previewWorker_->camPoints()[idx];
+
+    this->coordsPreview_->updateActive(idx);
+    this->editor_->goToLine(camPoint.lineNum());
     emit this->previewWorker_->processCommands(this->editor_->activeLineText());
 }
 
-void MainWindow::onImgIndicesUpdated()
+void MainWindow::onCamPointsUpdated()
 {
-    if (this->previewWorker_->imgIndices().size() > 0)
+    if (this->previewWorker_->camPoints().size() > 0)
     {
         this->progressBar_->setEnabled(true);
         this->progressBar_->setMaximum(
-            this->previewWorker_->imgIndices().size() - 1);
+            this->previewWorker_->camPoints().size() - 1);
     }
     else
     {
@@ -668,12 +687,12 @@ void MainWindow::onImgIndicesUpdated()
         this->progressBar_->blockSignals(false);
         this->progressBar_->setEnabled(false);
     }
-    this->coordPreview_->updatePoints(this->previewWorker_->camPositions());
+    this->coordsPreview_->updatePoints(this->previewWorker_->camPoints());
 }
 
 void MainWindow::onEditorContentChanged()
 {
     if (this->autoCommScan_)
-        emit this->previewWorker_->updateImgIndices(
+        emit this->previewWorker_->updateCamPoints(
             this->editor_->toPlainText());
 }

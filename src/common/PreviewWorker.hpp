@@ -5,6 +5,7 @@
 
 #include "common/PanguConnection.hpp"
 #include "common/PanguParser.hpp"
+#include "common/CamPoint.hpp"
 #include "enums/CommandErr.hpp"
 #include "enums/ConnectionErr.hpp"
 #include "interfaces/IConnection.hpp"
@@ -19,18 +20,17 @@ public:
     ~PreviewWorker();
 
     QSemaphore *previewLock() const;
-    QList<unsigned int> imgIndices() const;
-    QList<QVector3D> camPositions() const;
+    QList<CamPoint> camPoints() const;
     void cancelStepping();
 
 private:
     PanguConnection *connection_;
     PanguParser *parser_;
 
+    QList<CamPoint> camPoints_;
+
     QSemaphore *previewLock_;
     std::atomic<bool> isCancelled_;
-    QList<unsigned int> imgIndices_;
-    QList<QVector3D> camPositions_;
 
 signals:
     ConnectionErr connect(const QString &address, const int &port) override;
@@ -46,8 +46,8 @@ signals:
 
     void commandsProcessed();
 
-    void updateImgIndices(const QString &str);
-    void imgIndicesUpdated();
+    void updateCamPoints(const QString &str);
+    void camPointsUpdated();
 
 private slots:
     ConnectionErr onConnect(const QString &address, const int &port);
@@ -56,5 +56,5 @@ private slots:
     void onProcessCommands(const QString &text, const int &start = 0,
                            const int &msLineDelay = 0);
 
-    void onUpdateImgIndices(const QString &str);
+    void onUpdateCamPoints(const QString &str);
 };

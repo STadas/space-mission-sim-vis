@@ -3,6 +3,8 @@ set(EXECUTABLE_PROJECT "${PROJECT_NAME}")
 
 # src
 set(SOURCE_PROJECT
+        common/CamPoint.cpp
+        common/CamPoint.hpp
         common/HBoxLayout.cpp
         common/HBoxLayout.hpp
         common/MessageController.cpp
@@ -38,8 +40,8 @@ set(SOURCE_PROJECT
 
         widgets/CamPreview.cpp
         widgets/CamPreview.hpp
-        widgets/CoordPreview.cpp
-        widgets/CoordPreview.hpp
+        widgets/CoordsPreview.cpp
+        widgets/CoordsPreview.hpp
         widgets/MainWindow.cpp
         widgets/MainWindow.hpp
         widgets/Editor.cpp
