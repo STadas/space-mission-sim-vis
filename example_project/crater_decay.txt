@@ -1,0 +1,14 @@
+identifier     PANGU: Crater Decay File
+base_diameter  100
+base_density   1
+power          1
+// Depth decay graph point pairs: Age, Normalised_Depth
+// Each line following this comment is a crater depth decay graph point consisting of two values.
+0	1
+50	0.5
+100	0
+!
+// Rim decay graph point pairs: Age, Normalised_Rim_Height decay graph point consisting of two values.
+0	1
+50	0.5
+100	0

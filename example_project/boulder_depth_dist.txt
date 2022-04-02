@@ -1,0 +1,8 @@
+identifier PANGU: Boulder Depth Distribution File
+range 0 1
+cumulative false
+// Boulder Depth distribution graph point pairs: Boulder Depth, relative probability
+// Each line following this comment is a Boulder Depth distribution  graph point consisting of two values.
+0	40
+0.5	20
+1	0

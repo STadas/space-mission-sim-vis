@@ -1,0 +1,9 @@
+identifier PANGU: Crater Age Distribution File
+range 0 1000
+//cumulative false
+// Crater age distribution graph point pairs: Age, relative probability
+// Each line following this comment is a Crater Age distribution  graph point consisting of two values.
+0	0
+100	5
+800	90
+1000	100
