@@ -24,22 +24,86 @@ CoordsVis::CoordsVis(QWidget *parent, Settings *const settings,
 
     // camera
     this->camera_ = view3d->camera();
-    //TODO: setting or widget
     this->camera_->lens()->setPerspectiveProjection(45.0f, 4.0f / 3.0f, 0.1f,
-                                                    100000.0f);
+                                                    10000.0f);
     this->camera_->setPosition(QVector3D(0, 0, 20.0f));
     this->camera_->setUpVector(QVector3D(0, 1, 0));
     this->camera_->setViewCenter(QVector3D(0, 0, 0));
 
-    // camera controls
-    auto camController =
-        new Qt3DExtras::QOrbitCameraController(this->rootEntity_);
-    camController->setCamera(this->camera_);
+    this->initPlane();
+    this->initPathGeometry();
+    this->initControls();
+}
 
+CoordsVis::~CoordsVis()
+{
+}
+
+void CoordsVis::initControls()
+{
+    QWidget *controlsWrapper = new QWidget(this);
+    QHBoxLayout *controlsLayout = new QHBoxLayout(controlsWrapper);
+    controlsLayout->setMargin(0);
+
+    // plane scale
+    QLabel *planeScaleLabel = new QLabel("Plane scale", controlsWrapper);
+    planeScaleLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    QSpinBox *planeScaleBox = new QSpinBox(this);
+    planeScaleBox->setMaximum(INT_MAX);
+    planeScaleBox->setValue(this->planeTransform_->scale());
+    QObject::connect(planeScaleBox, QOverload<int>::of(&QSpinBox::valueChanged),
+                     this, [=](const int &newVal) {
+                         this->planeTransform_->setScale(newVal);
+                     });
+
+    // far plane
+    QLabel *farPlaneLabel = new QLabel("Cam far plane", controlsWrapper);
+    farPlaneLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    QSpinBox *farPlaneBox = new QSpinBox(this);
+    farPlaneBox->setMaximum(INT_MAX);
+    farPlaneBox->setValue(this->camera_->lens()->farPlane());
+    QObject::connect(farPlaneBox, QOverload<int>::of(&QSpinBox::valueChanged),
+                     this, [=](const int &newVal) {
+                         this->camera_->lens()->setFarPlane(newVal);
+                     });
+
+    controlsLayout->addWidget(planeScaleLabel);
+    controlsLayout->addWidget(planeScaleBox);
+    controlsLayout->addWidget(farPlaneLabel);
+    controlsLayout->addWidget(farPlaneBox);
+
+    this->layout()->addWidget(controlsWrapper);
+
+    // camera
+    this->camController_ =
+        new Qt3DExtras::QOrbitCameraController(this->rootEntity_);
+    this->camController_->setCamera(this->camera_);
+
+    QObject::connect(
+        this->camera_, &Qt3DRender::QCamera::positionChanged, this,
+        [this](const QVector3D &pos) {
+            QByteArray posBytes = this->posAttr_->buffer()->data();
+            if (posBytes.size() == 0)
+                return;
+
+            float *positions = reinterpret_cast<float *>(posBytes.data());
+
+            QVector3D pointPos = {positions[this->lastActiveIdx_ * 3],
+                                  positions[this->lastActiveIdx_ * 3 + 1],
+                                  positions[this->lastActiveIdx_ * 3 + 2]};
+
+            this->camController_->setLinearSpeed((pos - pointPos).length() * 2);
+            this->camera_->setViewCenter(pointPos);
+            this->camera_->transform()->setRotationZ(0);
+        });
+}
+
+void CoordsVis::initPlane()
+{
     auto *planeEntity = new Qt3DCore::QEntity(this->rootEntity_);
     auto *planeMesh = new Qt3DExtras::QPlaneMesh();
     auto *planeMaterial = new Qt3DExtras::QPhongMaterial();
-    auto *planeTransform = new Qt3DCore::QTransform();
+    this->planeTransform_ = new Qt3DCore::QTransform();
 
     planeMesh->setWidth(1.0f);
     planeMesh->setHeight(1.0f);
@@ -48,20 +112,14 @@ CoordsVis::CoordsVis(QWidget *parent, Settings *const settings,
     planeMaterial->setAmbient(QColor("#ffffff"));
     planeMaterial->setShininess(0);
 
-    planeTransform->setScale(100);
-    planeTransform->setRotation(
+    this->planeTransform_->setScale(10);
+    this->planeTransform_->setRotation(
         QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), 0.0f));
-    planeTransform->setTranslation({0, 0, 0});
+    this->planeTransform_->setTranslation({0, 0, 0});
 
     planeEntity->addComponent(planeMesh);
     planeEntity->addComponent(planeMaterial);
-    planeEntity->addComponent(planeTransform);
-
-    this->initPathGeometry();
-}
-
-CoordsVis::~CoordsVis()
-{
+    planeEntity->addComponent(this->planeTransform_);
 }
 
 void CoordsVis::initPathGeometry()
@@ -286,9 +344,8 @@ void CoordsVis::updateActive(const unsigned int &activeIdx)
         QVector3D offset =
             this->camera_->position() - this->camera_->viewCenter();
 
-        this->camera_->setPosition(pointPos + offset);
-        this->camera_->setViewCenter(pointPos);
-    }
+        this->lastActiveIdx_ = activeIdx;
 
-    this->lastActiveIdx_ = activeIdx;
+        this->camera_->setPosition(pointPos + offset);
+    }
 }

@@ -25,6 +25,8 @@ public:
     void updateActive(const unsigned int &activeIdx);
 
 private:
+    void initControls();
+    void initPlane();
     void initPathGeometry();
 
     Settings *const settings_;
@@ -32,6 +34,9 @@ private:
 
     Qt3DCore::QEntity *rootEntity_;
     Qt3DRender::QCamera *camera_;
+    Qt3DExtras::QOrbitCameraController *camController_;
+
+    Qt3DCore::QTransform *planeTransform_;
 
     Qt3DRender::QAttribute *posAttr_;
     Qt3DRender::QAttribute *idxAttr_;
