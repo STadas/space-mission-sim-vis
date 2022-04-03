@@ -49,35 +49,35 @@ void MessageController::onError(CommandErr err, QWidget *parent)
     QString windowTitle = "Syntax error";
     switch (err)
     {
-        case CommandErr::NOT_IMPLEMENTED: {
+        case CommandErr::NotImplemented: {
             this->showCritical(parent, windowTitle,
                                "No such command implemented. Please check your "
                                "syntax and try again.");
             break;
         }
-        case CommandErr::BAD_ARG_COUNT: {
+        case CommandErr::BadArgCount: {
             this->showCritical(
                 parent, windowTitle,
                 "Invalid amount of arguments for command. Please "
                 "check your syntax and try again.");
             break;
         }
-        case CommandErr::BAD_ARG_TYPE: {
+        case CommandErr::BadArgType: {
             this->showCritical(parent, windowTitle,
                                "Invalid argument type for command. Please check"
                                "your syntax and try again.");
             break;
         }
-        case CommandErr::UNKNOWN: {
+        case CommandErr::Unknown: {
             this->showCritical(parent, windowTitle,
                                "Unknown syntax error. Please check your "
                                "settings and syntax and try again.");
             break;
         }
-        case CommandErr::EMPTY: {
+        case CommandErr::Empty: {
             break;
         }
-        case CommandErr::OK: {
+        case CommandErr::Ok: {
             break;
         }
         default: {
@@ -91,10 +91,10 @@ void MessageController::onError(ConnectionErr err, QWidget *parent)
     QString windowTitle = "Connection error";
     switch (err)
     {
-        case ConnectionErr::OK: {
+        case ConnectionErr::Ok: {
             break;
         }
-        case ConnectionErr::BAD_DATA: {
+        case ConnectionErr::BadData: {
             this->showCritical(
                 parent, windowTitle,
                 "There was an error when getting the preview image. Please "
@@ -116,12 +116,12 @@ void MessageController::onError(FileErr err, QWidget *parent)
 {
     switch (err)
     {
-        case FileErr::OPEN_FAIL: {
+        case FileErr::OpenFail: {
             this->showCritical(parent, "Open file",
                                "There was an error opening the file.");
             break;
         }
-        case FileErr::SAVE_FAIL: {
+        case FileErr::SaveFail: {
             this->showCritical(parent, "Save file as",
                                "There was an error saving the file.");
             break;
@@ -136,12 +136,12 @@ QMessageBox::StandardButton MessageController::question(FileQuestion qst,
 {
     switch (qst)
     {
-        case FileQuestion::FILE_NEW: {
+        case FileQuestion::FileNew: {
             return QMessageBox::question(
                 parent, "New file",
                 "Are you sure? This will discard any unsaved changes.");
         }
-        case FileQuestion::FILE_OPEN: {
+        case FileQuestion::FileOpen: {
             return QMessageBox::question(
                 parent, "Open file",
                 "Are you sure? This will discard any unsaved changes.");

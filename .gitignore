@@ -60,3 +60,13 @@ instdir/
 
 # AppImage
 *.AppImage
+
+# PANGU Specific
+albedo_map.tga
+boulder_list.txt
+boulder_size_freq_dist.txt
+crater_list.txt
+crater_size_freq_dist.txt
+model.pan
+surface.dem
+surface.dem.txt

@@ -44,4 +44,17 @@ public:
 
     QStringSetting currLineHighlightColor = {"editor/currLineHightlightColor",
                                              "#ffff00", this->manager_};
+
+    QStringSetting coordsVisBackgroundColor = {"coordsVis/backgroundColor",
+                                               "#000000", this->manager_};
+    QStringSetting coordsVisPlaneColor = {"coordsVis/planeColor", "#333333",
+                                          this->manager_};
+    QStringSetting coordsVisDefaultColor = {"coordsVis/defaultColor", "#ffffff",
+                                            this->manager_};
+    QStringSetting coordsVisActiveColor = {"coordsVis/activeColor", "#ffff00",
+                                           this->manager_};
+    FloatSetting coordsVisDefaultPSize = {"coordsVis/defaultPSize", 4.0f,
+                                          this->manager_};
+    FloatSetting coordsVisActivePSize = {"coordsVis/activePSize", 8.0f,
+                                         this->manager_};
 };

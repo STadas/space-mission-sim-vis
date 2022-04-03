@@ -22,7 +22,7 @@ ConnectionErr PanguConnection::connect(const QString &address, const int &port)
     WSAData wsaData;
     if (WSAStartup(MAKEWORD(2, 2), &wsaData))
     {
-        return ConnectionErr::BAD_SOCK;
+        return ConnectionErr::BadSock;
     }
 #endif
 
@@ -31,7 +31,7 @@ ConnectionErr PanguConnection::connect(const QString &address, const int &port)
 
     if (this->sock_ == -1)
     {
-        return ConnectionErr::BAD_SOCK;
+        return ConnectionErr::BadSock;
     }
 
     saddr.sin_family = AF_INET;
@@ -41,16 +41,16 @@ ConnectionErr PanguConnection::connect(const QString &address, const int &port)
 
     if (::connect(this->sock_, (struct sockaddr *)&saddr, saddr_len) == -1)
     {
-        return ConnectionErr::BAD_CONN;
+        return ConnectionErr::BadConn;
     }
 
     char *panguErr = pan_net_start_TX(this->sock_);
     if (panguErr)
     {
-        return ConnectionErr::BAD_RESPONSE;
+        return ConnectionErr::BadResponse;
     }
 
-    return ConnectionErr::OK;
+    return ConnectionErr::Ok;
 }
 
 ConnectionErr PanguConnection::disconnect()
@@ -63,7 +63,7 @@ ConnectionErr PanguConnection::disconnect()
 #ifdef _WIN32
     WSACleanup();
 #endif
-    return ConnectionErr::OK;
+    return ConnectionErr::Ok;
 }
 
 ConnectionErr PanguConnection::sendCommand(ParsedCommand &command)
@@ -75,7 +75,7 @@ ConnectionErr PanguConnection::sendCommand(ParsedCommand &command)
     QString cmdName = command.name();
     if (PanguParser::commandMap.find(cmdName) == PanguParser::commandMap.end())
     {
-        return ConnectionErr::BAD_REQUEST;
+        return ConnectionErr::BadRequest;
     }
 
     try
@@ -94,10 +94,10 @@ ConnectionErr PanguConnection::sendCommand(ParsedCommand &command)
 
                 if (panguErr)
                 {
-                    return ConnectionErr::BAD_RESPONSE;
+                    return ConnectionErr::BadResponse;
                 }
 
-                return ConnectionErr::OK;
+                return ConnectionErr::Ok;
             }
 
             case PanguParser::CommandName::Quaternion: {
@@ -112,20 +112,20 @@ ConnectionErr PanguConnection::sendCommand(ParsedCommand &command)
 
                 if (panguErr)
                 {
-                    return ConnectionErr::BAD_RESPONSE;
+                    return ConnectionErr::BadResponse;
                 }
 
-                return ConnectionErr::OK;
+                return ConnectionErr::Ok;
             }
 
             case PanguParser::CommandName::Update: {
-                return ConnectionErr::OK;
+                return ConnectionErr::Ok;
             }
 
             case PanguParser::CommandName::Pause: {
                 QThread::currentThread()->msleep(
                     1000 * std::get<double>(command.args()[0]));
-                return ConnectionErr::OK;
+                return ConnectionErr::Ok;
             }
         }
     }
@@ -133,7 +133,7 @@ ConnectionErr PanguConnection::sendCommand(ParsedCommand &command)
     {
     }
 
-    return ConnectionErr::BAD_REQUEST;
+    return ConnectionErr::BadRequest;
 }
 
 ConnectionErr PanguConnection::sendCommand(ParsedCommand &command,
@@ -141,27 +141,27 @@ ConnectionErr PanguConnection::sendCommand(ParsedCommand &command,
                                            unsigned long &size)
 {
     ConnectionErr err = this->sendCommand(command);
-    if (err != ConnectionErr::OK)
+    if (err != ConnectionErr::Ok)
     {
         return err;
     }
 
     if (!command.expectsImg())
     {
-        return ConnectionErr::OK;
+        return ConnectionErr::Ok;
     }
 
     char *panguErr = pan_net_get_image_TX(this->sock_);
     if (panguErr)
     {
-        return ConnectionErr::BAD_RESPONSE;
+        return ConnectionErr::BadResponse;
     }
 
     img = pan_net_get_image_RX(this->sock_, &size);
     if (img == nullptr)
     {
-        return ConnectionErr::BAD_DATA;
+        return ConnectionErr::BadData;
     }
 
-    return ConnectionErr::OK;
+    return ConnectionErr::Ok;
 }

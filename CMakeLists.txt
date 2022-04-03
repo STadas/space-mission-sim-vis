@@ -26,6 +26,9 @@ find_package(Qt5 REQUIRED
     Widgets
     Core
     Concurrent
+    3DCore
+    3DExtras
+    3DRender
 )
 
 find_package(Threads REQUIRED)

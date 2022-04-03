@@ -23,7 +23,7 @@ ParseResult PanguParser::parse(const QString &strCommand)
         strippedCommand.split(QRegExp("[ \\t]+"), Qt::SkipEmptyParts);
 
     if (words.size() == 0 || (words.size() == 1 && words[0].size() == 0))
-        return CommandErr::EMPTY;
+        return CommandErr::Empty;
 
     std::vector<Arg> args;
 
@@ -32,62 +32,70 @@ ParseResult PanguParser::parse(const QString &strCommand)
 
     if (PanguParser::commandMap.find(cmdName) == PanguParser::commandMap.end())
     {
-        return CommandErr::NOT_IMPLEMENTED;
+        return CommandErr::NotImplemented;
     }
 
     switch (PanguParser::commandMap[cmdName])
     {
         case CommandName::Start: {
             if (words.size() != 6)
-                return CommandErr::BAD_ARG_COUNT;
+                return CommandErr::BadArgCount;
 
             for (auto &it : words)
             {
                 if (!StringUtil::isNumeric(it))
-                    return CommandErr::BAD_ARG_TYPE;
+                    return CommandErr::BadArgType;
 
                 args.push_back(Arg(it.toDouble()));
             }
 
-            return {CommandErr::OK, ParsedCommand(cmdName, true, args)};
+            return {CommandErr::Ok,
+                    ParsedCommand(cmdName, args, true,
+                                  QVector3D(std::get<double>(args[0]),
+                                            std::get<double>(args[1]),
+                                            std::get<double>(args[2])))};
         }
 
         case CommandName::Quaternion: {
             if (words.size() != 7)
-                return CommandErr::BAD_ARG_COUNT;
+                return CommandErr::BadArgCount;
 
             for (auto &it : words)
             {
                 if (!StringUtil::isNumeric(it))
-                    return CommandErr::BAD_ARG_TYPE;
+                    return CommandErr::BadArgType;
 
                 args.push_back(Arg(it.toDouble()));
             }
 
-            return {CommandErr::OK, ParsedCommand(cmdName, true, args)};
+            return {CommandErr::Ok,
+                    ParsedCommand(cmdName, args, true,
+                                  QVector3D(std::get<double>(args[0]),
+                                            std::get<double>(args[1]),
+                                            std::get<double>(args[2])))};
         }
 
         case CommandName::Update: {
             if (words.size() != 0)
-                return CommandErr::BAD_ARG_COUNT;
+                return CommandErr::BadArgCount;
 
-            return {CommandErr::OK, ParsedCommand(cmdName, true, args)};
+            return {CommandErr::Ok, ParsedCommand(cmdName, args, true)};
         }
 
         case CommandName::Pause: {
             if (words.size() != 1)
-                return CommandErr::BAD_ARG_COUNT;
+                return CommandErr::BadArgCount;
 
             if (!StringUtil::isNumeric(words[0]))
-                return CommandErr::BAD_ARG_TYPE;
+                return CommandErr::BadArgType;
 
             args.push_back(Arg(words[0].toDouble()));
 
-            return {CommandErr::OK, ParsedCommand(cmdName, false, args)};
+            return {CommandErr::Ok, ParsedCommand(cmdName, args, false)};
         }
 
         default: {
-            return CommandErr::UNKNOWN;
+            return CommandErr::Unknown;
         }
     }
 }

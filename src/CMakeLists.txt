@@ -3,6 +3,8 @@ set(EXECUTABLE_PROJECT "${PROJECT_NAME}")
 
 # src
 set(SOURCE_PROJECT
+        common/CamPoint.cpp
+        common/CamPoint.hpp
         common/HBoxLayout.cpp
         common/HBoxLayout.hpp
         common/MessageController.cpp
@@ -38,6 +40,8 @@ set(SOURCE_PROJECT
 
         widgets/CamPreview.cpp
         widgets/CamPreview.hpp
+        widgets/CoordsVis.cpp
+        widgets/CoordsVis.hpp
         widgets/MainWindow.cpp
         widgets/MainWindow.hpp
         widgets/Editor.cpp
@@ -52,6 +56,8 @@ set(SOURCE_PROJECT
         widgets/dialogs/SettingsDialog.cpp
         widgets/dialogs/SettingsDialog.hpp
 
+        widgets/settingspages/CoordsVisPage.cpp
+        widgets/settingspages/CoordsVisPage.hpp
         widgets/settingspages/EditorPage.cpp
         widgets/settingspages/EditorPage.hpp
         widgets/settingspages/ServerPage.cpp
@@ -92,6 +98,9 @@ target_link_libraries(${LIBRARY_PROJECT}
         Qt5::Widgets
         Qt5::Gui
         Qt5::Concurrent
+        Qt5::3DCore
+        Qt5::3DExtras
+        Qt5::3DRender
 
         Threads::Threads
         )

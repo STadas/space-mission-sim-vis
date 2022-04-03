@@ -27,5 +27,11 @@
     <file alias="configure">breeze-icons/configure.svg</file>
 
     <file alias="editor">breeze-icons/story-editor.svg</file>
+    <file alias="coordinate">breeze-icons/coordinate.svg</file>
+  </qresource>
+
+  <qresource prefix="/shaders">
+      <file alias="FlightPathV">shaders/FlightPath.vert</file>
+      <file alias="FlightPathF">shaders/FlightPath.frag</file>
   </qresource>
 </RCC>

@@ -24,6 +24,8 @@ protected:
                               const int &max);
     QLineEdit *createLineEdit(DoubleSetting &setting, const double &min,
                               const double &max, const int &decimals);
+    QLineEdit *createLineEdit(FloatSetting &setting, const double &min,
+                              const double &max, const int &decimals);
     QWidget *createLineEditBrowse(QStringSetting &setting,
                                   const QString &caption, const QString &dir,
                                   const QString &filter);

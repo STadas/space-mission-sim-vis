@@ -13,8 +13,8 @@ PreviewWorker::PreviewWorker()
                      &PreviewWorker::onDisconnect);
     QObject::connect(this, &PreviewWorker::processCommands, this,
                      &PreviewWorker::onProcessCommands);
-    QObject::connect(this, &PreviewWorker::updateImgIndices, this,
-                     &PreviewWorker::onUpdateImgIndices);
+    QObject::connect(this, &PreviewWorker::updateCamPoints, this,
+                     &PreviewWorker::onUpdateCamPoints);
 }
 
 PreviewWorker::~PreviewWorker()
@@ -26,9 +26,9 @@ QSemaphore *PreviewWorker::previewLock() const
     return this->previewLock_;
 }
 
-std::vector<int> PreviewWorker::imgIndices() const
+QList<CamPoint> PreviewWorker::camPoints() const
 {
-    return this->imgIndices_;
+    return this->camPoints_;
 }
 
 ConnectionErr PreviewWorker::onConnect(const QString &address, const int &port)
@@ -61,18 +61,18 @@ void PreviewWorker::onProcessCommands(const QString &text, const int &start,
 
         ParseResult parsed = this->parser_->parse(lines[i]);
 
-        if (parsed.err != CommandErr::OK)
+        if (parsed.err != CommandErr::Ok)
         {
             emit this->error(parsed.err);
 
-            if (parsed.err == CommandErr::EMPTY)
+            if (parsed.err == CommandErr::Empty)
                 continue;
             else
                 break;
         }
         if (!parsed.command.has_value())
         {
-            emit this->error(CommandErr::UNKNOWN);
+            emit this->error(CommandErr::Unknown);
             break;
         }
 
@@ -81,7 +81,7 @@ void PreviewWorker::onProcessCommands(const QString &text, const int &start,
         ConnectionErr connectionErr =
             this->connection_->sendCommand(parsed.command.value(), img, size);
 
-        if (connectionErr != ConnectionErr::OK)
+        if (connectionErr != ConnectionErr::Ok)
         {
             emit this->error(connectionErr);
             if (img != nullptr)
@@ -103,7 +103,7 @@ void PreviewWorker::onProcessCommands(const QString &text, const int &start,
         if (this->isCancelled_)
             break;
 
-        if (parsed.err != CommandErr::EMPTY && i < lines.size() - 1)
+        if (parsed.err != CommandErr::Empty && i < lines.size() - 1)
         {
             // If the command itself took longer to execute than the specified
             // delay, don't sleep.
@@ -126,26 +126,32 @@ void PreviewWorker::cancelStepping()
     }
 }
 
-void PreviewWorker::onUpdateImgIndices(const QString &str)
+void PreviewWorker::onUpdateCamPoints(const QString &str)
 {
     /* TODO: Some kind of progress bar in the statusbar would be good for large
      * files */
     QStringList lines = str.split(QRegExp("\\n"));
 
-    std::vector<int> newImgIndices;
-    int lineNum = 0;
+    QList<CamPoint> newCamPoints;
+    unsigned int lineNum = 0;
+    QVector3D lastCamPos = {0, 0, 0};
 
     for (auto &line : lines)
     {
         ParseResult parsed = this->parser_->parse(line);
 
-        if (parsed.err == CommandErr::OK && parsed.command->expectsImg())
+        if (parsed.err == CommandErr::Ok && parsed.command->expectsImg())
         {
-            newImgIndices.push_back(lineNum);
+            if (parsed.command->hasCamPos())
+            {
+                newCamPoints.push_back({lineNum, parsed.command->camPos()});
+            }
+            else
+                newCamPoints.push_back({lineNum, lastCamPos});
         }
 
         lineNum++;
     }
-    this->imgIndices_ = newImgIndices;
-    emit this->imgIndicesUpdated();
+    this->camPoints_ = newCamPoints;
+    emit this->camPointsUpdated();
 }
