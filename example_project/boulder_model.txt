@@ -1,0 +1,10 @@
+identifier PANGU: Boulder Library File
+// Each line following this comment is a boulder library definition
+// The parameters are defined in order:
+//	relative probablility, start level, end level, random seed,
+//	diffuse(Red), diffuse(green), diffuse(blue), specular(red), specular(green), specular(blue), shine,
+//	max slope angle(degrees), algorithm,  roundadditions,
+//	inital_random_height, inital_random_shift, fractal_scale, fractal_scale_factor.
+1	0	4	1245	0.9	0.9	0.9	0.1	0.1	0.1	5	20	1	1	0.25	0.25	0.05	0.85
+1	0	3	1247	0.75	0.75	0.75	0.1	0.1	0.1	10	20	1	1	0.45	0.45	0.1	0.75
+1	0	2	1248	0.85	0.85	0.85	0.1	0.1	0.1	10	20	1	1	0.45	0.45	0.25	0.6

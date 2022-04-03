@@ -1,0 +1,26 @@
+identifier  PANGU: Region Descriptor File
+number_of_regions  2
+
+; First region: Define number of layers including the base layer
+number_of_layers 3
+
+; Base surface has size 1024 x 512 with horizontal res of 2
+; layer positions are estimates
+
+// region, layer, offset(x, y)., fractal number, height factor
+// size(x, y), resolution increase, border width.
+layer_definition 1 1 500  0 0.8 0.2 513 513 2 0	  ; res = 1
+layer_definition 1 2 500  0 0.8 0.2 513 513 2 0	  ; res = 0.5
+
+; Second region: Define number of layers including the base layer
+number_of_layers 4
+
+; Base surface has size 1024 x 512 with horizontal res of 2
+; layer positions are estimates
+
+// region, layer, offset(x, y)., fractal number, height factor
+// size(x, y), resolution increase, border width.
+layer_definition 1 1 -500  20 0.8 0.2 613 513 2 0	; res = 1
+layer_definition 1 2 -500  20 0.8 0.2 613 513 2 0	; res = 0.5
+layer_definition 1 2 -500  20 0.8 0.2 613 513 2 0	; res = 0.25
+

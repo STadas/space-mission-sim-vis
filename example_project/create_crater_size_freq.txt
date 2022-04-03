@@ -1,0 +1,10 @@
+identifier         PANGU: Create Distribution Parameters File
+output_filename    crater_size_freq_dist.txt
+distribution_type  crater_size_freq
+number_of_points   100
+cumulative         true
+log_graph          true
+range              0.5  1000
+// Power Laws, [C] [K] [min] [max], N = CX^K
+power_law[0]       0.1  -2.0  0.5  1000
+

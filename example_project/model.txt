@@ -1,0 +1,20 @@
+identifier          PANGU: Model Parameters File
+
+base_file_type      pangu
+pan_file_name       model.pan
+base_file_name      surface.dem
+
+add_regions         true
+region_descriptor   regions.txt  
+
+add_craters         true
+crater_list         crater_list.txt
+crater_model        crater_model.txt
+crater_decay        crater_decay.txt
+
+add_boulders        true
+boulder_list        boulder_list.txt
+boulder_model       boulder_model.txt
+
+add_albedo_map      true
+albedo_map          albedo_map.tga

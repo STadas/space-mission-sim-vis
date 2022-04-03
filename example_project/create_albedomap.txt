@@ -1,0 +1,9 @@
+identifier       PANGU: Albedo Map Parameters File
+output_filename  albedo_map.tga
+size             1025  513
+seed_random      true
+seed             21
+hsv_mode         true 
+h_range          0.0  0.5
+s_range          0.0  0.2
+v_range          0.5  1.0
