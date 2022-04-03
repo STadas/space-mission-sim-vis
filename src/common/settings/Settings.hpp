@@ -56,5 +56,5 @@ public:
     FloatSetting coordsVisDefaultPSize = {"coordsVis/defaultPSize", 4.0f,
                                           this->manager_};
     FloatSetting coordsVisActivePSize = {"coordsVis/activePSize", 8.0f,
-                                          this->manager_};
+                                         this->manager_};
 };

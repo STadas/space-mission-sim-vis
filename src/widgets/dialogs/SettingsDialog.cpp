@@ -75,9 +75,9 @@ void SettingsDialog::createPages()
     this->addPage(new QAction(this->resources_->iconEditor, "Editor", this),
                   new EditorPage(this, this->settings_));
 
-    this->addPage(new QAction(this->resources_->iconCoordinate,
-                              "Coord-Vis", this),
-                  new CoordsVisPage(this, this->settings_));
+    this->addPage(
+        new QAction(this->resources_->iconCoordinate, "Coord-Vis", this),
+        new CoordsVisPage(this, this->settings_));
 }
 
 void SettingsDialog::addPage(QAction *action, QWidget *page)

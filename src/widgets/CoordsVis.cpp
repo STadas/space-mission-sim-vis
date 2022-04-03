@@ -326,7 +326,8 @@ void CoordsVis::updateActive(const unsigned int &activeIdx)
 
         float *sizes = reinterpret_cast<float *>(sizeBytes.data());
 
-        sizes[this->lastActiveIdx_] = this->settings_->coordsVisDefaultPSize.value();
+        sizes[this->lastActiveIdx_] =
+            this->settings_->coordsVisDefaultPSize.value();
         sizes[activeIdx] = this->settings_->coordsVisActivePSize.value();
 
         this->pSizeAttr_->buffer()->setData(sizeBytes);
