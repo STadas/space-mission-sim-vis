@@ -40,8 +40,8 @@ set(SOURCE_PROJECT
 
         widgets/CamPreview.cpp
         widgets/CamPreview.hpp
-        widgets/CoordsPreview.cpp
-        widgets/CoordsPreview.hpp
+        widgets/CoordsVis.cpp
+        widgets/CoordsVis.hpp
         widgets/MainWindow.cpp
         widgets/MainWindow.hpp
         widgets/Editor.cpp

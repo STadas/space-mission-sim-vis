@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Qt3DRender/QShaderProgram>
 #include <QtCore>
 #include <QtWidgets>
 
@@ -38,4 +39,9 @@ public:
     QIcon iconConfigure = QIcon(":/icons/configure");
 
     QIcon iconEditor = QIcon(":/icons/editor");
+
+    QByteArray flightPathVShader = Qt3DRender::QShaderProgram::loadSource(
+        QUrl("qrc:/shaders/FlightPathV"));
+    QByteArray flightPathFShader = Qt3DRender::QShaderProgram::loadSource(
+        QUrl("qrc:/shaders/FlightPathF"));
 };

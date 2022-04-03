@@ -15,7 +15,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     this->settings_->load();
     this->editor_ = new Editor(this, this->settings_);
-    this->coordsPreview_ = new CoordsPreview(this, this->settings_);
+    this->coordsVis_ = new CoordsVis(this, this->settings_, this->resources_);
 
     /* As weird as this is, it needs to be done for us to be able to use the
      * enums with signals and slots. Potential for a generated source code
@@ -35,17 +35,17 @@ MainWindow::MainWindow(QWidget *parent)
     this->centralWidget()->setLayout(new VBoxLayout);
     this->centralWidget()->layout()->addWidget(this->editor_);
 
-    this->dockCoordsPreview_ = new QDockWidget("Coordinates Preview", this);
-    this->dockCoordsPreview_->setObjectName("dockCoordsPreview");
-    this->dockCoordsPreview_->setWidget(this->coordsPreview_);
-    this->addDockWidget(Qt::RightDockWidgetArea, this->dockCoordsPreview_);
+    this->dockCoordsVis_ = new QDockWidget("Coordinates Visualisation", this);
+    this->dockCoordsVis_->setObjectName("dockCoordsVis");
+    this->dockCoordsVis_->setWidget(this->coordsVis_);
+    this->addDockWidget(Qt::RightDockWidgetArea, this->dockCoordsVis_);
 
     this->dockCamPreview_ = new QDockWidget("Camera Preview", this);
     this->dockCamPreview_->setObjectName("dockCamPreview");
     this->dockCamPreview_->setWidget(this->camPreview_);
     this->addDockWidget(Qt::RightDockWidgetArea, this->dockCamPreview_);
 
-    this->dockPlaybackInterface_ = new QDockWidget("Playback Controls", this);
+    this->dockPlaybackInterface_ = new QDockWidget("Playback Interface", this);
     this->dockPlaybackInterface_->setObjectName("dockPlaybackInterface");
     this->dockPlaybackInterface_->setWidget(this->playbackInterface_);
     this->addDockWidget(Qt::RightDockWidgetArea, this->dockPlaybackInterface_);
@@ -229,16 +229,15 @@ void MainWindow::initActions()
     QObject::connect(this->actOpenSettings_, &QAction::triggered, this,
                      &MainWindow::onActOpenSettings);
 
-    this->actToggleCoordsPreview_ = new QAction("Coordinates preview", this);
-    this->actToggleCoordsPreview_->setStatusTip(
-        "Toggle visibility of the coordinates preview");
-    this->actToggleCoordsPreview_->setCheckable(true);
-    this->actToggleCoordsPreview_->setChecked(
-        this->dockCoordsPreview_->isVisible());
-    QObject::connect(this->actToggleCoordsPreview_, &QAction::toggled, this,
-                     &MainWindow::onActToggleCoordsPreview);
-    QObject::connect(this->dockCoordsPreview_, &QDockWidget::visibilityChanged,
-                     this->actToggleCoordsPreview_, &QAction::setChecked);
+    this->actToggleCoordsVis_ = new QAction("Coordinates visualisation", this);
+    this->actToggleCoordsVis_->setStatusTip(
+        "Toggle visibility of the coordinates visualisation");
+    this->actToggleCoordsVis_->setCheckable(true);
+    this->actToggleCoordsVis_->setChecked(this->dockCoordsVis_->isVisible());
+    QObject::connect(this->actToggleCoordsVis_, &QAction::toggled, this,
+                     &MainWindow::onActToggleCoordsVis);
+    QObject::connect(this->dockCoordsVis_, &QDockWidget::visibilityChanged,
+                     this->actToggleCoordsVis_, &QAction::setChecked);
 
     this->actToggleCamPreview_ = new QAction("Camera preview", this);
     this->actToggleCamPreview_->setStatusTip(
@@ -326,7 +325,7 @@ void MainWindow::initMenus()
     this->viewMenu_ = new QMenu("View", this);
     this->menuBar()->addMenu(this->viewMenu_);
     this->viewMenu_->addActions({
-        this->actToggleCoordsPreview_,
+        this->actToggleCoordsVis_,
         this->actToggleCamPreview_,
         this->actTogglePlaybackInterface_,
     });
@@ -556,12 +555,12 @@ void MainWindow::onActOpenSettings()
     settingsDialog->show();
 }
 
-void MainWindow::onActToggleCoordsPreview(bool on)
+void MainWindow::onActToggleCoordsVis(bool on)
 {
     if (on)
-        this->dockCoordsPreview_->show();
+        this->dockCoordsVis_->show();
     else
-        this->dockCoordsPreview_->hide();
+        this->dockCoordsVis_->hide();
 }
 
 void MainWindow::onActToggleCamPreview(bool on)
@@ -606,7 +605,7 @@ void MainWindow::onLineStarted(const int &lineNum)
             this->progressBar_->setValue(activeIdx);
             this->progressBar_->blockSignals(false);
 
-            this->coordsPreview_->updateActive(activeIdx);
+            this->coordsVis_->updateActive(activeIdx);
         }
     }
 }
@@ -647,7 +646,7 @@ void MainWindow::onPBarChanged(int idx)
     if (this->previewWorker_->previewLock()->available())
     {
         this->editor_->goToLine(camPoint.lineNum());
-        this->coordsPreview_->updateActive(idx);
+        this->coordsVis_->updateActive(idx);
 
         emit this->previewWorker_->processCommands(
             this->editor_->activeLineText());
@@ -655,7 +654,7 @@ void MainWindow::onPBarChanged(int idx)
     else
     {
         this->editor_->goToLine(camPoint.lineNum());
-        this->coordsPreview_->updateActive(idx);
+        this->coordsVis_->updateActive(idx);
     }
 }
 
@@ -666,7 +665,7 @@ void MainWindow::onPBarReleased()
     unsigned int idx = this->progressBar_->value();
     CamPoint camPoint = this->previewWorker_->camPoints()[idx];
 
-    this->coordsPreview_->updateActive(idx);
+    this->coordsVis_->updateActive(idx);
     this->editor_->goToLine(camPoint.lineNum());
     emit this->previewWorker_->processCommands(this->editor_->activeLineText());
 }
@@ -686,7 +685,7 @@ void MainWindow::onCamPointsUpdated()
         this->progressBar_->blockSignals(false);
         this->progressBar_->setEnabled(false);
     }
-    this->coordsPreview_->updatePoints(this->previewWorker_->camPoints());
+    this->coordsVis_->updatePoints(this->previewWorker_->camPoints());
 }
 
 void MainWindow::onEditorContentChanged()

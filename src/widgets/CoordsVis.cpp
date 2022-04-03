@@ -1,44 +1,73 @@
-#include "CoordsPreview.hpp"
-#include <qrgb.h>
+#include "CoordsVis.hpp"
 
-CoordsPreview::CoordsPreview(QWidget *parent, Settings *const settings)
+CoordsVis::CoordsVis(QWidget *parent, Settings *const settings,
+                     Resources *const resources)
     : QWidget(parent)
     , settings_(settings)
+    , resources_(resources)
 {
     QBoxLayout *layout = new VBoxLayout(this);
     this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    Qt3DExtras::Qt3DWindow *view3d = new Qt3DExtras::Qt3DWindow();
-    QWidget *container = QWidget::createWindowContainer(view3d, this);
+    auto view3d = new Qt3DExtras::Qt3DWindow();
+    auto container = QWidget::createWindowContainer(view3d, this);
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     this->layout()->addWidget(container);
 
     // root entity
-    Qt3DCore::QEntity *rootEntity = new Qt3DCore::QEntity();
-    view3d->setRootEntity(rootEntity);
+    this->rootEntity_ = new Qt3DCore::QEntity();
+    view3d->setRootEntity(this->rootEntity_);
 
     // background
-    //TODO: setting
-    view3d->defaultFrameGraph()->setClearColor(QColor(QColor("#000000")));
+    view3d->defaultFrameGraph()->setClearColor(
+        QColor(this->settings_->coordsVisBackgroundColor.value()));
 
     // camera
-    Qt3DRender::QCamera *camera = view3d->camera();
-    //TODO: setting
-    camera->lens()->setPerspectiveProjection(45.0f, 16.0f / 9.0f, 0.1f,
-                                             10000.0f);
-    camera->setPosition(QVector3D(0, 0, 20.0f));
-    camera->setUpVector(QVector3D(0, 1, 0));
-    camera->setViewCenter(QVector3D(0, 0, 0));
+    this->camera_ = view3d->camera();
+    //TODO: setting or widget
+    this->camera_->lens()->setPerspectiveProjection(45.0f, 4.0f / 3.0f, 0.1f,
+                                                    100000.0f);
+    this->camera_->setPosition(QVector3D(0, 0, 20.0f));
+    this->camera_->setUpVector(QVector3D(0, 1, 0));
+    this->camera_->setViewCenter(QVector3D(0, 0, 0));
 
     // camera controls
-    auto *camController = new Qt3DExtras::QOrbitCameraController(rootEntity);
-    camController->setCamera(camera);
+    auto camController =
+        new Qt3DExtras::QOrbitCameraController(this->rootEntity_);
+    camController->setCamera(this->camera_);
 
-    // material stuff
-    auto *material = new Qt3DRender::QMaterial(rootEntity);
-    //TODO: setting
+    auto *planeEntity = new Qt3DCore::QEntity(this->rootEntity_);
+    auto *planeMesh = new Qt3DExtras::QPlaneMesh();
+    auto *planeMaterial = new Qt3DExtras::QPhongMaterial();
+    auto *planeTransform = new Qt3DCore::QTransform();
 
+    planeMesh->setWidth(1.0f);
+    planeMesh->setHeight(1.0f);
+
+    planeMaterial->setDiffuse(this->settings_->coordsVisPlaneColor.value());
+    planeMaterial->setAmbient(QColor("#ffffff"));
+    planeMaterial->setShininess(0);
+
+    planeTransform->setScale(100);
+    planeTransform->setRotation(
+        QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), 0.0f));
+    planeTransform->setTranslation({0, 0, 0});
+
+    planeEntity->addComponent(planeMesh);
+    planeEntity->addComponent(planeMaterial);
+    planeEntity->addComponent(planeTransform);
+
+    this->initPathGeometry();
+}
+
+CoordsVis::~CoordsVis()
+{
+}
+
+void CoordsVis::initPathGeometry()
+{
     // shader
+    auto *material = new Qt3DRender::QMaterial();
     auto *pointEffect = new Qt3DRender::QEffect();
     auto *pointTechnique = new Qt3DRender::QTechnique();
     auto *pointRenderPass = new Qt3DRender::QRenderPass();
@@ -64,38 +93,18 @@ CoordsPreview::CoordsPreview(QWidget *parent, Settings *const settings)
     pointRenderPass->setShaderProgram(pointShaderProgram);
     auto pointSize = new Qt3DRender::QPointSize();
     pointSize->setSizeMode(Qt3DRender::QPointSize::SizeMode::Programmable);
-    /* pointSize->setValue(8.0f); */
     pointRenderPass->addRenderState(pointSize);
 
     pointShaderProgram->setVertexShaderCode(
-        "#version 330\n"
+        this->resources_->flightPathVShader);
+    pointShaderProgram->setFragmentShaderCode(
+        this->resources_->flightPathFShader);
 
-        "uniform mat4 modelViewProjection;"
-
-        "layout(location = 0) in vec3 vertexPosition;"
-        "layout(location = 1) in vec4 vertexColor;"
-        "layout(location = 2) in float pointSize;"
-
-        "out vec4 fragColor;"
-
-        "void main(void)"
-        "{"
-        "    fragColor = vertexColor;"
-        "    gl_PointSize = pointSize;"
-        "    gl_Position = modelViewProjection * vec4(vertexPosition, 1);"
-        "}");
-    pointShaderProgram->setFragmentShaderCode("#version 330\n"
-
-                                              "in vec4 fragColor;"
-
-                                              "void main(void)"
-                                              "{"
-                                              "    gl_FragColor = fragColor;"
-                                              "}");
-
-    Qt3DRender::QGeometry *geometry = new Qt3DRender::QGeometry(rootEntity);
+    Qt3DRender::QGeometry *geometry =
+        new Qt3DRender::QGeometry(this->rootEntity_);
     Qt3DRender::QBuffer *vertBuffer = new Qt3DRender::QBuffer(geometry);
 
+    // vertexPosition attribute
     this->posAttr_ = new Qt3DRender::QAttribute(geometry);
     this->posAttr_->setName(
         Qt3DRender::QAttribute::defaultPositionAttributeName());
@@ -106,13 +115,17 @@ CoordsPreview::CoordsPreview(QWidget *parent, Settings *const settings)
     this->posAttr_->setBuffer(vertBuffer);
     geometry->addAttribute(this->posAttr_);
 
+    // vertex indices
     Qt3DRender::QBuffer *idxBuffer = new Qt3DRender::QBuffer(geometry);
     this->idxAttr_ = new Qt3DRender::QAttribute(geometry);
+    this->idxAttr_->setByteStride(sizeof(unsigned int));
+    this->idxAttr_->setVertexSize(1);
     this->idxAttr_->setVertexBaseType(Qt3DRender::QAttribute::UnsignedInt);
     this->idxAttr_->setAttributeType(Qt3DRender::QAttribute::IndexAttribute);
     this->idxAttr_->setBuffer(idxBuffer);
     geometry->addAttribute(this->idxAttr_);
 
+    // vertexColor attribute
     Qt3DRender::QBuffer *colorBuffer = new Qt3DRender::QBuffer(geometry);
     this->colorAttr_ = new Qt3DRender::QAttribute(geometry);
     this->colorAttr_->setName(
@@ -124,6 +137,7 @@ CoordsPreview::CoordsPreview(QWidget *parent, Settings *const settings)
     this->colorAttr_->setBuffer(colorBuffer);
     geometry->addAttribute(this->colorAttr_);
 
+    // pointSize attribute
     Qt3DRender::QBuffer *pSizeBuffer = new Qt3DRender::QBuffer(geometry);
     this->pSizeAttr_ = new Qt3DRender::QAttribute(geometry);
     this->pSizeAttr_->setName("pointSize");
@@ -134,42 +148,38 @@ CoordsPreview::CoordsPreview(QWidget *parent, Settings *const settings)
     this->pSizeAttr_->setBuffer(pSizeBuffer);
     geometry->addAttribute(this->pSizeAttr_);
 
-    auto *lineMesh = new Qt3DRender::QGeometryRenderer(rootEntity);
+    auto *lineMesh = new Qt3DRender::QGeometryRenderer(this->rootEntity_);
     lineMesh->setGeometry(geometry);
     lineMesh->setPrimitiveType(Qt3DRender::QGeometryRenderer::Lines);
-    auto *lineEntity = new Qt3DCore::QEntity(rootEntity);
+    auto *lineEntity = new Qt3DCore::QEntity(this->rootEntity_);
     lineEntity->addComponent(lineMesh);
     lineEntity->addComponent(material);
 
-    //TODO: have separate, simpler index array for points
-    auto *pointsMesh = new Qt3DRender::QGeometryRenderer(rootEntity);
+    auto *pointsMesh = new Qt3DRender::QGeometryRenderer(this->rootEntity_);
     pointsMesh->setGeometry(geometry);
     pointsMesh->setPrimitiveType(Qt3DRender::QGeometryRenderer::Points);
-    auto *pointsEntity = new Qt3DCore::QEntity(rootEntity);
-
+    auto *pointsEntity = new Qt3DCore::QEntity(this->rootEntity_);
     pointsEntity->addComponent(pointsMesh);
     pointsEntity->addComponent(material);
 }
 
-CoordsPreview::~CoordsPreview()
+void CoordsVis::updatePoints(const QList<CamPoint> &pointsList)
 {
-}
-
-void CoordsPreview::updatePoints(const QList<CamPoint> &pointsList)
-{
-    // vertices
+    // positions
     {
-        QByteArray vertBytes;
-        vertBytes.resize(pointsList.size() * 3 * sizeof(float));
+        QByteArray posBytes;
+        posBytes.resize(pointsList.size() * 3 * sizeof(float));
 
-        float *positions = reinterpret_cast<float *>(vertBytes.data());
+        float *positions = reinterpret_cast<float *>(posBytes.data());
         for (auto &p : pointsList)
         {
+            // the command treats z as the vertical axis, whereas the 3D
+            // environment - y, so we switch them around
             *positions++ = p.position().x();
-            *positions++ = p.position().y();
             *positions++ = p.position().z();
+            *positions++ = p.position().y();
         }
-        this->posAttr_->buffer()->setData(vertBytes);
+        this->posAttr_->buffer()->setData(posBytes);
         this->posAttr_->setCount(pointsList.size());
     }
 
@@ -225,7 +235,7 @@ void CoordsPreview::updatePoints(const QList<CamPoint> &pointsList)
     }
 }
 
-void CoordsPreview::updateActive(const unsigned int &activeIdx)
+void CoordsVis::updateActive(const unsigned int &activeIdx)
 {
     // colors
     {
@@ -263,6 +273,21 @@ void CoordsPreview::updateActive(const unsigned int &activeIdx)
 
         this->pSizeAttr_->buffer()->setData(sizeBytes);
         this->pSizeAttr_->setCount(count);
+    }
+
+    // camera position
+    {
+        QByteArray posBytes = this->posAttr_->buffer()->data();
+        float *positions = reinterpret_cast<float *>(posBytes.data());
+        QVector3D pointPos = {positions[activeIdx * 3],
+                              positions[activeIdx * 3 + 1],
+                              positions[activeIdx * 3 + 2]};
+
+        QVector3D offset =
+            this->camera_->position() - this->camera_->viewCenter();
+
+        this->camera_->setPosition(pointPos + offset);
+        this->camera_->setViewCenter(pointPos);
     }
 
     this->lastActiveIdx_ = activeIdx;
