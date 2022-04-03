@@ -19,7 +19,7 @@ TEST_F(PanguParserTest, ParsePanguEmptyString)
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::EMPTY);
+    ASSERT_EQ(parsed.err, CommandErr::Empty);
     ASSERT_FALSE(parsed.command.has_value());
 }
 
@@ -29,7 +29,7 @@ TEST_F(PanguParserTest, ParsePanguComment)
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::EMPTY);
+    ASSERT_EQ(parsed.err, CommandErr::Empty);
     ASSERT_FALSE(parsed.command.has_value());
 }
 
@@ -39,7 +39,7 @@ TEST_F(PanguParserTest, ParsePanguNotImplementedCommand)
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::NOT_IMPLEMENTED);
+    ASSERT_EQ(parsed.err, CommandErr::NotImplemented);
     ASSERT_FALSE(parsed.command.has_value());
 }
 
@@ -49,7 +49,7 @@ TEST_F(PanguParserTest, ParsePanguStartNotEnoughArgs)
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::BAD_ARG_COUNT);
+    ASSERT_EQ(parsed.err, CommandErr::BadArgCount);
     ASSERT_FALSE(parsed.command.has_value());
 }
 
@@ -59,7 +59,7 @@ TEST_F(PanguParserTest, ParsePanguStartTooManyArgs)
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::BAD_ARG_COUNT);
+    ASSERT_EQ(parsed.err, CommandErr::BadArgCount);
     ASSERT_FALSE(parsed.command.has_value());
 }
 
@@ -69,37 +69,37 @@ TEST_F(PanguParserTest, ParsePanguStartBadArgType)
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::BAD_ARG_TYPE);
+    ASSERT_EQ(parsed.err, CommandErr::BadArgType);
     ASSERT_FALSE(parsed.command.has_value());
 }
 
-TEST_F(PanguParserTest, ParsePanguStartOK)
+TEST_F(PanguParserTest, ParsePanguStartOk)
 {
     const QString str = "start 1 2 3 4 5 6";
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::OK);
+    ASSERT_EQ(parsed.err, CommandErr::Ok);
     ASSERT_TRUE(parsed.command.has_value());
 }
 
-TEST_F(PanguParserTest, ParsePanguOKWithComment)
+TEST_F(PanguParserTest, ParsePanguOkWithComment)
 {
     const QString str = "start 1 2 3 4 5 6 # foo bar";
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::OK);
+    ASSERT_EQ(parsed.err, CommandErr::Ok);
     ASSERT_TRUE(parsed.command.has_value());
 }
 
-TEST_F(PanguParserTest, ParsePanguOKWithCommentNoSpaceBetween)
+TEST_F(PanguParserTest, ParsePanguOkWithCommentNoSpaceBetween)
 {
     const QString str = "start 1 2 3 4 5 6# foo bar";
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::OK);
+    ASSERT_EQ(parsed.err, CommandErr::Ok);
     ASSERT_TRUE(parsed.command.has_value());
 }
 
@@ -109,7 +109,7 @@ TEST_F(PanguParserTest, ParsePanguStartTrailingSpaces)
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::OK);
+    ASSERT_EQ(parsed.err, CommandErr::Ok);
     ASSERT_TRUE(parsed.command.has_value());
 }
 
@@ -119,7 +119,7 @@ TEST_F(PanguParserTest, PanguStartTabs)
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::OK);
+    ASSERT_EQ(parsed.err, CommandErr::Ok);
     ASSERT_TRUE(parsed.command.has_value());
 }
 
@@ -129,7 +129,7 @@ TEST_F(PanguParserTest, PanguStartMultipleSpacesAndTabs)
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::OK);
+    ASSERT_EQ(parsed.err, CommandErr::Ok);
     ASSERT_TRUE(parsed.command.has_value());
 }
 
@@ -139,7 +139,7 @@ TEST_F(PanguParserTest, ParsePanguStartDouble)
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::OK);
+    ASSERT_EQ(parsed.err, CommandErr::Ok);
     ASSERT_TRUE(parsed.command.has_value());
 }
 
@@ -149,7 +149,7 @@ TEST_F(PanguParserTest, ParsePanguQuaternionNotEnoughArgs)
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::BAD_ARG_COUNT);
+    ASSERT_EQ(parsed.err, CommandErr::BadArgCount);
     ASSERT_FALSE(parsed.command.has_value());
 }
 
@@ -159,7 +159,7 @@ TEST_F(PanguParserTest, ParsePanguQuaternionTooManyArgs)
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::BAD_ARG_COUNT);
+    ASSERT_EQ(parsed.err, CommandErr::BadArgCount);
     ASSERT_FALSE(parsed.command.has_value());
 }
 
@@ -169,17 +169,17 @@ TEST_F(PanguParserTest, ParsePanguQuaternionBadArgType)
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::BAD_ARG_TYPE);
+    ASSERT_EQ(parsed.err, CommandErr::BadArgType);
     ASSERT_FALSE(parsed.command.has_value());
 }
 
-TEST_F(PanguParserTest, ParsePanguQuaternionOK)
+TEST_F(PanguParserTest, ParsePanguQuaternionOk)
 {
     const QString str = "quaternion 1 2 3 4 5 6 7";
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::OK);
+    ASSERT_EQ(parsed.err, CommandErr::Ok);
     ASSERT_TRUE(parsed.command.has_value());
 }
 
@@ -189,7 +189,7 @@ TEST_F(PanguParserTest, ParsePanguQuaternionDouble)
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::OK);
+    ASSERT_EQ(parsed.err, CommandErr::Ok);
     ASSERT_TRUE(parsed.command.has_value());
 }
 
@@ -199,17 +199,17 @@ TEST_F(PanguParserTest, ParsePanguUpdateTooManyArgs)
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::BAD_ARG_COUNT);
+    ASSERT_EQ(parsed.err, CommandErr::BadArgCount);
     ASSERT_FALSE(parsed.command.has_value());
 }
 
-TEST_F(PanguParserTest, ParsePanguUpdateOK)
+TEST_F(PanguParserTest, ParsePanguUpdateOk)
 {
     const QString str = "update";
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::OK);
+    ASSERT_EQ(parsed.err, CommandErr::Ok);
     ASSERT_TRUE(parsed.command.has_value());
 }
 
@@ -219,7 +219,7 @@ TEST_F(PanguParserTest, ParsePanguPauseNotEnoughArgs)
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::BAD_ARG_COUNT);
+    ASSERT_EQ(parsed.err, CommandErr::BadArgCount);
     ASSERT_FALSE(parsed.command.has_value());
 }
 
@@ -229,7 +229,7 @@ TEST_F(PanguParserTest, ParsePanguPauseTooManyArgs)
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::BAD_ARG_COUNT);
+    ASSERT_EQ(parsed.err, CommandErr::BadArgCount);
     ASSERT_FALSE(parsed.command.has_value());
 }
 
@@ -239,17 +239,17 @@ TEST_F(PanguParserTest, ParsePanguPauseBadArgType)
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::BAD_ARG_TYPE);
+    ASSERT_EQ(parsed.err, CommandErr::BadArgType);
     ASSERT_FALSE(parsed.command.has_value());
 }
 
-TEST_F(PanguParserTest, ParsePanguPauseOK)
+TEST_F(PanguParserTest, ParsePanguPauseOk)
 {
     const QString str = "pause 1";
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::OK);
+    ASSERT_EQ(parsed.err, CommandErr::Ok);
     ASSERT_TRUE(parsed.command.has_value());
 }
 
@@ -259,6 +259,6 @@ TEST_F(PanguParserTest, ParsePanguPauseDouble)
 
     auto parsed = parser.parse(str);
 
-    ASSERT_EQ(parsed.err, CommandErr::OK);
+    ASSERT_EQ(parsed.err, CommandErr::Ok);
     ASSERT_TRUE(parsed.command.has_value());
 }
