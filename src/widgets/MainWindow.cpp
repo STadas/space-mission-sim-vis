@@ -35,7 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->centralWidget()->setLayout(new VBoxLayout);
     this->centralWidget()->layout()->addWidget(this->editor_);
 
-    this->dockCoordsVis_ = new QDockWidget("Coordinates Visualisation", this);
+    this->dockCoordsVis_ = new QDockWidget("3D Coordinates Visualisation", this);
     this->dockCoordsVis_->setObjectName("dockCoordsVis");
     this->dockCoordsVis_->setWidget(this->coordsVis_);
     this->addDockWidget(Qt::RightDockWidgetArea, this->dockCoordsVis_);

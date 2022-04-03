@@ -53,6 +53,23 @@ QLineEdit *SettingsPage::createLineEdit(IntSetting &setting, const int &min,
     return lineEdit;
 }
 
+QLineEdit *SettingsPage::createLineEdit(FloatSetting &setting,
+                                        const double &min, const double &max,
+                                        const int &decimals)
+{
+    QLineEdit *lineEdit = new QLineEdit(QString::number(setting.value()), this);
+    lineEdit->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
+    lineEdit->setValidator(new QDoubleValidator(min, max, decimals, lineEdit));
+
+    QObject::connect(lineEdit, &QLineEdit::textChanged, this,
+                     [&setting, lineEdit](const QString &newText) {
+                         if (lineEdit->hasAcceptableInput())
+                             setting.setValue(newText.toDouble());
+                     });
+
+    return lineEdit;
+}
+
 QLineEdit *SettingsPage::createLineEdit(DoubleSetting &setting,
                                         const double &min, const double &max,
                                         const int &decimals)

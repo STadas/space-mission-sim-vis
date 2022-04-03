@@ -26,7 +26,7 @@ CoordsVis::CoordsVis(QWidget *parent, Settings *const settings,
     this->camera_ = view3d->camera();
     this->camera_->lens()->setPerspectiveProjection(45.0f, 4.0f / 3.0f, 0.1f,
                                                     10000.0f);
-    this->camera_->setPosition(QVector3D(0, 0, 20.0f));
+    this->camera_->setPosition(QVector3D(0, 10.0f, 20.0f));
     this->camera_->setUpVector(QVector3D(0, 1, 0));
     this->camera_->setViewCenter(QVector3D(0, 0, 0));
 
@@ -286,7 +286,7 @@ void CoordsVis::updatePoints(const QList<CamPoint> &pointsList)
         float *sizes = reinterpret_cast<float *>(sizeBytes.data());
         for (unsigned int i = 0; i < pointsList.size(); i++)
         {
-            *sizes++ = 4.f;
+            *sizes++ = this->settings_->coordsVisDefaultPSize.value();
         }
         this->pSizeAttr_->buffer()->setData(sizeBytes);
         this->pSizeAttr_->setCount(pointsList.size());
@@ -326,8 +326,8 @@ void CoordsVis::updateActive(const unsigned int &activeIdx)
 
         float *sizes = reinterpret_cast<float *>(sizeBytes.data());
 
-        sizes[this->lastActiveIdx_] = 4.f;
-        sizes[activeIdx] = 8.f;
+        sizes[this->lastActiveIdx_] = this->settings_->coordsVisDefaultPSize.value();
+        sizes[activeIdx] = this->settings_->coordsVisActivePSize.value();
 
         this->pSizeAttr_->buffer()->setData(sizeBytes);
         this->pSizeAttr_->setCount(count);

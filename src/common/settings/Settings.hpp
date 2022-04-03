@@ -53,4 +53,8 @@ public:
                                             this->manager_};
     QStringSetting coordsVisActiveColor = {"coordsVis/activeColor", "#ffff00",
                                            this->manager_};
+    FloatSetting coordsVisDefaultPSize = {"coordsVis/defaultPSize", 4.0f,
+                                          this->manager_};
+    FloatSetting coordsVisActivePSize = {"coordsVis/activePSize", 8.0f,
+                                          this->manager_};
 };
