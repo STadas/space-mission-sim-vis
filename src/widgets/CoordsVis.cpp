@@ -242,6 +242,7 @@ void CoordsVis::updatePoints(const QList<CamPoint> &pointsList)
     }
 
     // indices
+    if (pointsList.size() != 1)
     {
         QByteArray idxBytes;
         unsigned int vertCount = std::max(pointsList.size() - 1, 0);
@@ -256,6 +257,22 @@ void CoordsVis::updatePoints(const QList<CamPoint> &pointsList)
             *indices++ = i;
             *indices++ = i + 1;
         }
+        this->idxAttr_->buffer()->setData(idxBytes);
+        this->idxAttr_->setCount(idxCount);
+    }
+    else
+    {
+        // hacky way to still draw a point if there's just one vertex
+        // using the same line indices structure
+        QByteArray idxBytes;
+        unsigned int idxCount = 2;
+        idxBytes.resize(idxCount * sizeof(unsigned int));
+
+        unsigned int *indices =
+            reinterpret_cast<unsigned int *>(idxBytes.data());
+        *indices++ = 0;
+        *indices++ = 0;
+
         this->idxAttr_->buffer()->setData(idxBytes);
         this->idxAttr_->setCount(idxCount);
     }
@@ -295,6 +312,9 @@ void CoordsVis::updatePoints(const QList<CamPoint> &pointsList)
 
 void CoordsVis::updateActive(const unsigned int &activeIdx)
 {
+    if (this->posAttr_->buffer()->data().size() == 0)
+        return;
+
     // colors
     {
         QByteArray colorBytes = this->colorAttr_->buffer()->data();

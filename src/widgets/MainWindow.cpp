@@ -687,6 +687,7 @@ void MainWindow::onCamPointsUpdated()
         this->progressBar_->setEnabled(false);
     }
     this->coordsVis_->updatePoints(this->previewWorker_->camPoints());
+    this->coordsVis_->updateActive(this->progressBar_->value());
 }
 
 void MainWindow::onEditorContentChanged()
