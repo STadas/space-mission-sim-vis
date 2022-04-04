@@ -273,7 +273,8 @@ void MainWindow::initActions()
                      this->actTogglePlaybackInterface_, &QAction::setChecked);
 
     this->actToggleLogsView_ = new QAction("Server Log", this);
-    this->actToggleLogsView_->setStatusTip("Toggle visibility of the server log");
+    this->actToggleLogsView_->setStatusTip(
+        "Toggle visibility of the server log");
     this->actToggleLogsView_->setCheckable(true);
     this->actToggleLogsView_->setChecked(this->dockLogsView_->isVisible());
     QObject::connect(this->actToggleLogsView_, &QAction::toggled, this,
