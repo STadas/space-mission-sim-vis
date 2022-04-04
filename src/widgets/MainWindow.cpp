@@ -248,7 +248,10 @@ void MainWindow::initActions()
     QObject::connect(this->actToggleCoordsVis_, &QAction::toggled, this,
                      &MainWindow::onActToggleCoordsVis);
     QObject::connect(this->dockCoordsVis_, &QDockWidget::visibilityChanged,
-                     this->actToggleCoordsVis_, &QAction::setChecked);
+                     this, [this](const bool &on) {
+                         this->actToggleCoordsVis_->setChecked(
+                             !this->dockCoordsVis_->isHidden());
+                     });
 
     this->actToggleCamPreview_ = new QAction("Camera preview", this);
     this->actToggleCamPreview_->setStatusTip(
@@ -258,7 +261,10 @@ void MainWindow::initActions()
     QObject::connect(this->actToggleCamPreview_, &QAction::toggled, this,
                      &MainWindow::onActToggleCamPreview);
     QObject::connect(this->dockCamPreview_, &QDockWidget::visibilityChanged,
-                     this->actToggleCamPreview_, &QAction::setChecked);
+                     this, [this](const bool &on) {
+                         this->actToggleCamPreview_->setChecked(
+                             !this->dockCamPreview_->isHidden());
+                     });
 
     this->actTogglePlaybackInterface_ = new QAction("Playback interface", this);
     this->actTogglePlaybackInterface_->setStatusTip(
@@ -268,11 +274,13 @@ void MainWindow::initActions()
         this->dockPlaybackInterface_->isVisible());
     QObject::connect(this->actTogglePlaybackInterface_, &QAction::toggled, this,
                      &MainWindow::onActTogglePlaybackInterface);
-    QObject::connect(this->dockPlaybackInterface_,
-                     &QDockWidget::visibilityChanged,
-                     this->actTogglePlaybackInterface_, &QAction::setChecked);
+    QObject::connect(this->dockPlaybackInterface_, &QDockWidget::visibilityChanged,
+                     this, [this](const bool &on) {
+                         this->actTogglePlaybackInterface_->setChecked(
+                             !this->dockPlaybackInterface_->isHidden());
+                     });
 
-    this->actToggleLogsView_ = new QAction("Server Log", this);
+    this->actToggleLogsView_ = new QAction("Server log", this);
     this->actToggleLogsView_->setStatusTip(
         "Toggle visibility of the server log");
     this->actToggleLogsView_->setCheckable(true);
@@ -280,7 +288,10 @@ void MainWindow::initActions()
     QObject::connect(this->actToggleLogsView_, &QAction::toggled, this,
                      &MainWindow::onActToggleLogsView);
     QObject::connect(this->dockLogsView_, &QDockWidget::visibilityChanged,
-                     this->actToggleLogsView_, &QAction::setChecked);
+                     this, [this](const bool &on) {
+                         this->actToggleLogsView_->setChecked(
+                             !this->dockLogsView_->isHidden());
+                     });
 
     this->actUndo_ = new QAction("Undo", this);
     this->actUndo_->setStatusTip("Undo the latest edit in the editor");
