@@ -22,6 +22,6 @@ signals:
     void output(QString data);
 
 private slots:
-    // TODO: make stderr and stdout separate
-    void onReadyRead();
+    void onReadyReadStdOut();
+    void onReadyReadStdErr();
 };

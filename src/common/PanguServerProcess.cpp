@@ -4,8 +4,10 @@ PanguServerProcess::PanguServerProcess(QObject *parent)
     : QObject(parent)
     , process_(new QProcess(this))
 {
-    QObject::connect(this->process_, &QProcess::readyRead, this,
-                     &PanguServerProcess::onReadyRead);
+    QObject::connect(this->process_, &QProcess::readyReadStandardOutput, this,
+                     &PanguServerProcess::onReadyReadStdOut);
+    QObject::connect(this->process_, &QProcess::readyReadStandardError, this,
+                     &PanguServerProcess::onReadyReadStdErr);
 }
 
 PanguServerProcess::~PanguServerProcess()
@@ -23,8 +25,14 @@ void PanguServerProcess::stop()
     this->process_->close();
 }
 
-void PanguServerProcess::onReadyRead()
+void PanguServerProcess::onReadyReadStdOut()
 {
-    QString out = this->process_->readAll();
+    QString out = this->process_->readAllStandardOutput().trimmed();
     emit this->output(out);
+}
+
+void PanguServerProcess::onReadyReadStdErr()
+{
+    QString err = this->process_->readAllStandardError().trimmed();
+    emit this->output(err);
 }
