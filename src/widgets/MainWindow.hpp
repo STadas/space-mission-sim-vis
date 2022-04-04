@@ -14,6 +14,7 @@
 #include "widgets/CamPreview.hpp"
 #include "widgets/CoordsVis.hpp"
 #include "widgets/Editor.hpp"
+#include "widgets/LogsView.hpp"
 #include "widgets/PlaybackInterface.hpp"
 #include "widgets/dialogs/SettingsDialog.hpp"
 
@@ -31,6 +32,7 @@ private:
     void save() override;
     void load() override;
 
+    void initDockWidgets();
     void initSignalConnections();
     void initActions();
     void initMenus();
@@ -41,15 +43,16 @@ private:
     Resources *const resources_;
 
     Editor *editor_;
-
     CoordsVis *coordsVis_;
     CamPreview *camPreview_;
     PlaybackInterface *playbackInterface_;
     ProgressBar *progressBar_;
+    LogsView *logsView_;
 
     QDockWidget *dockCoordsVis_;
     QDockWidget *dockCamPreview_;
     QDockWidget *dockPlaybackInterface_;
+    QDockWidget *dockLogsView_;
 
     bool autoCommScan_;
 
@@ -81,6 +84,7 @@ private:
     QAction *actToggleCoordsVis_;
     QAction *actToggleCamPreview_;
     QAction *actTogglePlaybackInterface_;
+    QAction *actToggleLogsView_;
 
     QAction *actExecCurrentLine_;
     QAction *actExecPreviousLine_;
@@ -121,6 +125,7 @@ private slots:
     void onActToggleCoordsVis(bool on);
     void onActToggleCamPreview(bool on);
     void onActTogglePlaybackInterface(bool on);
+    void onActToggleLogsView(bool on);
 
     /* on other signal */
     void onLineStarted(const int &lineNum);

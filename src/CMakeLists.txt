@@ -46,6 +46,8 @@ set(SOURCE_PROJECT
         widgets/MainWindow.hpp
         widgets/Editor.cpp
         widgets/Editor.hpp
+        widgets/LogsView.cpp
+        widgets/LogsView.hpp
         widgets/PlaybackInterface.cpp
         widgets/PlaybackInterface.hpp
         widgets/ProgressBar.cpp

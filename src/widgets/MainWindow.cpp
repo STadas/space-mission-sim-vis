@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent)
     , camPreview_(new CamPreview(this))
     , playbackInterface_(new PlaybackInterface(this))
     , progressBar_(this->playbackInterface_->progressBar_)
+    , logsView_(new LogsView(this))
     , autoCommScan_(false)
     , messageController_(new MessageController(this))
     , previewWorker_(new PreviewWorker)  // no parent so it can moveToThread
@@ -35,22 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
     this->centralWidget()->setLayout(new VBoxLayout);
     this->centralWidget()->layout()->addWidget(this->editor_);
 
-    this->dockCoordsVis_ =
-        new QDockWidget("3D Coordinates Visualisation", this);
-    this->dockCoordsVis_->setObjectName("dockCoordsVis");
-    this->dockCoordsVis_->setWidget(this->coordsVis_);
-    this->addDockWidget(Qt::RightDockWidgetArea, this->dockCoordsVis_);
-
-    this->dockCamPreview_ = new QDockWidget("Camera Preview", this);
-    this->dockCamPreview_->setObjectName("dockCamPreview");
-    this->dockCamPreview_->setWidget(this->camPreview_);
-    this->addDockWidget(Qt::RightDockWidgetArea, this->dockCamPreview_);
-
-    this->dockPlaybackInterface_ = new QDockWidget("Playback Interface", this);
-    this->dockPlaybackInterface_->setObjectName("dockPlaybackInterface");
-    this->dockPlaybackInterface_->setWidget(this->playbackInterface_);
-    this->addDockWidget(Qt::RightDockWidgetArea, this->dockPlaybackInterface_);
-
+    this->initDockWidgets();
     this->initSignalConnections();
     this->initActions();
     this->initMenus();
@@ -88,6 +74,30 @@ void MainWindow::load()
         this->restoreState(this->settings_->stateMainWindow.value());
 }
 
+void MainWindow::initDockWidgets()
+{
+    this->dockCoordsVis_ =
+        new QDockWidget("3D coordinates visualisation", this);
+    this->dockCoordsVis_->setObjectName("dockCoordsVis");
+    this->dockCoordsVis_->setWidget(this->coordsVis_);
+    this->addDockWidget(Qt::RightDockWidgetArea, this->dockCoordsVis_);
+
+    this->dockCamPreview_ = new QDockWidget("Camera preview", this);
+    this->dockCamPreview_->setObjectName("dockCamPreview");
+    this->dockCamPreview_->setWidget(this->camPreview_);
+    this->addDockWidget(Qt::RightDockWidgetArea, this->dockCamPreview_);
+
+    this->dockPlaybackInterface_ = new QDockWidget("Playback interface", this);
+    this->dockPlaybackInterface_->setObjectName("dockPlaybackInterface");
+    this->dockPlaybackInterface_->setWidget(this->playbackInterface_);
+    this->addDockWidget(Qt::RightDockWidgetArea, this->dockPlaybackInterface_);
+
+    this->dockLogsView_ = new QDockWidget("Server log", this);
+    this->dockLogsView_->setObjectName("dockLogsView");
+    this->dockLogsView_->setWidget(this->logsView_);
+    this->addDockWidget(Qt::RightDockWidgetArea, this->dockLogsView_);
+}
+
 void MainWindow::initSignalConnections()
 {
     QObject::connect(this->previewWorker_, &PreviewWorker::lineStarted, this,
@@ -119,8 +129,8 @@ void MainWindow::initSignalConnections()
     QObject::connect(this->editor_->document(), &QTextDocument::contentsChanged,
                      this, &MainWindow::onEditorContentChanged);
 
-    QObject::connect(this->serverProcess_, &PanguServerProcess::output, this,
-                     [=](QString text) {});
+    QObject::connect(this->serverProcess_, &PanguServerProcess::output,
+                     this->logsView_, &LogsView::appendPlainText);
 }
 
 void MainWindow::initActions()
@@ -238,7 +248,10 @@ void MainWindow::initActions()
     QObject::connect(this->actToggleCoordsVis_, &QAction::toggled, this,
                      &MainWindow::onActToggleCoordsVis);
     QObject::connect(this->dockCoordsVis_, &QDockWidget::visibilityChanged,
-                     this->actToggleCoordsVis_, &QAction::setChecked);
+                     this, [this](const bool &on) {
+                         this->actToggleCoordsVis_->setChecked(
+                             !this->dockCoordsVis_->isHidden());
+                     });
 
     this->actToggleCamPreview_ = new QAction("Camera preview", this);
     this->actToggleCamPreview_->setStatusTip(
@@ -248,7 +261,10 @@ void MainWindow::initActions()
     QObject::connect(this->actToggleCamPreview_, &QAction::toggled, this,
                      &MainWindow::onActToggleCamPreview);
     QObject::connect(this->dockCamPreview_, &QDockWidget::visibilityChanged,
-                     this->actToggleCamPreview_, &QAction::setChecked);
+                     this, [this](const bool &on) {
+                         this->actToggleCamPreview_->setChecked(
+                             !this->dockCamPreview_->isHidden());
+                     });
 
     this->actTogglePlaybackInterface_ = new QAction("Playback interface", this);
     this->actTogglePlaybackInterface_->setStatusTip(
@@ -259,8 +275,24 @@ void MainWindow::initActions()
     QObject::connect(this->actTogglePlaybackInterface_, &QAction::toggled, this,
                      &MainWindow::onActTogglePlaybackInterface);
     QObject::connect(this->dockPlaybackInterface_,
-                     &QDockWidget::visibilityChanged,
-                     this->actTogglePlaybackInterface_, &QAction::setChecked);
+                     &QDockWidget::visibilityChanged, this,
+                     [this](const bool &on) {
+                         this->actTogglePlaybackInterface_->setChecked(
+                             !this->dockPlaybackInterface_->isHidden());
+                     });
+
+    this->actToggleLogsView_ = new QAction("Server log", this);
+    this->actToggleLogsView_->setStatusTip(
+        "Toggle visibility of the server log");
+    this->actToggleLogsView_->setCheckable(true);
+    this->actToggleLogsView_->setChecked(this->dockLogsView_->isVisible());
+    QObject::connect(this->actToggleLogsView_, &QAction::toggled, this,
+                     &MainWindow::onActToggleLogsView);
+    QObject::connect(this->dockLogsView_, &QDockWidget::visibilityChanged, this,
+                     [this](const bool &on) {
+                         this->actToggleLogsView_->setChecked(
+                             !this->dockLogsView_->isHidden());
+                     });
 
     this->actUndo_ = new QAction("Undo", this);
     this->actUndo_->setStatusTip("Undo the latest edit in the editor");
@@ -329,6 +361,7 @@ void MainWindow::initMenus()
         this->actToggleCoordsVis_,
         this->actToggleCamPreview_,
         this->actTogglePlaybackInterface_,
+        this->actToggleLogsView_,
     });
 
     this->toolsMenu_ = new QMenu("Tools", this);
@@ -578,6 +611,14 @@ void MainWindow::onActTogglePlaybackInterface(bool on)
         this->dockPlaybackInterface_->show();
     else
         this->dockPlaybackInterface_->hide();
+}
+
+void MainWindow::onActToggleLogsView(bool on)
+{
+    if (on)
+        this->dockLogsView_->show();
+    else
+        this->dockLogsView_->hide();
 }
 
 void MainWindow::onLineStarted(const int &lineNum)
