@@ -274,8 +274,9 @@ void MainWindow::initActions()
         this->dockPlaybackInterface_->isVisible());
     QObject::connect(this->actTogglePlaybackInterface_, &QAction::toggled, this,
                      &MainWindow::onActTogglePlaybackInterface);
-    QObject::connect(this->dockPlaybackInterface_, &QDockWidget::visibilityChanged,
-                     this, [this](const bool &on) {
+    QObject::connect(this->dockPlaybackInterface_,
+                     &QDockWidget::visibilityChanged, this,
+                     [this](const bool &on) {
                          this->actTogglePlaybackInterface_->setChecked(
                              !this->dockPlaybackInterface_->isHidden());
                      });
@@ -287,8 +288,8 @@ void MainWindow::initActions()
     this->actToggleLogsView_->setChecked(this->dockLogsView_->isVisible());
     QObject::connect(this->actToggleLogsView_, &QAction::toggled, this,
                      &MainWindow::onActToggleLogsView);
-    QObject::connect(this->dockLogsView_, &QDockWidget::visibilityChanged,
-                     this, [this](const bool &on) {
+    QObject::connect(this->dockLogsView_, &QDockWidget::visibilityChanged, this,
+                     [this](const bool &on) {
                          this->actToggleLogsView_->setChecked(
                              !this->dockLogsView_->isHidden());
                      });
