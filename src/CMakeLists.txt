@@ -44,6 +44,8 @@ set(SOURCE_PROJECT
         widgets/CoordsVis.hpp
         widgets/MainWindow.cpp
         widgets/MainWindow.hpp
+        widgets/MenuSeparator.cpp
+        widgets/MenuSeparator.hpp
         widgets/Editor.cpp
         widgets/Editor.hpp
         widgets/LogsView.cpp

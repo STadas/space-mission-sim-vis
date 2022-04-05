@@ -24,10 +24,14 @@ public:
     void clear() override;
 
     void keyPressEvent(QKeyEvent *keyEvent) override;
+    void showContextMenu(const QPoint &pt);
+
+    void setExtraContextMenuActions(const QList<QAction *> &actions);
 
 private:
     QString defaultSavePath_{};
     Settings *const settings_;
+    QList<QAction *> extraContextMenuActions_;
 
     void highlightCurrentLine();
 };

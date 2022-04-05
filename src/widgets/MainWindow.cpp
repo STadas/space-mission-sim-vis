@@ -334,13 +334,9 @@ void MainWindow::initMenus()
     this->menuBar()->addMenu(this->fileMenu_);
     this->fileMenu_->addActions({
         this->actNewFile_,
-    });
-    this->fileMenu_->addSeparator();
-    this->fileMenu_->addActions({
+        new MenuSeparator(this),
         this->actOpenFile_,
-    });
-    this->fileMenu_->addSeparator();
-    this->fileMenu_->addActions({
+        new MenuSeparator(this),
         this->actSaveFile_,
         this->actSaveFileAs_,
     });
@@ -350,6 +346,7 @@ void MainWindow::initMenus()
     this->editMenu_->addActions({
         this->actUndo_,
         this->actRedo_,
+        new MenuSeparator(this),
         this->actCut_,
         this->actCopy_,
         this->actPaste_,
@@ -368,6 +365,7 @@ void MainWindow::initMenus()
     this->menuBar()->addMenu(this->toolsMenu_);
     this->toolsMenu_->addActions({
         this->actOpenSettings_,
+        new MenuSeparator(this),
     });
 
     this->commandsMenu_ = new QMenu("Commands", this);
@@ -377,11 +375,16 @@ void MainWindow::initMenus()
         this->actExecPreviousLine_,
         this->actExecNextLine_,
         this->actToggleMultiLine_,
-    });
-    this->commandsMenu_->addSeparator();
-    this->commandsMenu_->addActions({
+        new MenuSeparator(this),
         this->actCommScan_,
         this->actToggleAutoCommScan_,
+    });
+
+    this->editor_->setExtraContextMenuActions({
+        this->actExecCurrentLine_,
+        this->actToggleMultiLine_,
+        this->actCommScan_,
+        new MenuSeparator(this),
     });
 
     this->serverMenu_ = new QMenu("Server", this);

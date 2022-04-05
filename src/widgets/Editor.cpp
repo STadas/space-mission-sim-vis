@@ -13,6 +13,10 @@ Editor::Editor(QWidget *parent, Settings *const settings)
         }
     });
 
+    this->setContextMenuPolicy(Qt::CustomContextMenu);
+    QObject::connect(this, &QPlainTextEdit::customContextMenuRequested, this,
+                     &Editor::showContextMenu);
+
     highlightCurrentLine();
 }
 
@@ -114,6 +118,19 @@ void Editor::keyPressEvent(QKeyEvent *keyEvent)
     }
 
     QPlainTextEdit::keyPressEvent(keyEvent);
+}
+
+void Editor::showContextMenu(const QPoint &pt)
+{
+    QMenu *menu = this->createStandardContextMenu();
+    menu->insertActions(menu->actions().at(0), this->extraContextMenuActions_);
+    menu->exec(this->mapToGlobal(pt));
+    menu->deleteLater();
+}
+
+void Editor::setExtraContextMenuActions(const QList<QAction *> &actions)
+{
+    this->extraContextMenuActions_ = actions;
 }
 
 void Editor::highlightCurrentLine()
