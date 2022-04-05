@@ -3,13 +3,14 @@
 EditorPage::EditorPage(QWidget *parent, Settings *const settings)
     : SettingsPage(parent, settings)
 {
-    QFormLayout *form = new QFormLayout;
-    form->setMargin(0);
-    this->setLayout(form);
+    QGroupBox *colorsGroup = new QGroupBox("Colors", this);
+    QFormLayout *colorsLayout = new QFormLayout(colorsGroup);
+    this->layout()->addWidget(colorsGroup);
 
-    form->addRow("Current line highlight color",
-                 this->createColorPicker(
-                     this->settings_->currLineHighlightColor, "Sample text"));
+    colorsLayout->addRow(
+        "Current line highlight color",
+        this->createColorPicker(this->settings_->currLineHighlightColor,
+                                "Sample text"));
 }
 
 EditorPage::~EditorPage()

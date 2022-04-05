@@ -3,31 +3,37 @@
 CoordsVisPage::CoordsVisPage(QWidget *parent, Settings *settings)
     : SettingsPage(parent, settings)
 {
-    QFormLayout *form = new QFormLayout(this);
-    form->setMargin(0);
+    QGroupBox *colorsGroup = new QGroupBox("Colors", this);
+    QFormLayout *colorsLayout = new QFormLayout(colorsGroup);
+    this->layout()->addWidget(colorsGroup);
 
-    form->addRow(
+    colorsLayout->addRow(
         "Background color",
         this->createColorPicker(this->settings_->coordsVisBackgroundColor));
 
-    form->addRow("Plane color",
-                 this->createColorPicker(this->settings_->coordsVisPlaneColor));
+    colorsLayout->addRow(
+        "Plane color",
+        this->createColorPicker(this->settings_->coordsVisPlaneColor));
 
-    form->addRow(
+    colorsLayout->addRow(
         "Default point/line color",
         this->createColorPicker(this->settings_->coordsVisDefaultColor));
 
-    form->addRow(
+    colorsLayout->addRow(
         "Active point/line color",
         this->createColorPicker(this->settings_->coordsVisActiveColor));
 
-    form->addRow("Default point size",
-                 this->createLineEdit(this->settings_->coordsVisDefaultPSize, 0,
-                                      FLT_MAX, 5));
+    QGroupBox *sizesGroup = new QGroupBox("Point sizes", this);
+    QFormLayout *sizesLayout = new QFormLayout(sizesGroup);
+    this->layout()->addWidget(sizesGroup);
 
-    form->addRow("Active point size",
-                 this->createLineEdit(this->settings_->coordsVisActivePSize, 0,
-                                      FLT_MAX, 5));
+    sizesLayout->addRow(
+        "Default point size",
+        this->createLineEdit(this->settings_->coordsVisDefaultPSize, 0));
+
+    sizesLayout->addRow(
+        "Active point size",
+        this->createLineEdit(this->settings_->coordsVisActivePSize, 0));
 }
 
 CoordsVisPage::~CoordsVisPage()

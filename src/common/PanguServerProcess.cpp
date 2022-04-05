@@ -1,8 +1,10 @@
 #include "PanguServerProcess.hpp"
 
-PanguServerProcess::PanguServerProcess(QObject *parent)
+PanguServerProcess::PanguServerProcess(QObject *parent,
+                                       Settings *const settings)
     : QObject(parent)
     , process_(new QProcess(this))
+    , settings_(settings)
 {
     QObject::connect(this->process_, &QProcess::readyReadStandardOutput, this,
                      &PanguServerProcess::onReadyReadStdOut);
@@ -17,7 +19,21 @@ PanguServerProcess::~PanguServerProcess()
 
 void PanguServerProcess::start(const QString &pathStr, const QStringList &args)
 {
-    this->process_->start(pathStr, args);
+    //NOTE: could probably make &args not const, maybe even copy, if we end up
+    //NOTE: adding more specific arg settings
+    if (this->settings_->serverCamPredefined.value())
+    {
+        QStringList camArgs = {
+            "-use_save_size",
+            "-save_width",
+            QString::number(this->settings_->serverCamWidth.value()),
+            "-save_height",
+            QString::number(this->settings_->serverCamHeight.value()),
+        };
+        this->process_->start(pathStr, camArgs + args);
+    }
+    else
+        this->process_->start(pathStr, args);
 }
 
 void PanguServerProcess::stop()

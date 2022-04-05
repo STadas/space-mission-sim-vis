@@ -4,7 +4,11 @@ SettingsPage::SettingsPage(QWidget *parent, Settings *const settings)
     : QFrame(parent)
     , settings_(settings)
 {
-    this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    //TODO: make the page scrollable
+    //not an issue atm because there aren't that many settings
+    this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
+    QVBoxLayout *pageLayout = new QVBoxLayout(this);
+    this->layout()->setAlignment(Qt::AlignTop);
 }
 
 SettingsPage::~SettingsPage()
@@ -15,6 +19,7 @@ QCheckBox *SettingsPage::createCheckBox(BoolSetting &setting,
                                         const QString &text)
 {
     QCheckBox *checkbox = new QCheckBox(text, this);
+    checkbox->setChecked(setting.value());
 
     QObject::connect(checkbox, &QCheckBox::toggled, this,
                      [&setting](const bool &newVal) {
@@ -53,9 +58,8 @@ QLineEdit *SettingsPage::createLineEdit(IntSetting &setting, const int &min,
     return lineEdit;
 }
 
-QLineEdit *SettingsPage::createLineEdit(FloatSetting &setting,
-                                        const double &min, const double &max,
-                                        const int &decimals)
+QLineEdit *SettingsPage::createLineEdit(FloatSetting &setting, const float &min,
+                                        const float &max, const int &decimals)
 {
     QLineEdit *lineEdit = new QLineEdit(QString::number(setting.value()), this);
     lineEdit->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);

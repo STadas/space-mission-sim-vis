@@ -12,11 +12,11 @@ MainWindow::MainWindow(QWidget *parent)
     , messageController_(new MessageController(this))
     , previewWorker_(new PreviewWorker)  // no parent so it can moveToThread
     , previewWorkerThread_(new QThread(this))
-    , serverProcess_(new PanguServerProcess(this))
 {
     this->settings_->load();
     this->editor_ = new Editor(this, this->settings_);
     this->coordsVis_ = new CoordsVis(this, this->settings_, this->resources_);
+    this->serverProcess_ = new PanguServerProcess(this, this->settings_);
 
     /* As weird as this is, it needs to be done for us to be able to use the
      * enums with signals and slots. Potential for a generated source code
