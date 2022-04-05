@@ -15,6 +15,7 @@
 #include "widgets/CoordsVis.hpp"
 #include "widgets/Editor.hpp"
 #include "widgets/LogsView.hpp"
+#include "widgets/MenuSeparator.hpp"
 #include "widgets/PlaybackInterface.hpp"
 #include "widgets/dialogs/SettingsDialog.hpp"
 
