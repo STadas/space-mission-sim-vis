@@ -46,7 +46,8 @@ void CoordsVis::initControls()
     controlsLayout->setMargin(0);
 
     // plane scale
-    QLabel *planeScaleLabel = new QLabel("Plane scale", controlsWrapper);
+    QLabel *planeScaleLabel =
+        new QLabel("Surface plane scale", controlsWrapper);
     planeScaleLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     QSpinBox *planeScaleBox = new QSpinBox(this);
     planeScaleBox->setMaximum(INT_MAX);
@@ -57,7 +58,8 @@ void CoordsVis::initControls()
                      });
 
     // far plane
-    QLabel *farPlaneLabel = new QLabel("Cam far plane", controlsWrapper);
+    QLabel *farPlaneLabel =
+        new QLabel("Cam far plane distance", controlsWrapper);
     farPlaneLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     QSpinBox *farPlaneBox = new QSpinBox(this);
     farPlaneBox->setMaximum(INT_MAX);
