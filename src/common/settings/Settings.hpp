@@ -39,7 +39,8 @@ public:
     IntSetting serverPort = {"server/port", 10363, this->manager_};
 
     // server cam
-    BoolSetting serverCamPredefined = {"server/cam/usePredefined", true, this->manager_};
+    BoolSetting serverCamPredefined = {"server/cam/usePredefined", true,
+                                       this->manager_};
     IntSetting serverCamWidth = {"server/cam/width", 1024, this->manager_};
     IntSetting serverCamHeight = {"server/cam/height", 1024, this->manager_};
 

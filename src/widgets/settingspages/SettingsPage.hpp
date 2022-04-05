@@ -24,10 +24,13 @@ protected:
     QLineEdit *createLineEdit(QStringSetting &setting);
     QLineEdit *createLineEdit(IntSetting &setting, const int &min = INT_MIN,
                               const int &max = INT_MAX);
-    QLineEdit *createLineEdit(DoubleSetting &setting, const double &min = DBL_MIN,
-                              const double &max = DBL_MAX, const int &decimals = DBL_DIG);
+    QLineEdit *createLineEdit(DoubleSetting &setting,
+                              const double &min = DBL_MIN,
+                              const double &max = DBL_MAX,
+                              const int &decimals = DBL_DIG);
     QLineEdit *createLineEdit(FloatSetting &setting, const float &min = FLT_MIN,
-                              const float &max = FLT_MAX, const int &decimals = FLT_DIG);
+                              const float &max = FLT_MAX,
+                              const int &decimals = FLT_DIG);
     QWidget *createLineEditBrowse(QStringSetting &setting,
                                   const QString &caption, const QString &dir,
                                   const QString &filter);

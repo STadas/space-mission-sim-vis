@@ -2,8 +2,8 @@
 
 #include <QtCore>
 
-#include "interfaces/IProcess.hpp"
 #include "common/settings/Settings.hpp"
+#include "interfaces/IProcess.hpp"
 
 class PanguServerProcess : public QObject, public IProcess
 {
