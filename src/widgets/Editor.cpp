@@ -34,7 +34,6 @@ int Editor::load()
 {
     QFileDevice::FileError err = QFileDevice::FileError::NoError;
 
-    //TODO: starting path in dialog should be same as currently open file's if applicable
     QString filePath = QFileDialog::getOpenFileName(
         this, "Open file", "", "Flight files (*.fli);;All files (*)");
     if (filePath.length() == 0)
@@ -88,7 +87,6 @@ int Editor::save()
 
 int Editor::saveAs()
 {
-    //TODO: starting path in dialog should be same as currently open file's if applicable
     QString filePath = QFileDialog::getSaveFileName(
         this, "Save file as", "", "Flight files (*.fli);;All files (*)");
     if (filePath.length() == 0)
@@ -125,7 +123,6 @@ void Editor::highlightCurrentLine()
 
     QTextEdit::ExtraSelection selection;
 
-    //TODO: could have a setting for the color
     QColor lineColor = QColor(this->settings_->currLineHighlightColor.value());
 
     selection.format.setBackground(lineColor);
