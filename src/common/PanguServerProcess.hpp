@@ -3,13 +3,14 @@
 #include <QtCore>
 
 #include "interfaces/IProcess.hpp"
+#include "common/settings/Settings.hpp"
 
 class PanguServerProcess : public QObject, public IProcess
 {
     Q_OBJECT
 
 public:
-    PanguServerProcess(QObject *parent);
+    PanguServerProcess(QObject *parent, Settings *const settings);
     ~PanguServerProcess() override;
 
     void start(const QString &pathStr, const QStringList &args = {}) override;
@@ -17,6 +18,7 @@ public:
 
 private:
     QProcess *process_;
+    Settings *const settings_;
 
 signals:
     void output(QString data);
