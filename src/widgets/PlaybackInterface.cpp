@@ -1,7 +1,8 @@
 #include "PlaybackInterface.hpp"
 
-PlaybackInterface::PlaybackInterface(QWidget *parent)
+PlaybackInterface::PlaybackInterface(QWidget *parent, Settings *const settings)
     : QWidget(parent)
+    , settings_(settings)
     , progressBar_(new ProgressBar(this))
     , buttonWrapper_(new QWidget(this))
 {
@@ -14,6 +15,20 @@ PlaybackInterface::PlaybackInterface(QWidget *parent)
     this->layout()->addWidget(this->progressBar_);
     this->layout()->addWidget(this->buttonWrapper_);
     this->layout()->setAlignment(this->buttonWrapper_, Qt::AlignCenter);
+
+    QSpinBox *msDelayBox = new QSpinBox(this);
+    msDelayBox->setMinimum(0);
+    msDelayBox->setMaximum(INT_MAX);
+    msDelayBox->setSingleStep(100);
+    msDelayBox->setValue(this->settings_->commandsStepMsDelay.value());
+    QObject::connect(msDelayBox, QOverload<int>::of(&QSpinBox::valueChanged),
+                     this, [this](const int &newVal) {
+                         this->settings_->commandsStepMsDelay.setValue(newVal);
+                         this->settings_->commandsStepMsDelay.save();
+                     });
+    this->buttonWrapper_->layout()->addWidget(new QLabel("Step delay (ms) "));
+    this->buttonWrapper_->layout()->addWidget(msDelayBox);
+    this->buttonWrapper_->layout()->addItem(new QSpacerItem(10, 0));
 }
 
 PlaybackInterface::~PlaybackInterface()

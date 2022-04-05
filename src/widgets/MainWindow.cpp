@@ -5,8 +5,6 @@ MainWindow::MainWindow(QWidget *parent)
     , settings_(new Settings(this))
     , resources_(new Resources(this))
     , camPreview_(new CamPreview(this))
-    , playbackInterface_(new PlaybackInterface(this))
-    , progressBar_(this->playbackInterface_->progressBar_)
     , logsView_(new LogsView(this))
     , autoCommScan_(false)
     , messageController_(new MessageController(this))
@@ -17,6 +15,8 @@ MainWindow::MainWindow(QWidget *parent)
     this->editor_ = new Editor(this, this->settings_);
     this->coordsVis_ = new CoordsVis(this, this->settings_, this->resources_);
     this->serverProcess_ = new PanguServerProcess(this, this->settings_);
+    this->playbackInterface_ = new PlaybackInterface(this, this->settings_);
+    this->progressBar_ = this->playbackInterface_->progressBar_;
 
     /* As weird as this is, it needs to be done for us to be able to use the
      * enums with signals and slots. Potential for a generated source code
@@ -516,17 +516,6 @@ void MainWindow::onActToggleMultiLine(bool on)
 {
     if (on)
     {
-        bool ok;
-        /* TODO: dont always ask for it, have a setting for it and maybe ask for
-         * first time in the session*/
-        int msDelay = QInputDialog::getInt(this, "Minimum delay", "Delay (ms)",
-                                           1000, 0, INT32_MAX, 100, &ok);
-        if (!ok)
-        {
-            this->actToggleMultiLine_->setChecked(false);
-            return;
-        }
-
         this->actToggleMultiLine_->setText("Stop stepping");
         this->actToggleMultiLine_->setStatusTip(
             "Stop the currently active command stepping");
@@ -537,7 +526,8 @@ void MainWindow::onActToggleMultiLine(bool on)
 
         emit this->previewWorker_->processCommands(
             this->editor_->toPlainText(),
-            this->editor_->textCursor().blockNumber(), msDelay);
+            this->editor_->textCursor().blockNumber(),
+            this->settings_->commandsStepMsDelay.value());
     }
     else
     {

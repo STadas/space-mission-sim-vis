@@ -5,6 +5,7 @@
 
 #include "common/HBoxLayout.hpp"
 #include "common/VBoxLayout.hpp"
+#include "common/settings/Settings.hpp"
 #include "widgets/ProgressBar.hpp"
 
 class PlaybackInterface : public QWidget
@@ -12,7 +13,7 @@ class PlaybackInterface : public QWidget
     Q_OBJECT
 
 public:
-    PlaybackInterface(QWidget *parent);
+    PlaybackInterface(QWidget *parent, Settings *const settings);
     ~PlaybackInterface();
 
     void addButton(QAction *action);
@@ -20,5 +21,7 @@ public:
     ProgressBar *progressBar_;
 
 private:
+    Settings *const settings_;
+
     QWidget *buttonWrapper_;
 };

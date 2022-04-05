@@ -44,6 +44,10 @@ public:
     IntSetting serverCamWidth = {"server/cam/width", 1024, this->manager_};
     IntSetting serverCamHeight = {"server/cam/height", 1024, this->manager_};
 
+    // commands
+    IntSetting commandsStepMsDelay = {"commands/step/msDelay", 1000,
+                                      this->manager_};
+
     // windows' geometry/state
     QByteArraySetting stateMainWindow = {
         "rect/mainWindow/state", {}, this->manager_};
