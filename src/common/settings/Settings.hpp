@@ -13,6 +13,7 @@ using FloatSetting = GenericSetting<float>;
 using DoubleSetting = GenericSetting<double>;
 using StringSetting = GenericSetting<std::string>;
 using QStringSetting = GenericSetting<QString>;
+using QStringListSetting = GenericSetting<QStringList>;
 using QByteArraySetting = GenericSetting<QByteArray>;
 
 class Settings : public QObject, public ISavableLoadable
@@ -59,6 +60,10 @@ public:
     // editor colors
     QStringSetting currLineHighlightColor = {"editor/currLine/hightlightColor",
                                              "#ffff00", this->manager_};
+
+    // editor recent files
+    QStringListSetting recentFiles = {"editor/recentFiles", {}, this->manager_};
+    IntSetting maxRecentFiles = {"editor/maxRecentFiles", 5, this->manager_};
 
     // coords vis colors
     QStringSetting coordsVisBackgroundColor = {"coordsVis/backgroundColor",

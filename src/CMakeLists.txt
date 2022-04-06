@@ -54,6 +54,8 @@ set(SOURCE_PROJECT
         widgets/PlaybackInterface.hpp
         widgets/ProgressBar.cpp
         widgets/ProgressBar.hpp
+        widgets/RecentsMenu.cpp
+        widgets/RecentsMenu.hpp
 
         widgets/dialogs/Dialog.cpp
         widgets/dialogs/Dialog.hpp

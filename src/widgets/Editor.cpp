@@ -34,28 +34,35 @@ QString Editor::activeLineText() const
     return this->textCursor().block().text();
 }
 
-int Editor::load()
+QFileDevice::FileError Editor::load(const QString &pathStr)
 {
     QFileDevice::FileError err = QFileDevice::FileError::NoError;
 
-    QString filePath = QFileDialog::getOpenFileName(
-        this, "Open file", "", "Flight files (*.fli);;All files (*)");
-    if (filePath.length() == 0)
+    if (pathStr.length() == 0)
     {
         return err;
     }
 
-    QString newText;
-    err = FileUtil::readFile(filePath, newText);
+    QString newText{};
+    err = FileUtil::readFile(pathStr, newText);
     if (err != QFileDevice::FileError::NoError)
     {
         return err;
     }
 
-    this->defaultSavePath_ = filePath;
+    this->defaultSavePath_ = pathStr;
     this->setPlainText(newText);
 
+    this->updateRecents();
+
     return err;
+}
+
+int Editor::load()
+{
+    QString filePath = QFileDialog::getOpenFileName(
+        this, "Open file", "", "Flight files (*.fli);;All files (*)");
+    return this->load(filePath);
 }
 
 void Editor::goToLine(int lineNum)
@@ -86,6 +93,8 @@ int Editor::save()
 
     this->document()->setModified(false);
 
+    this->updateRecents();
+
     return err;
 }
 
@@ -104,6 +113,9 @@ int Editor::saveAs()
     {
         this->document()->setModified(false);
     }
+
+    this->updateRecents();
+
     return err;
 }
 
@@ -149,4 +161,17 @@ void Editor::highlightCurrentLine()
     extraSelections.append(selection);
 
     this->setExtraSelections(extraSelections);
+}
+
+void Editor::updateRecents()
+{
+    QStringList recentFiles = this->settings_->recentFiles.value();
+    recentFiles.removeAll(this->defaultSavePath_);
+    recentFiles.prepend(this->defaultSavePath_);
+    while (recentFiles.count() > this->settings_->maxRecentFiles.value())
+        recentFiles.removeLast();
+    this->settings_->recentFiles.setValue(recentFiles);
+    this->settings_->recentFiles.save();
+
+    emit this->recentsUpdated(this);
 }

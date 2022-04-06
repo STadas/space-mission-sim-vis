@@ -37,11 +37,11 @@ MainWindow::MainWindow(QWidget *parent)
     this->centralWidget()->layout()->addWidget(this->editor_);
 
     this->initDockWidgets();
-    this->initSignalConnections();
     this->initActions();
     this->initMenus();
     this->initToolBars();
     this->initPlayBackInterface();
+    this->initSignalConnections();
 
     this->load();
 }
@@ -95,7 +95,7 @@ void MainWindow::initDockWidgets()
     this->dockLogsView_ = new QDockWidget("Server log", this);
     this->dockLogsView_->setObjectName("dockLogsView");
     this->dockLogsView_->setWidget(this->logsView_);
-    this->addDockWidget(Qt::RightDockWidgetArea, this->dockLogsView_);
+    this->addDockWidget(Qt::BottomDockWidgetArea, this->dockLogsView_);
 }
 
 void MainWindow::initSignalConnections()
@@ -131,34 +131,37 @@ void MainWindow::initSignalConnections()
 
     QObject::connect(this->serverProcess_, &PanguServerProcess::output,
                      this->logsView_, &LogsView::appendPlainText);
+
+    QObject::connect(this->editor_, &Editor::recentsUpdated, this->recentsMenu_,
+                     &RecentsMenu::updateActions);
 }
 
 void MainWindow::initActions()
 {
-    this->actNewFile_ = new QAction("New file", this);
+    this->actNewFile_ = new QAction("New flight file", this);
     this->actNewFile_->setShortcuts(QKeySequence::New);
-    this->actNewFile_->setStatusTip("Start editing a new file");
+    this->actNewFile_->setStatusTip("Start editing a new flight file");
     this->actNewFile_->setIcon(this->resources_->iconDocumentNew);
     QObject::connect(this->actNewFile_, &QAction::triggered, this,
                      &MainWindow::onActNewFile);
 
-    this->actOpenFile_ = new QAction("Open file", this);
+    this->actOpenFile_ = new QAction("Open flight file", this);
     this->actOpenFile_->setShortcuts(QKeySequence::Open);
-    this->actOpenFile_->setStatusTip("Open a file to edit");
+    this->actOpenFile_->setStatusTip("Open a flight file to edit");
     this->actOpenFile_->setIcon(this->resources_->iconDocumentOpen);
     QObject::connect(this->actOpenFile_, &QAction::triggered, this,
                      &MainWindow::onActOpenFile);
 
-    this->actSaveFile_ = new QAction("Save", this);
+    this->actSaveFile_ = new QAction("Save flight file", this);
     this->actSaveFile_->setShortcuts(QKeySequence::Save);
-    this->actSaveFile_->setStatusTip("Save the currently opened file");
+    this->actSaveFile_->setStatusTip("Save the currently opened flight file");
     this->actSaveFile_->setIcon(this->resources_->iconDocumentSave);
     QObject::connect(this->actSaveFile_, &QAction::triggered, this,
                      &MainWindow::onActSaveFile);
 
-    this->actSaveFileAs_ = new QAction("Save as", this);
+    this->actSaveFileAs_ = new QAction("Save as flight file", this);
     this->actSaveFileAs_->setShortcuts(QKeySequence::SaveAs);
-    this->actSaveFileAs_->setStatusTip("Save as a new file");
+    this->actSaveFileAs_->setStatusTip("Save as a new flight file");
     this->actSaveFileAs_->setIcon(this->resources_->iconDocumentSaveAs);
     QObject::connect(this->actSaveFileAs_, &QAction::triggered, this,
                      &MainWindow::onActSaveFileAs);
@@ -295,18 +298,21 @@ void MainWindow::initActions()
                      });
 
     this->actUndo_ = new QAction("Undo", this);
+    this->actUndo_->setShortcuts(QKeySequence::Undo);
     this->actUndo_->setStatusTip("Undo the latest edit in the editor");
     this->actUndo_->setIcon(this->resources_->iconEditUndo);
     QObject::connect(this->actUndo_, &QAction::triggered, this->editor_,
                      &QPlainTextEdit::undo);
 
     this->actRedo_ = new QAction("Redo", this);
+    this->actRedo_->setShortcuts(QKeySequence::Redo);
     this->actRedo_->setStatusTip("Redo the latest edit in the editor");
     this->actRedo_->setIcon(this->resources_->iconEditRedo);
     QObject::connect(this->actRedo_, &QAction::triggered, this->editor_,
                      &QPlainTextEdit::redo);
 
     this->actCut_ = new QAction("Cut", this);
+    this->actCut_->setShortcuts(QKeySequence::Cut);
     this->actCut_->setStatusTip(
         "Cut the currently selected text in the editor");
     this->actCut_->setIcon(this->resources_->iconEditCut);
@@ -314,6 +320,7 @@ void MainWindow::initActions()
                      &QPlainTextEdit::cut);
 
     this->actCopy_ = new QAction("Copy", this);
+    this->actCopy_->setShortcuts(QKeySequence::Copy);
     this->actCopy_->setStatusTip(
         "Copy the currently selected text in the editor");
     this->actCopy_->setIcon(this->resources_->iconEditCopy);
@@ -321,6 +328,7 @@ void MainWindow::initActions()
                      &QPlainTextEdit::copy);
 
     this->actPaste_ = new QAction("Paste", this);
+    this->actPaste_->setShortcuts(QKeySequence::Paste);
     this->actPaste_->setStatusTip(
         "Paste text from the clipboard under the editor cursor");
     this->actPaste_->setIcon(this->resources_->iconEditPaste);
@@ -336,6 +344,14 @@ void MainWindow::initMenus()
         this->actNewFile_,
         new MenuSeparator(this),
         this->actOpenFile_,
+    });
+
+    this->recentsMenu_ =
+        new RecentsMenu(this, this->settings_, this->messageController_);
+    this->recentsMenu_->updateActions(this->editor_);
+    this->fileMenu_->addMenu(this->recentsMenu_);
+
+    this->fileMenu_->addActions({
         new MenuSeparator(this),
         this->actSaveFile_,
         this->actSaveFileAs_,
