@@ -118,12 +118,16 @@ void MessageController::onError(FileErr err, QWidget *parent)
     {
         case FileErr::OpenFail: {
             this->showCritical(parent, "Open file",
-                               "There was an error opening the file.");
+                               "There was an error opening the file. You may "
+                               "want to check if it still exists and if you "
+                               "have permissions to open it.");
             break;
         }
         case FileErr::SaveFail: {
-            this->showCritical(parent, "Save file as",
-                               "There was an error saving the file.");
+            this->showCritical(
+                parent, "Save file as",
+                "There was an error saving the file. You may want to check if "
+                "you have permissions to write to it.");
             break;
         }
         default: {

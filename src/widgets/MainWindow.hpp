@@ -17,6 +17,7 @@
 #include "widgets/LogsView.hpp"
 #include "widgets/MenuSeparator.hpp"
 #include "widgets/PlaybackInterface.hpp"
+#include "widgets/RecentsMenu.hpp"
 #include "widgets/dialogs/SettingsDialog.hpp"
 
 class MainWindow : public QMainWindow, public ISavableLoadable
@@ -64,6 +65,7 @@ private:
 
     PanguServerProcess *serverProcess_;
 
+    RecentsMenu *recentsMenu_;
     QMenu *fileMenu_;
     QMenu *editMenu_;
     QMenu *viewMenu_;

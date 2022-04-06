@@ -21,6 +21,7 @@ public:
     int save() override;
     int saveAs() override;
     int load() override;
+    QFileDevice::FileError load(const QString &pathStr);
     void clear() override;
 
     void keyPressEvent(QKeyEvent *keyEvent) override;
@@ -34,4 +35,8 @@ private:
     QList<QAction *> extraContextMenuActions_;
 
     void highlightCurrentLine();
+    void updateRecents();
+
+signals:
+    void recentsUpdated(Editor *editor);
 };
