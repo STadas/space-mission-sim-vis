@@ -1,6 +1,7 @@
 #include "RecentsMenu.hpp"
 
-RecentsMenu::RecentsMenu(QWidget *parent, Settings *const settings, MessageController *const messageController)
+RecentsMenu::RecentsMenu(QWidget *parent, Settings *const settings,
+                         MessageController *const messageController)
     : QMenu(parent)
     , settings_(settings)
     , messageController_(messageController)
