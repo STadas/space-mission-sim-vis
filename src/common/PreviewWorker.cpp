@@ -11,10 +11,18 @@ PreviewWorker::PreviewWorker()
                      &PreviewWorker::onConnect);
     QObject::connect(this, &PreviewWorker::disconnect, this,
                      &PreviewWorker::onDisconnect);
+    QObject::connect(this, &PreviewWorker::ping, this,
+                     &PreviewWorker::onPing);
+
     QObject::connect(this, &PreviewWorker::processCommands, this,
                      &PreviewWorker::onProcessCommands);
     QObject::connect(this, &PreviewWorker::updateCamPoints, this,
                      &PreviewWorker::onUpdateCamPoints);
+
+    QObject::connect(this->connection_, &PanguConnection::connected, this,
+                     &PreviewWorker::connected);
+    QObject::connect(this->connection_, &PanguConnection::disconnected, this,
+                     &PreviewWorker::disconnected);
 }
 
 PreviewWorker::~PreviewWorker()
@@ -41,6 +49,18 @@ ConnectionErr PreviewWorker::onDisconnect()
     return this->connection_->disconnect();
 }
 
+ConnectionErr PreviewWorker::onPing()
+{
+    if (this->previewLock_->tryAcquire())
+    {
+        ConnectionErr err = this->connection_->ping();
+        this->previewLock_->release();
+        return err;
+    }
+
+    return ConnectionErr::Unknown;
+}
+
 void PreviewWorker::onProcessCommands(const QString &text, const int &start,
                                       const int &msLineDelay)
 {
@@ -52,7 +72,7 @@ void PreviewWorker::onProcessCommands(const QString &text, const int &start,
     if (end == 1)
         end = start + 1;
 
-    for (int i = start; i < end; i++)
+    for (int i = start; i < end; ++i)
     {
         QTime startTime = QTime::currentTime();
 
@@ -88,6 +108,8 @@ void PreviewWorker::onProcessCommands(const QString &text, const int &start,
                 delete img;
             break;
         }
+
+        emit this->connected();
 
         if (!parsed.command->expectsImg() && img != nullptr)
             delete img;

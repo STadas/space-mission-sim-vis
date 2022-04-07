@@ -13,6 +13,8 @@ ConnectionErr PanguConnection::connect(const QString &address, const int &port)
 {
     /* Modified example provided with PANGU */
 
+    emit this->disconnected();
+
     unsigned long addr;
     size_t saddr_len;
 
@@ -50,6 +52,8 @@ ConnectionErr PanguConnection::connect(const QString &address, const int &port)
         return ConnectionErr::BadResponse;
     }
 
+    emit this->connected();
+
     return ConnectionErr::Ok;
 }
 
@@ -63,6 +67,46 @@ ConnectionErr PanguConnection::disconnect()
 #ifdef _WIN32
     WSACleanup();
 #endif
+
+    emit this->disconnected();
+    return ConnectionErr::Ok;
+}
+
+ConnectionErr PanguConnection::ping()
+{
+    unsigned char outPayload[4] = {1, 2, 3, 4};
+    size_t outSize = 4;
+    char *panguErr = pan_net_echo_TX(this->sock_, &outPayload, outSize);
+
+    if (panguErr)
+    {
+        emit this->disconnected();
+        return ConnectionErr::BadResponse;
+    }
+
+    size_t inSize = 0;
+    unsigned char *inPayload =
+        (unsigned char *)pan_net_echo_RX(this->sock_, &inSize);
+
+    if (outSize != inSize)
+    {
+        free(inPayload);
+        emit this->disconnected();
+        return ConnectionErr::BadData;
+    }
+
+    for (int i = 0; i < inSize; ++i)
+    {
+        if (outPayload[i] != inPayload[i])
+        {
+            free(inPayload);
+            emit this->disconnected();
+            return ConnectionErr::BadData;
+        }
+    }
+
+    free(inPayload);
+    emit this->connected();
     return ConnectionErr::Ok;
 }
 
@@ -94,6 +138,7 @@ ConnectionErr PanguConnection::sendCommand(ParsedCommand &command)
 
                 if (panguErr)
                 {
+                    emit this->disconnected();
                     return ConnectionErr::BadResponse;
                 }
 
@@ -112,6 +157,7 @@ ConnectionErr PanguConnection::sendCommand(ParsedCommand &command)
 
                 if (panguErr)
                 {
+                    emit this->disconnected();
                     return ConnectionErr::BadResponse;
                 }
 
@@ -154,6 +200,7 @@ ConnectionErr PanguConnection::sendCommand(ParsedCommand &command,
     char *panguErr = pan_net_get_image_TX(this->sock_);
     if (panguErr)
     {
+        emit this->disconnected();
         return ConnectionErr::BadResponse;
     }
 

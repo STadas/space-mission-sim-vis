@@ -15,6 +15,8 @@ set(SOURCE_PROJECT
         common/PanguParser.hpp
         common/PanguServerProcess.cpp
         common/PanguServerProcess.hpp
+        common/PingWorker.cpp
+        common/PingWorker.hpp
         common/PreviewWorker.cpp
         common/PreviewWorker.hpp
         common/ParsedCommand.cpp
@@ -38,8 +40,12 @@ set(SOURCE_PROJECT
         util/ThreadUtil.cpp
         util/ThreadUtil.hpp
 
+        widgets/Action.cpp
+        widgets/Action.hpp
         widgets/CamPreview.cpp
         widgets/CamPreview.hpp
+        widgets/ConnectionDisplay.cpp
+        widgets/ConnectionDisplay.hpp
         widgets/CoordsVis.cpp
         widgets/CoordsVis.hpp
         widgets/MainWindow.cpp

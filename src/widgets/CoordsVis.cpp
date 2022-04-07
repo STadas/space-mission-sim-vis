@@ -303,7 +303,7 @@ void CoordsVis::updatePoints(const QList<CamPoint> &pointsList)
         sizeBytes.resize(pointsList.size() * sizeof(float));
 
         float *sizes = reinterpret_cast<float *>(sizeBytes.data());
-        for (unsigned int i = 0; i < pointsList.size(); i++)
+        for (unsigned int i = 0; i < pointsList.size(); ++i)
         {
             *sizes++ = this->settings_->coordsVisDefaultPSize.value();
         }

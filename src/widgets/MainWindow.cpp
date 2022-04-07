@@ -8,8 +8,11 @@ MainWindow::MainWindow(QWidget *parent)
     , logsView_(new LogsView(this))
     , autoCommScan_(false)
     , messageController_(new MessageController(this))
+    , pingWorker_(new PingWorker)  // no parent so it can moveToThread
+    , pingWorkerThread_(new QThread(this))
     , previewWorker_(new PreviewWorker)  // no parent so it can moveToThread
     , previewWorkerThread_(new QThread(this))
+    , connectionDisplay_(new ConnectionDisplay(this, this->resources_))
 {
     this->settings_->load();
     this->editor_ = new Editor(this, this->settings_);
@@ -19,12 +22,15 @@ MainWindow::MainWindow(QWidget *parent)
     this->progressBar_ = this->playbackInterface_->progressBar_;
 
     /* As weird as this is, it needs to be done for us to be able to use the
-     * enums with signals and slots. Potential for a generated source code
-     * file? */
+     * enums with signals and slots. */
     qRegisterMetaType<CommandErr>("CommandErr");
     qRegisterMetaType<ConnectionErr>("ConnectionErr");
     qRegisterMetaType<FileErr>("FileErr");
     qRegisterMetaType<FileQuestion>("FileQuestion");
+
+    this->pingWorker_->moveToThread(this->pingWorkerThread_);
+    this->pingWorkerThread_->start();
+    emit this->pingWorker_->start();
 
     this->previewWorker_->moveToThread(this->previewWorkerThread_);
     this->previewWorkerThread_->start();
@@ -32,6 +38,8 @@ MainWindow::MainWindow(QWidget *parent)
     this->setCentralWidget(new QWidget(this));
     this->setStatusBar(new QStatusBar(this));
     this->setMenuBar(new QMenuBar(this));
+
+    this->statusBar()->addPermanentWidget(this->connectionDisplay_);
 
     this->centralWidget()->setLayout(new VBoxLayout);
     this->centralWidget()->layout()->addWidget(this->editor_);
@@ -48,6 +56,12 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    qDebug() << "Waiting for threads...";
+
+    this->pingWorker_->stop();
+    this->pingWorkerThread_->quit();
+    this->pingWorkerThread_->wait();
+
     this->previewWorkerThread_->quit();
     this->previewWorkerThread_->wait();
 }
@@ -100,6 +114,9 @@ void MainWindow::initDockWidgets()
 
 void MainWindow::initSignalConnections()
 {
+    QObject::connect(this->pingWorker_, &PingWorker::pinged,
+                     this->previewWorker_, &PreviewWorker::ping);
+
     QObject::connect(this->previewWorker_, &PreviewWorker::lineStarted, this,
                      &MainWindow::onLineStarted);
 
@@ -117,77 +134,89 @@ void MainWindow::initSignalConnections()
     QObject::connect(this->previewWorker_, &PreviewWorker::changePreview, this,
                      &MainWindow::onChangePreview);
 
+    QObject::connect(this->previewWorker_, &PreviewWorker::camPointsUpdated,
+                     this, &MainWindow::onCamPointsUpdated);
+
+    QObject::connect(this->previewWorker_, &PreviewWorker::connected, this,
+                     [this] {
+                         this->connectionDisplay_->updateStatus(
+                             ConnectionDisplay::Status::Connected);
+                     });
+
+    QObject::connect(this->previewWorker_, &PreviewWorker::disconnected, this,
+                     [this] {
+                         this->connectionDisplay_->updateStatus(
+                             ConnectionDisplay::Status::Disconnected);
+                     });
+
+    QObject::connect(this->serverProcess_, &PanguServerProcess::output,
+                     this->logsView_, &LogsView::appendPlainText);
+
+    QObject::connect(this->editor_->document(), &QTextDocument::contentsChanged,
+                     this, &MainWindow::onEditorContentChanged);
+
+    QObject::connect(this->editor_, &Editor::recentsUpdated, this->recentsMenu_,
+                     &RecentsMenu::updateActions);
+
     QObject::connect(this->progressBar_, &ProgressBar::valueChanged, this,
                      &MainWindow::onPBarChanged);
 
     QObject::connect(this->progressBar_, &ProgressBar::sliderReleased, this,
                      &MainWindow::onPBarReleased);
-
-    QObject::connect(this->previewWorker_, &PreviewWorker::camPointsUpdated,
-                     this, &MainWindow::onCamPointsUpdated);
-
-    QObject::connect(this->editor_->document(), &QTextDocument::contentsChanged,
-                     this, &MainWindow::onEditorContentChanged);
-
-    QObject::connect(this->serverProcess_, &PanguServerProcess::output,
-                     this->logsView_, &LogsView::appendPlainText);
-
-    QObject::connect(this->editor_, &Editor::recentsUpdated, this->recentsMenu_,
-                     &RecentsMenu::updateActions);
 }
 
 void MainWindow::initActions()
 {
-    this->actNewFile_ = new QAction("New flight file", this);
+    this->actNewFile_ = new Action("New flight file", this);
     this->actNewFile_->setShortcuts(QKeySequence::New);
     this->actNewFile_->setStatusTip("Start editing a new flight file");
     this->actNewFile_->setIcon(this->resources_->iconDocumentNew);
     QObject::connect(this->actNewFile_, &QAction::triggered, this,
                      &MainWindow::onActNewFile);
 
-    this->actOpenFile_ = new QAction("Open flight file", this);
+    this->actOpenFile_ = new Action("Open flight file", this);
     this->actOpenFile_->setShortcuts(QKeySequence::Open);
     this->actOpenFile_->setStatusTip("Open a flight file to edit");
     this->actOpenFile_->setIcon(this->resources_->iconDocumentOpen);
     QObject::connect(this->actOpenFile_, &QAction::triggered, this,
                      &MainWindow::onActOpenFile);
 
-    this->actSaveFile_ = new QAction("Save flight file", this);
+    this->actSaveFile_ = new Action("Save flight file", this);
     this->actSaveFile_->setShortcuts(QKeySequence::Save);
     this->actSaveFile_->setStatusTip("Save the currently opened flight file");
     this->actSaveFile_->setIcon(this->resources_->iconDocumentSave);
     QObject::connect(this->actSaveFile_, &QAction::triggered, this,
                      &MainWindow::onActSaveFile);
 
-    this->actSaveFileAs_ = new QAction("Save as flight file", this);
+    this->actSaveFileAs_ = new Action("Save as flight file", this);
     this->actSaveFileAs_->setShortcuts(QKeySequence::SaveAs);
     this->actSaveFileAs_->setStatusTip("Save as a new flight file");
     this->actSaveFileAs_->setIcon(this->resources_->iconDocumentSaveAs);
     QObject::connect(this->actSaveFileAs_, &QAction::triggered, this,
                      &MainWindow::onActSaveFileAs);
 
-    this->actExecCurrentLine_ = new QAction("Execute line", this);
+    this->actExecCurrentLine_ = new Action("Execute line", this);
     this->actExecCurrentLine_->setStatusTip(
         "Execute the command in the currently active line");
     this->actExecCurrentLine_->setIcon(this->resources_->iconCursorExecute);
     QObject::connect(this->actExecCurrentLine_, &QAction::triggered, this,
                      &MainWindow::onActExecCurrentLine);
 
-    this->actExecPreviousLine_ = new QAction("Execute previous line", this);
+    this->actExecPreviousLine_ = new Action("Execute previous line", this);
     this->actExecPreviousLine_->setStatusTip(
         "Execute the command in the previous line, skipping empty ones");
     this->actExecPreviousLine_->setIcon(this->resources_->iconSkipBackward);
     QObject::connect(this->actExecPreviousLine_, &QAction::triggered, this,
                      &MainWindow::onActExecPreviousLine);
 
-    this->actExecNextLine_ = new QAction("Execute next line", this);
+    this->actExecNextLine_ = new Action("Execute next line", this);
     this->actExecNextLine_->setStatusTip(
         "Execute the command in the next line, skipping empty ones");
     this->actExecNextLine_->setIcon(this->resources_->iconSkipForward);
     QObject::connect(this->actExecNextLine_, &QAction::triggered, this,
                      &MainWindow::onActExecNextLine);
 
-    this->actToggleMultiLine_ = new QAction("Step through lines", this);
+    this->actToggleMultiLine_ = new Action("Step through lines", this);
     this->actToggleMultiLine_->setStatusTip(
         "Step through and execute all commands (with delay) starting with the "
         "currently active line");
@@ -197,7 +226,7 @@ void MainWindow::initActions()
     QObject::connect(this->actToggleMultiLine_, &QAction::toggled, this,
                      &MainWindow::onActToggleMultiLine);
 
-    this->actCommScan_ = new QAction("Scan all commands", this);
+    this->actCommScan_ = new Action("Scan all commands", this);
     this->actCommScan_->setStatusTip("Scan all commands to update components "
                                      "like the playback progress bar");
     this->actCommScan_->setIcon(this->resources_->iconScan);
@@ -205,7 +234,7 @@ void MainWindow::initActions()
                      &MainWindow::onActCommScan);
 
     this->actToggleAutoCommScan_ =
-        new QAction("Toggle auto command scanning", this);
+        new Action("Toggle auto command scanning", this);
     this->actToggleAutoCommScan_->setStatusTip(
         "Toggle automatic scanning of all commands when editing to update "
         "components like the playback progress bar (slow with large files!)");
@@ -215,21 +244,20 @@ void MainWindow::initActions()
     QObject::connect(this->actToggleAutoCommScan_, &QAction::toggled, this,
                      &MainWindow::onActToggleAutoCommScan);
 
-    this->actStartServer_ = new QAction("Start server", this);
+    this->actStartServer_ = new Action("Start server", this);
     this->actStartServer_->setStatusTip("Start a server to send commands to");
     this->actStartServer_->setIcon(this->resources_->iconDisplay);
     QObject::connect(this->actStartServer_, &QAction::triggered, this,
                      &MainWindow::onActStartServer);
 
-    this->actConnectToServer_ = new QAction("Connect to server", this);
+    this->actConnectToServer_ = new Action("Connect to server", this);
     this->actConnectToServer_->setStatusTip(
         "Connect to the currently used server");
     this->actConnectToServer_->setIcon(this->resources_->iconNetworkConnect);
     QObject::connect(this->actConnectToServer_, &QAction::triggered, this,
                      &MainWindow::onActConnectToServer);
 
-    this->actDisconnectFromServer_ =
-        new QAction("Disconnect from server", this);
+    this->actDisconnectFromServer_ = new Action("Disconnect from server", this);
     this->actDisconnectFromServer_->setStatusTip(
         "Disconnect from the currently used server");
     this->actDisconnectFromServer_->setIcon(
@@ -237,13 +265,13 @@ void MainWindow::initActions()
     QObject::connect(this->actDisconnectFromServer_, &QAction::triggered, this,
                      &MainWindow::onActDisconnectFromServer);
 
-    this->actOpenSettings_ = new QAction("Settings", this);
+    this->actOpenSettings_ = new Action("Settings", this);
     this->actOpenSettings_->setStatusTip("Open the settings window");
     this->actOpenSettings_->setIcon(this->resources_->iconConfigure);
     QObject::connect(this->actOpenSettings_, &QAction::triggered, this,
                      &MainWindow::onActOpenSettings);
 
-    this->actToggleCoordsVis_ = new QAction("Coordinates visualisation", this);
+    this->actToggleCoordsVis_ = new Action("Coordinates visualisation", this);
     this->actToggleCoordsVis_->setStatusTip(
         "Toggle visibility of the coordinates visualisation");
     this->actToggleCoordsVis_->setCheckable(true);
@@ -256,7 +284,7 @@ void MainWindow::initActions()
                              !this->dockCoordsVis_->isHidden());
                      });
 
-    this->actToggleCamPreview_ = new QAction("Camera preview", this);
+    this->actToggleCamPreview_ = new Action("Camera preview", this);
     this->actToggleCamPreview_->setStatusTip(
         "Toggle visibility of the camera preview");
     this->actToggleCamPreview_->setCheckable(true);
@@ -269,7 +297,7 @@ void MainWindow::initActions()
                              !this->dockCamPreview_->isHidden());
                      });
 
-    this->actTogglePlaybackInterface_ = new QAction("Playback interface", this);
+    this->actTogglePlaybackInterface_ = new Action("Playback interface", this);
     this->actTogglePlaybackInterface_->setStatusTip(
         "Toggle visibility of the playback interface");
     this->actTogglePlaybackInterface_->setCheckable(true);
@@ -284,7 +312,7 @@ void MainWindow::initActions()
                              !this->dockPlaybackInterface_->isHidden());
                      });
 
-    this->actToggleLogsView_ = new QAction("Server log", this);
+    this->actToggleLogsView_ = new Action("Server log", this);
     this->actToggleLogsView_->setStatusTip(
         "Toggle visibility of the server log");
     this->actToggleLogsView_->setCheckable(true);
@@ -297,21 +325,21 @@ void MainWindow::initActions()
                              !this->dockLogsView_->isHidden());
                      });
 
-    this->actUndo_ = new QAction("Undo", this);
+    this->actUndo_ = new Action("Undo", this);
     this->actUndo_->setShortcuts(QKeySequence::Undo);
     this->actUndo_->setStatusTip("Undo the latest edit in the editor");
     this->actUndo_->setIcon(this->resources_->iconEditUndo);
     QObject::connect(this->actUndo_, &QAction::triggered, this->editor_,
                      &QPlainTextEdit::undo);
 
-    this->actRedo_ = new QAction("Redo", this);
+    this->actRedo_ = new Action("Redo", this);
     this->actRedo_->setShortcuts(QKeySequence::Redo);
     this->actRedo_->setStatusTip("Redo the latest edit in the editor");
     this->actRedo_->setIcon(this->resources_->iconEditRedo);
     QObject::connect(this->actRedo_, &QAction::triggered, this->editor_,
                      &QPlainTextEdit::redo);
 
-    this->actCut_ = new QAction("Cut", this);
+    this->actCut_ = new Action("Cut", this);
     this->actCut_->setShortcuts(QKeySequence::Cut);
     this->actCut_->setStatusTip(
         "Cut the currently selected text in the editor");
@@ -319,7 +347,7 @@ void MainWindow::initActions()
     QObject::connect(this->actCut_, &QAction::triggered, this->editor_,
                      &QPlainTextEdit::cut);
 
-    this->actCopy_ = new QAction("Copy", this);
+    this->actCopy_ = new Action("Copy", this);
     this->actCopy_->setShortcuts(QKeySequence::Copy);
     this->actCopy_->setStatusTip(
         "Copy the currently selected text in the editor");
@@ -327,7 +355,7 @@ void MainWindow::initActions()
     QObject::connect(this->actCopy_, &QAction::triggered, this->editor_,
                      &QPlainTextEdit::copy);
 
-    this->actPaste_ = new QAction("Paste", this);
+    this->actPaste_ = new Action("Paste", this);
     this->actPaste_->setShortcuts(QKeySequence::Paste);
     this->actPaste_->setStatusTip(
         "Paste text from the clipboard under the editor cursor");

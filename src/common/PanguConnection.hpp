@@ -21,10 +21,16 @@ public:
     ConnectionErr connect(const QString &address, const int &port) override;
     ConnectionErr disconnect() override;
 
+    ConnectionErr ping() override;
+
     ConnectionErr sendCommand(ParsedCommand &command, unsigned char *&img,
                               unsigned long &size) override;
     ConnectionErr sendCommand(ParsedCommand &command) override;
 
 private:
     SOCKET sock_;
+
+signals:
+    void connected() override;
+    void disconnected() override;
 };

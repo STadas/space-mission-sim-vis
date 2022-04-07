@@ -41,6 +41,9 @@ public:
     QIcon iconEditor = QIcon(":/icons/editor");
     QIcon iconCoordinate = QIcon(":/icons/coordinate");
 
+    QIcon iconOk = QIcon(":/icons/ok");
+    QIcon iconWarn = QIcon(":/icons/warn");
+
     QByteArray flightPathVShader = Qt3DRender::QShaderProgram::loadSource(
         QUrl("qrc:/shaders/FlightPathV"));
     QByteArray flightPathFShader = Qt3DRender::QShaderProgram::loadSource(
