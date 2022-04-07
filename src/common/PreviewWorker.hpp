@@ -6,6 +6,7 @@
 #include "common/CamPoint.hpp"
 #include "common/PanguConnection.hpp"
 #include "common/PanguParser.hpp"
+#include "common/settings/Settings.hpp"
 #include "enums/CommandErr.hpp"
 #include "enums/ConnectionErr.hpp"
 #include "interfaces/IConnection.hpp"
@@ -16,7 +17,7 @@ class PreviewWorker : public QObject, public IConnection
     Q_OBJECT
 
 public:
-    PreviewWorker();
+    PreviewWorker(Settings *const settings);
     ~PreviewWorker();
 
     QSemaphore *previewLock() const;
@@ -24,6 +25,8 @@ public:
     void cancelStepping();
 
 private:
+    Settings *const settings_;
+
     PanguConnection *connection_;
     PanguParser *parser_;
 

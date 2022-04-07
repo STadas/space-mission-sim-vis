@@ -1,7 +1,8 @@
 #include "PreviewWorker.hpp"
 
-PreviewWorker::PreviewWorker()
+PreviewWorker::PreviewWorker(Settings *const settings)
     : QObject(nullptr)
+    , settings_(settings)
     , connection_(new PanguConnection(this))
     , parser_(new PanguParser(this))
     , previewLock_(new QSemaphore(1))
@@ -82,12 +83,16 @@ void PreviewWorker::onProcessCommands(const QString &text, const int &start,
 
         if (parsed.err != CommandErr::Ok)
         {
-            emit this->error(parsed.err);
-
             if (parsed.err == CommandErr::Empty)
                 continue;
-            else
-                break;
+
+            if (parsed.err == CommandErr::NotImplemented &&
+                !this->settings_->commandsStepStopUnimplemented.value())
+                continue;
+
+            emit this->error(parsed.err);
+
+            break;
         }
         if (!parsed.command.has_value())
         {

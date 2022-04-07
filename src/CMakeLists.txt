@@ -68,6 +68,8 @@ set(SOURCE_PROJECT
         widgets/dialogs/SettingsDialog.cpp
         widgets/dialogs/SettingsDialog.hpp
 
+        widgets/settingspages/CommandsPage.cpp
+        widgets/settingspages/CommandsPage.hpp
         widgets/settingspages/CoordsVisPage.cpp
         widgets/settingspages/CoordsVisPage.hpp
         widgets/settingspages/EditorPage.cpp

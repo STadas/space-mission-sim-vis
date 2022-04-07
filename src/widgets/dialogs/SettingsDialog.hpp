@@ -9,6 +9,7 @@
 #include "common/settings/Settings.hpp"
 
 #include "widgets/dialogs/Dialog.hpp"
+#include "widgets/settingspages/CommandsPage.hpp"
 #include "widgets/settingspages/CoordsVisPage.hpp"
 #include "widgets/settingspages/EditorPage.hpp"
 #include "widgets/settingspages/ServerPage.hpp"
