@@ -80,9 +80,6 @@ void MessageController::onError(CommandErr err, QWidget *parent)
         case CommandErr::Ok: {
             break;
         }
-        default: {
-            break;
-        }
     }
 }
 
@@ -129,8 +126,6 @@ void MessageController::onError(FileErr err, QWidget *parent)
                 "There was an error saving the file. You may want to check if "
                 "you have permissions to write to it.");
             break;
-        }
-        default: {
         }
     }
 }

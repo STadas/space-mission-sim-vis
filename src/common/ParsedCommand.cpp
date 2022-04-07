@@ -2,30 +2,30 @@
 
 ParsedCommand::ParsedCommand(QString name, std::vector<Arg> args,
                              bool expectsImg)
-    : expectsImg_(expectsImg)
-    , name_(name)
+    : name_(name)
     , args_(args)
+    , expectsImg_(expectsImg)
 {
 }
 
 ParsedCommand::ParsedCommand(QString name, std::vector<Arg> args,
                              bool expectsImg, QVector3D camPos)
-    : expectsImg_(expectsImg)
-    , name_(name)
+    : name_(name)
     , args_(args)
     , camPos_(camPos)
+    , expectsImg_(expectsImg)
 {
 }
 
 bool ParsedCommand::expectsImg() const
 {
     return this->expectsImg_;
-};
+}
 
 bool ParsedCommand::hasCamPos() const
 {
     return this->hasCamPos_;
-};
+}
 
 QString ParsedCommand::name() const
 {

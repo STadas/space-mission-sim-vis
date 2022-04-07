@@ -19,6 +19,7 @@ public:
         Quaternion,
         Update,
         Pause,
+        SetTime,
     };
     static std::map<QString, CommandName> commandMap;
 };

@@ -118,7 +118,7 @@ void PreviewWorker::onProcessCommands(const QString &text, const int &start,
             QByteArray data(reinterpret_cast<char *>(img), size);
             delete img;
 
-            emit this->changePreview(data, size);
+            emit this->changePreview(data);
         }
 
         if (this->isCancelled_)

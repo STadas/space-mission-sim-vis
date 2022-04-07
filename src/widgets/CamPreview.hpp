@@ -13,7 +13,7 @@ public:
     CamPreview(QWidget *parent = nullptr);
     ~CamPreview() override;
 
-    void showPreview(QByteArray data, const unsigned long &size);
+    void showPreview(QByteArray data);
 
     bool eventFilter(QObject *object, QEvent *event) override;
 

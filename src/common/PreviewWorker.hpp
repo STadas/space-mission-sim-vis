@@ -46,8 +46,8 @@ signals:
 
     void processCommands(const QString &text, const int &start = 0,
                          const int &msLineDelay = 0);
-    void lineStarted(const int &lineNum);
-    void changePreview(QByteArray byteArr, unsigned long size);
+    void lineStarted(const unsigned int &lineNum);
+    void changePreview(QByteArray byteArr);
 
     void commandsProcessed();
 

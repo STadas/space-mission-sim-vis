@@ -7,7 +7,7 @@ ConnectionDisplay::ConnectionDisplay(QWidget *parent,
     , connIcon_(new QLabel(this))
     , connLabel_(new QLabel("Disconnected", this))
 {
-    QLayout *layout = new QHBoxLayout(this);
+    this->setLayout(new QHBoxLayout);
     this->layout()->setMargin(0);
     this->layout()->addWidget(this->connIcon_);
     this->layout()->addWidget(this->connLabel_);
@@ -31,11 +31,6 @@ void ConnectionDisplay::updateStatus(ConnectionDisplay::Status status)
         case ConnectionDisplay::Status::Disconnected: {
             this->connIcon_->setPixmap(this->resources_->iconWarn.pixmap(16));
             this->connLabel_->setText("Disconnected");
-            break;
-        }
-        default: {
-            this->connIcon_->setPixmap(this->resources_->iconWarn.pixmap(16));
-            this->connLabel_->setText("Unknown");
             break;
         }
     }

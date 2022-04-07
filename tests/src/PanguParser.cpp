@@ -262,3 +262,53 @@ TEST_F(PanguParserTest, ParsePanguPauseDouble)
     ASSERT_EQ(parsed.err, CommandErr::Ok);
     ASSERT_TRUE(parsed.command.has_value());
 }
+
+TEST_F(PanguParserTest, ParsePanguSetTimeNotEnoughArgs)
+{
+    const QString str = "set_time";
+
+    auto parsed = parser.parse(str);
+
+    ASSERT_EQ(parsed.err, CommandErr::BadArgCount);
+    ASSERT_FALSE(parsed.command.has_value());
+}
+
+TEST_F(PanguParserTest, ParsePanguSetTimeTooManyArgs)
+{
+    const QString str = "set_time 1 2";
+
+    auto parsed = parser.parse(str);
+
+    ASSERT_EQ(parsed.err, CommandErr::BadArgCount);
+    ASSERT_FALSE(parsed.command.has_value());
+}
+
+TEST_F(PanguParserTest, ParsePanguSetTimeBadArgType)
+{
+    const QString str = "set_time foo";
+
+    auto parsed = parser.parse(str);
+
+    ASSERT_EQ(parsed.err, CommandErr::BadArgType);
+    ASSERT_FALSE(parsed.command.has_value());
+}
+
+TEST_F(PanguParserTest, ParsePanguSetTimeOk)
+{
+    const QString str = "set_time 1";
+
+    auto parsed = parser.parse(str);
+
+    ASSERT_EQ(parsed.err, CommandErr::Ok);
+    ASSERT_TRUE(parsed.command.has_value());
+}
+
+TEST_F(PanguParserTest, ParsePanguSetTimeDouble)
+{
+    const QString str = "set_time 1.2218379264329384692384729347";
+
+    auto parsed = parser.parse(str);
+
+    ASSERT_EQ(parsed.err, CommandErr::Ok);
+    ASSERT_TRUE(parsed.command.has_value());
+}

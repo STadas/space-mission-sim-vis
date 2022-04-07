@@ -6,7 +6,7 @@ CoordsVis::CoordsVis(QWidget *parent, Settings *const settings,
     , settings_(settings)
     , resources_(resources)
 {
-    QBoxLayout *layout = new VBoxLayout(this);
+    this->setLayout(new VBoxLayout);
     this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     auto view3d = new Qt3DExtras::Qt3DWindow();
@@ -286,7 +286,7 @@ void CoordsVis::updatePoints(const QList<CamPoint> &pointsList)
 
         float *colors = reinterpret_cast<float *>(colorBytes.data());
         QColor defaultColor(settings_->coordsVisDefaultColor.value());
-        for (auto &p : pointsList)
+        for (int i = 0; i < pointsList.size(); ++i)
         {
             *colors++ = defaultColor.redF();
             *colors++ = defaultColor.greenF();
@@ -303,7 +303,7 @@ void CoordsVis::updatePoints(const QList<CamPoint> &pointsList)
         sizeBytes.resize(pointsList.size() * sizeof(float));
 
         float *sizes = reinterpret_cast<float *>(sizeBytes.data());
-        for (unsigned int i = 0; i < pointsList.size(); ++i)
+        for (int i = 0; i < pointsList.size(); ++i)
         {
             *sizes++ = this->settings_->coordsVisDefaultPSize.value();
         }

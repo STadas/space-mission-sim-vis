@@ -2,8 +2,8 @@
 
 PlaybackInterface::PlaybackInterface(QWidget *parent, Settings *const settings)
     : QWidget(parent)
-    , settings_(settings)
     , progressBar_(new ProgressBar(this))
+    , settings_(settings)
     , buttonWrapper_(new QWidget(this))
 {
     this->setLayout(new VBoxLayout);

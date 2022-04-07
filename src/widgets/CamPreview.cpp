@@ -4,7 +4,7 @@ CamPreview::CamPreview(QWidget *parent)
     : QWidget(parent)
     , imgLabel_(new QLabel(this))
 {
-    QLayout *layout = new VBoxLayout(this);
+    this->setLayout(new VBoxLayout);
     this->imgLabel_->setAlignment(Qt::AlignCenter);
     this->imgLabel_->setSizePolicy(QSizePolicy::Expanding,
                                    QSizePolicy::Expanding);
@@ -18,11 +18,11 @@ CamPreview::~CamPreview()
 {
 }
 
-void CamPreview::showPreview(QByteArray data, const unsigned long &size)
+void CamPreview::showPreview(QByteArray imgData)
 {
     QSize oldSize = this->size();
 
-    this->pm_.loadFromData(data, "PNG");
+    this->pm_.loadFromData(imgData, "PNG");
     this->imgLabel_->setPixmap(this->pm_);
 
     QSize newSize = this->size();

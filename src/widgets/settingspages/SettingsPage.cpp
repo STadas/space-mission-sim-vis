@@ -7,7 +7,7 @@ SettingsPage::SettingsPage(QWidget *parent, Settings *const settings)
     //TODO: make the page scrollable
     //not an issue atm because there aren't that many settings
     this->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Maximum);
-    QVBoxLayout *pageLayout = new QVBoxLayout(this);
+    this->setLayout(new QVBoxLayout);
     this->layout()->setAlignment(Qt::AlignTop);
 }
 

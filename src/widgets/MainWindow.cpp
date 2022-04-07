@@ -279,7 +279,7 @@ void MainWindow::initActions()
     QObject::connect(this->actToggleCoordsVis_, &QAction::toggled, this,
                      &MainWindow::onActToggleCoordsVis);
     QObject::connect(this->dockCoordsVis_, &QDockWidget::visibilityChanged,
-                     this, [this](const bool &on) {
+                     this, [this]() {
                          this->actToggleCoordsVis_->setChecked(
                              !this->dockCoordsVis_->isHidden());
                      });
@@ -292,7 +292,7 @@ void MainWindow::initActions()
     QObject::connect(this->actToggleCamPreview_, &QAction::toggled, this,
                      &MainWindow::onActToggleCamPreview);
     QObject::connect(this->dockCamPreview_, &QDockWidget::visibilityChanged,
-                     this, [this](const bool &on) {
+                     this, [this]() {
                          this->actToggleCamPreview_->setChecked(
                              !this->dockCamPreview_->isHidden());
                      });
@@ -306,8 +306,7 @@ void MainWindow::initActions()
     QObject::connect(this->actTogglePlaybackInterface_, &QAction::toggled, this,
                      &MainWindow::onActTogglePlaybackInterface);
     QObject::connect(this->dockPlaybackInterface_,
-                     &QDockWidget::visibilityChanged, this,
-                     [this](const bool &on) {
+                     &QDockWidget::visibilityChanged, this, [this]() {
                          this->actTogglePlaybackInterface_->setChecked(
                              !this->dockPlaybackInterface_->isHidden());
                      });
@@ -320,7 +319,7 @@ void MainWindow::initActions()
     QObject::connect(this->actToggleLogsView_, &QAction::toggled, this,
                      &MainWindow::onActToggleLogsView);
     QObject::connect(this->dockLogsView_, &QDockWidget::visibilityChanged, this,
-                     [this](const bool &on) {
+                     [this]() {
                          this->actToggleLogsView_->setChecked(
                              !this->dockLogsView_->isHidden());
                      });
@@ -658,7 +657,7 @@ void MainWindow::onActToggleLogsView(bool on)
         this->dockLogsView_->hide();
 }
 
-void MainWindow::onLineStarted(const int &lineNum)
+void MainWindow::onLineStarted(const unsigned int &lineNum)
 {
     this->editor_->goToLine(lineNum);
 
@@ -711,9 +710,9 @@ void MainWindow::onCommandsProcessed()
     this->actToggleMultiLine_->setChecked(false);
 }
 
-void MainWindow::onChangePreview(QByteArray data, const unsigned long &size)
+void MainWindow::onChangePreview(QByteArray data)
 {
-    this->camPreview_->showPreview(data, size);
+    this->camPreview_->showPreview(data);
 }
 
 void MainWindow::onPBarChanged(int idx)
