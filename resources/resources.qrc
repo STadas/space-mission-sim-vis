@@ -28,6 +28,9 @@
 
     <file alias="editor">breeze-icons/story-editor.svg</file>
     <file alias="coordinate">breeze-icons/coordinate.svg</file>
+
+    <file alias="ok">breeze-icons/vcs-normal.svg</file>
+    <file alias="warn">breeze-icons/vcs-conflicting.svg</file>
   </qresource>
 
   <qresource prefix="/shaders">

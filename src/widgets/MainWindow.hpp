@@ -6,12 +6,15 @@
 
 #include "common/MessageController.hpp"
 #include "common/PanguServerProcess.hpp"
+#include "common/PingWorker.hpp"
 #include "common/PreviewWorker.hpp"
 #include "common/Resources.hpp"
 #include "common/VBoxLayout.hpp"
 #include "common/settings/Settings.hpp"
 #include "interfaces/ISavableLoadable.hpp"
+#include "widgets/Action.hpp"
 #include "widgets/CamPreview.hpp"
+#include "widgets/ConnectionDisplay.hpp"
 #include "widgets/CoordsVis.hpp"
 #include "widgets/Editor.hpp"
 #include "widgets/LogsView.hpp"
@@ -60,10 +63,14 @@ private:
 
     MessageController *messageController_;
 
+    PanguServerProcess *serverProcess_;
+
+    PingWorker *pingWorker_;
+    QThread *pingWorkerThread_;
     PreviewWorker *previewWorker_;
     QThread *previewWorkerThread_;
 
-    PanguServerProcess *serverProcess_;
+    ConnectionDisplay *connectionDisplay_;
 
     RecentsMenu *recentsMenu_;
     QMenu *fileMenu_;
@@ -73,36 +80,36 @@ private:
     QMenu *commandsMenu_;
     QMenu *serverMenu_;
 
-    QAction *actNewFile_;
-    QAction *actOpenFile_;
-    QAction *actSaveFile_;
-    QAction *actSaveFileAs_;
+    Action *actNewFile_;
+    Action *actOpenFile_;
+    Action *actSaveFile_;
+    Action *actSaveFileAs_;
 
-    QAction *actUndo_;
-    QAction *actRedo_;
-    QAction *actCut_;
-    QAction *actCopy_;
-    QAction *actPaste_;
+    Action *actUndo_;
+    Action *actRedo_;
+    Action *actCut_;
+    Action *actCopy_;
+    Action *actPaste_;
 
-    QAction *actToggleCoordsVis_;
-    QAction *actToggleCamPreview_;
-    QAction *actTogglePlaybackInterface_;
-    QAction *actToggleLogsView_;
+    Action *actToggleCoordsVis_;
+    Action *actToggleCamPreview_;
+    Action *actTogglePlaybackInterface_;
+    Action *actToggleLogsView_;
 
-    QAction *actExecCurrentLine_;
-    QAction *actExecPreviousLine_;
-    QAction *actExecNextLine_;
-    QAction *actToggleMultiLine_;
+    Action *actExecCurrentLine_;
+    Action *actExecPreviousLine_;
+    Action *actExecNextLine_;
+    Action *actToggleMultiLine_;
 
-    QAction *actCommScan_;
-    QAction *actToggleAutoCommScan_;
+    Action *actCommScan_;
+    Action *actToggleAutoCommScan_;
 
-    QAction *actStartServer_;
-    QAction *actStopServer_;
-    QAction *actConnectToServer_;
-    QAction *actDisconnectFromServer_;
+    Action *actStartServer_;
+    Action *actStopServer_;
+    Action *actConnectToServer_;
+    Action *actDisconnectFromServer_;
 
-    QAction *actOpenSettings_;
+    Action *actOpenSettings_;
 
 private slots:
     /* on action */

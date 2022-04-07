@@ -36,6 +36,11 @@ signals:
     ConnectionErr connect(const QString &address, const int &port) override;
     ConnectionErr disconnect() override;
 
+    ConnectionErr ping() override;
+
+    void connected() override;
+    void disconnected() override;
+
     void error(CommandErr err);
     void error(ConnectionErr err);
 
@@ -52,6 +57,7 @@ signals:
 private slots:
     ConnectionErr onConnect(const QString &address, const int &port);
     ConnectionErr onDisconnect();
+    ConnectionErr onPing();
 
     void onProcessCommands(const QString &text, const int &start = 0,
                            const int &msLineDelay = 0);
