@@ -11,8 +11,7 @@ PreviewWorker::PreviewWorker()
                      &PreviewWorker::onConnect);
     QObject::connect(this, &PreviewWorker::disconnect, this,
                      &PreviewWorker::onDisconnect);
-    QObject::connect(this, &PreviewWorker::ping, this,
-                     &PreviewWorker::onPing);
+    QObject::connect(this, &PreviewWorker::ping, this, &PreviewWorker::onPing);
 
     QObject::connect(this, &PreviewWorker::processCommands, this,
                      &PreviewWorker::onProcessCommands);

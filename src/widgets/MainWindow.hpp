@@ -4,9 +4,9 @@
 #include <QtCore>
 #include <QtWidgets>
 
-#include "common/PingWorker.hpp"
 #include "common/MessageController.hpp"
 #include "common/PanguServerProcess.hpp"
+#include "common/PingWorker.hpp"
 #include "common/PreviewWorker.hpp"
 #include "common/Resources.hpp"
 #include "common/VBoxLayout.hpp"
