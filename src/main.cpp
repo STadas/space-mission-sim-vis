@@ -1,4 +1,4 @@
-#ifdef MSVC
+#ifdef _WIN32
 #    pragma warning(disable : 4005)
 #endif
 #include <QApplication>
