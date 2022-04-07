@@ -93,9 +93,5 @@ ParseResult PanguParser::parse(const QString &strCommand)
 
             return {CommandErr::Ok, ParsedCommand(cmdName, args, false)};
         }
-
-        default: {
-            return CommandErr::Unknown;
-        }
     }
 }

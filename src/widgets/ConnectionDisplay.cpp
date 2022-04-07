@@ -33,10 +33,5 @@ void ConnectionDisplay::updateStatus(ConnectionDisplay::Status status)
             this->connLabel_->setText("Disconnected");
             break;
         }
-        default: {
-            this->connIcon_->setPixmap(this->resources_->iconWarn.pixmap(16));
-            this->connLabel_->setText("Unknown");
-            break;
-        }
     }
 }
