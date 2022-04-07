@@ -75,7 +75,7 @@ ConnectionErr PanguConnection::disconnect()
 ConnectionErr PanguConnection::ping()
 {
     unsigned char outPayload[4] = {1, 2, 3, 4};
-    size_t outSize = 4;
+    unsigned long outSize = 4;
     char *panguErr = pan_net_echo_TX(this->sock_, &outPayload, outSize);
 
     if (panguErr)
@@ -84,7 +84,7 @@ ConnectionErr PanguConnection::ping()
         return ConnectionErr::BadResponse;
     }
 
-    size_t inSize = 0;
+    unsigned long inSize = 0;
     unsigned char *inPayload =
         (unsigned char *)pan_net_echo_RX(this->sock_, &inSize);
 
