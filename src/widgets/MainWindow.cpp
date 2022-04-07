@@ -306,8 +306,7 @@ void MainWindow::initActions()
     QObject::connect(this->actTogglePlaybackInterface_, &QAction::toggled, this,
                      &MainWindow::onActTogglePlaybackInterface);
     QObject::connect(this->dockPlaybackInterface_,
-                     &QDockWidget::visibilityChanged, this,
-                     [this]() {
+                     &QDockWidget::visibilityChanged, this, [this]() {
                          this->actTogglePlaybackInterface_->setChecked(
                              !this->dockPlaybackInterface_->isHidden());
                      });
