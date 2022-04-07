@@ -18,11 +18,11 @@ CamPreview::~CamPreview()
 {
 }
 
-void CamPreview::showPreview(QByteArray data)
+void CamPreview::showPreview(QByteArray imgData)
 {
     QSize oldSize = this->size();
 
-    this->pm_.loadFromData(data, "PNG");
+    this->pm_.loadFromData(imgData, "PNG");
     this->imgLabel_->setPixmap(this->pm_);
 
     QSize newSize = this->size();
