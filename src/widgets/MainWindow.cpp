@@ -67,6 +67,8 @@ MainWindow::~MainWindow()
 
     this->previewWorkerThread_->quit();
     this->previewWorkerThread_->wait();
+
+    qDebug() << "Bye";
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
