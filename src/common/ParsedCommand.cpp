@@ -20,12 +20,12 @@ ParsedCommand::ParsedCommand(QString name, std::vector<Arg> args,
 bool ParsedCommand::expectsImg() const
 {
     return this->expectsImg_;
-};
+}
 
 bool ParsedCommand::hasCamPos() const
 {
     return this->hasCamPos_;
-};
+}
 
 QString ParsedCommand::name() const
 {
