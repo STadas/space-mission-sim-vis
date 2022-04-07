@@ -3,7 +3,7 @@
 std::map<QString, PanguParser::CommandName> PanguParser::commandMap = {
     {"start", CommandName::Start},   {"quaternion", CommandName::Quaternion},
     {"update", CommandName::Update}, {"pause", CommandName::Pause},
-    {"time", CommandName::Time},
+    {"set_time", CommandName::SetTime},
 };
 
 PanguParser::PanguParser(QObject *parent)
@@ -93,7 +93,7 @@ ParseResult PanguParser::parse(const QString &strCommand)
             return {CommandErr::Ok, ParsedCommand(cmdName, args, false)};
         }
 
-        case CommandName::Time: {
+        case CommandName::SetTime: {
             if (words.size() != 1)
                 return CommandErr::BadArgCount;
 

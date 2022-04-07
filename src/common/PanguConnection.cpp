@@ -174,7 +174,7 @@ ConnectionErr PanguConnection::sendCommand(ParsedCommand &command)
                 return ConnectionErr::Ok;
             }
 
-            case PanguParser::CommandName::Time: {
+            case PanguParser::CommandName::SetTime: {
                 panguErr = pan_net_set_global_time_TX(
                     this->sock_, std::get<double>(command.args()[0]));
 
