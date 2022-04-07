@@ -95,7 +95,7 @@ ConnectionErr PanguConnection::ping()
         return ConnectionErr::BadData;
     }
 
-    for (int i = 0; i < inSize; ++i)
+    for (unsigned int i = 0; i < inSize; ++i)
     {
         if (outPayload[i] != inPayload[i])
         {
@@ -173,9 +173,22 @@ ConnectionErr PanguConnection::sendCommand(ParsedCommand &command)
                     1000 * std::get<double>(command.args()[0]));
                 return ConnectionErr::Ok;
             }
+
+            case PanguParser::CommandName::Time: {
+                panguErr = pan_net_set_global_time_TX(
+                    this->sock_, std::get<double>(command.args()[0]));
+
+                if (panguErr)
+                {
+                    emit this->disconnected();
+                    return ConnectionErr::BadResponse;
+                }
+
+                return ConnectionErr::Ok;
+            }
         }
     }
-    catch (std::bad_variant_access)
+    catch (std::bad_variant_access const &)
     {
     }
 

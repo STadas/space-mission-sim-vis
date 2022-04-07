@@ -138,12 +138,12 @@ private slots:
     void onActToggleLogsView(bool on);
 
     /* on other signal */
-    void onLineStarted(const int &lineNum);
+    void onLineStarted(const unsigned int &lineNum);
     void onCommandError(CommandErr err);
     void onConnectionError(ConnectionErr err);
 
     void onCommandsProcessed();
-    void onChangePreview(QByteArray data, const unsigned long &size);
+    void onChangePreview(QByteArray data);
 
     void onPBarChanged(int idx);
     void onPBarReleased();

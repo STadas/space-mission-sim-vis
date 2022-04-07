@@ -7,7 +7,7 @@ ConnectionDisplay::ConnectionDisplay(QWidget *parent,
     , connIcon_(new QLabel(this))
     , connLabel_(new QLabel("Disconnected", this))
 {
-    QLayout *layout = new QHBoxLayout(this);
+    this->setLayout(new QHBoxLayout);
     this->layout()->setMargin(0);
     this->layout()->addWidget(this->connIcon_);
     this->layout()->addWidget(this->connLabel_);
