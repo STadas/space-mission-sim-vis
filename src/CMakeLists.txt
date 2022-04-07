@@ -186,7 +186,7 @@ if (BUILD_APP)
 endif()
 
 if(MSVC)
-    target_compile_options(${LIBRARY_PROJECT} PUBLIC /EHsc /W4 /WX)
+    target_compile_options(${LIBRARY_PROJECT} PUBLIC /EHsc /W3 /WX)
 else()
     target_compile_options(${LIBRARY_PROJECT} PUBLIC -Wall -Wextra -Wpedantic -Werror)
 endif()
