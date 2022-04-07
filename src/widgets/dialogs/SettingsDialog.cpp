@@ -72,6 +72,10 @@ void SettingsDialog::createPages()
     this->addPage(new QAction(this->resources_->iconDisplay, "Server", this),
                   new ServerPage(this, this->settings_));
 
+    this->addPage(
+        new QAction(this->resources_->iconCursorExecute, "Commands", this),
+        new CommandsPage(this, this->settings_));
+
     this->addPage(new QAction(this->resources_->iconEditor, "Editor", this),
                   new EditorPage(this, this->settings_));
 

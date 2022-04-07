@@ -10,11 +10,14 @@ MainWindow::MainWindow(QWidget *parent)
     , messageController_(new MessageController(this))
     , pingWorker_(new PingWorker)  // no parent so it can moveToThread
     , pingWorkerThread_(new QThread(this))
-    , previewWorker_(new PreviewWorker)  // no parent so it can moveToThread
-    , previewWorkerThread_(new QThread(this))
     , connectionDisplay_(new ConnectionDisplay(this, this->resources_))
 {
     this->settings_->load();
+
+    this->previewWorker_ =
+        new PreviewWorker(this->settings_);  // no parent so it can moveToThread
+    this->previewWorkerThread_ = new QThread(this);
+
     this->editor_ = new Editor(this, this->settings_);
     this->coordsVis_ = new CoordsVis(this, this->settings_, this->resources_);
     this->serverProcess_ = new PanguServerProcess(this, this->settings_);
@@ -64,6 +67,8 @@ MainWindow::~MainWindow()
 
     this->previewWorkerThread_->quit();
     this->previewWorkerThread_->wait();
+
+    qDebug() << "Bye";
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

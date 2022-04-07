@@ -48,6 +48,8 @@ public:
     // commands
     IntSetting commandsStepMsDelay = {"commands/step/msDelay", 1000,
                                       this->manager_};
+    BoolSetting commandsStepStopUnimplemented = {
+        "commands/step/StopUnimplemented", false, this->manager_};
 
     // windows' geometry/state
     QByteArraySetting stateMainWindow = {
