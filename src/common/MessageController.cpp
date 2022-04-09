@@ -15,6 +15,11 @@ MessageController::MessageController(QObject *parent)
     QObject::connect(
         this, qOverload<FileErr, QWidget *>(&MessageController::error), this,
         qOverload<FileErr, QWidget *>(&MessageController::onError));
+
+    using ProcessError = QProcess::ProcessError;
+    QObject::connect(
+        this, qOverload<ProcessError, QWidget *>(&MessageController::error),
+        this, qOverload<ProcessError, QWidget *>(&MessageController::onError));
 }
 
 MessageController::~MessageController()
@@ -46,6 +51,9 @@ void MessageController::showCritical(QWidget *parent, const QString &title,
 
 void MessageController::onError(CommandErr err, QWidget *parent)
 {
+    // we don't want to spam this one in case the user quickly executes a bunch
+    // of commands
+
     QString windowTitle = "Syntax error";
     switch (err)
     {
@@ -56,10 +64,9 @@ void MessageController::onError(CommandErr err, QWidget *parent)
             break;
         }
         case CommandErr::BadArgCount: {
-            this->showCritical(
-                parent, windowTitle,
-                "Invalid amount of arguments for command. Please "
-                "check your syntax and try again.");
+            this->showCritical(parent, windowTitle,
+                               "Invalid amount of arguments for command. "
+                               "Please check your syntax and try again.");
             break;
         }
         case CommandErr::BadArgType: {
@@ -85,6 +92,9 @@ void MessageController::onError(CommandErr err, QWidget *parent)
 
 void MessageController::onError(ConnectionErr err, QWidget *parent)
 {
+    // we don't want to spam this one in case the user quickly executes a bunch
+    // of commands
+
     QString windowTitle = "Connection error";
     switch (err)
     {
@@ -95,8 +105,7 @@ void MessageController::onError(ConnectionErr err, QWidget *parent)
             this->showCritical(
                 parent, windowTitle,
                 "There was an error when getting the preview image. Please "
-                "check "
-                "your settings and the status of the PANGU server.");
+                "check your settings and the status of the PANGU server.");
             break;
         }
         default: {
@@ -114,17 +123,17 @@ void MessageController::onError(FileErr err, QWidget *parent)
     switch (err)
     {
         case FileErr::OpenFail: {
-            this->showCritical(parent, "Open file",
-                               "There was an error opening the file. You may "
-                               "want to check if it still exists and if you "
-                               "have permissions to open it.");
+            QMessageBox::critical(parent, "Open file",
+                                  "There was an error opening the file. Please "
+                                  "check if it still exists and if you have "
+                                  "permissions to open it.");
             break;
         }
         case FileErr::SaveFail: {
-            this->showCritical(
-                parent, "Save file as",
-                "There was an error saving the file. You may want to check if "
-                "you have permissions to write to it.");
+            QMessageBox::critical(
+                parent, "Save file",
+                "There was an error saving the file. Please check if you have "
+                "permissions to write to it.");
             break;
         }
     }
@@ -147,6 +156,46 @@ QMessageBox::StandardButton MessageController::question(FileQuestion qst,
         }
         default: {
             return QMessageBox::StandardButton::Close;
+        }
+    }
+}
+
+void MessageController::onError(QProcess::ProcessError err, QWidget *parent)
+{
+    using ProcessError = QProcess::ProcessError;
+
+    QString windowTitle = "Server executable error";
+
+    switch (err)
+    {
+        case ProcessError::FailedToStart: {
+            QMessageBox::critical(
+                parent, windowTitle,
+                "The server failed to start. Please check the settings and the "
+                "executable if you've configured them correctly.");
+            break;
+        }
+        case ProcessError::Crashed: {
+            QMessageBox::critical(
+                parent, windowTitle,
+                "The server has crashed. Please check the settings and the "
+                "executable if you've configured them correctly.");
+            break;
+        }
+        case ProcessError::Timedout: {
+            QMessageBox::critical(
+                parent, windowTitle,
+                "The server has timed out. Please check the settings and the "
+                "executable if you've configured them correctly.");
+            break;
+        }
+        default: {
+            QMessageBox::critical(
+                parent, windowTitle,
+                "The server has encountered an unexpected error. Please check "
+                "the settings and the executable if you've configured them "
+                "correctly.");
+            break;
         }
     }
 }

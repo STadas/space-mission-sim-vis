@@ -20,4 +20,7 @@ public:
 
     Settings *const settings_;
     MessageController *const messageController_;
+
+signals:
+    void error(FileErr err);
 };

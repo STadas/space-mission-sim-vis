@@ -157,6 +157,9 @@ void MainWindow::initSignalConnections()
     QObject::connect(this->serverProcess_, &PanguServerProcess::output,
                      this->logsView_, &LogsView::appendPlainText);
 
+    QObject::connect(this->serverProcess_, &PanguServerProcess::error, this,
+                     &MainWindow::onServerProcessError);
+
     QObject::connect(this->editor_->document(), &QTextDocument::contentsChanged,
                      this, &MainWindow::onEditorContentChanged);
 
@@ -168,6 +171,9 @@ void MainWindow::initSignalConnections()
 
     QObject::connect(this->progressBar_, &ProgressBar::sliderReleased, this,
                      &MainWindow::onPBarReleased);
+
+    QObject::connect(this->recentsMenu_, &RecentsMenu::error, this,
+                     &MainWindow::onFileError);
 }
 
 void MainWindow::initActions()
@@ -699,16 +705,6 @@ void MainWindow::onLineStarted(const unsigned int &lineNum)
     }
 }
 
-void MainWindow::onCommandError(CommandErr err)
-{
-    emit this->messageController_->error(err, this);
-}
-
-void MainWindow::onConnectionError(ConnectionErr err)
-{
-    emit this->messageController_->error(err, this);
-}
-
 void MainWindow::onCommandsProcessed()
 {
     this->editor_->setReadOnly(false);
@@ -783,4 +779,24 @@ void MainWindow::onEditorContentChanged()
     if (this->autoCommScan_)
         emit this->previewWorker_->updateCamPoints(
             this->editor_->toPlainText());
+}
+
+void MainWindow::onCommandError(CommandErr err)
+{
+    emit this->messageController_->error(err, this);
+}
+
+void MainWindow::onConnectionError(ConnectionErr err)
+{
+    emit this->messageController_->error(err, this);
+}
+
+void MainWindow::onServerProcessError(QProcess::ProcessError err)
+{
+    emit this->messageController_->error(err, this);
+}
+
+void MainWindow::onFileError(FileErr err)
+{
+    emit this->messageController_->error(err, this);
 }
