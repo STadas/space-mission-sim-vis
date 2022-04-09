@@ -21,8 +21,8 @@
 #include "widgets/MenuSeparator.hpp"
 #include "widgets/PlaybackInterface.hpp"
 #include "widgets/RecentsMenu.hpp"
-#include "widgets/dialogs/SettingsDialog.hpp"
 #include "widgets/dialogs/AboutDialog.hpp"
+#include "widgets/dialogs/SettingsDialog.hpp"
 
 class MainWindow : public QMainWindow, public ISavableLoadable
 {
