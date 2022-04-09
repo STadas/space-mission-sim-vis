@@ -575,9 +575,15 @@ void MainWindow::onActToggleMultiLine(bool on)
 
         this->editor_->setReadOnly(true);
 
+        int startLine = this->editor_->textCursor().blockNumber();
+
+        if (startLine == this->editor_->blockCount() - 1)
+        {
+            startLine = 0;
+        }
+
         emit this->previewWorker_->processCommands(
-            this->editor_->toPlainText(),
-            this->editor_->textCursor().blockNumber(),
+            this->editor_->toPlainText(), startLine,
             this->settings_->commandsStepMsDelay.value());
     }
     else
