@@ -13,3 +13,4 @@ Checked - DONE
 - [ ] https://github.com/STadas/space-mission-sim-vis/pull/64
 - [ ] https://github.com/STadas/space-mission-sim-vis/pull/66
 - [ ] https://github.com/STadas/space-mission-sim-vis/pull/68
+- [ ] https://github.com/STadas/space-mission-sim-vis/pull/69

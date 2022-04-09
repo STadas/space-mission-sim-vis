@@ -139,8 +139,6 @@ private slots:
 
     /* on other signal */
     void onLineStarted(const unsigned int &lineNum);
-    void onCommandError(CommandErr err);
-    void onConnectionError(ConnectionErr err);
 
     void onCommandsProcessed();
     void onChangePreview(QByteArray data);
@@ -150,4 +148,9 @@ private slots:
     void onCamPointsUpdated();
 
     void onEditorContentChanged();
+
+    void onCommandError(CommandErr err);
+    void onConnectionError(ConnectionErr err);
+    void onServerProcessError(QProcess::ProcessError err);
+    void onFileError(FileErr err);
 };

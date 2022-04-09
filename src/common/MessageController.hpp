@@ -27,9 +27,11 @@ signals:
     void error(CommandErr err, QWidget *parent = nullptr);
     void error(ConnectionErr err, QWidget *parent = nullptr);
     void error(FileErr err, QWidget *parent = nullptr);
+    void error(QProcess::ProcessError err, QWidget *parent = nullptr);
 
 public slots:
     void onError(CommandErr err, QWidget *parent = nullptr);
     void onError(ConnectionErr err, QWidget *parent = nullptr);
     void onError(FileErr err, QWidget *parent = nullptr);
+    void onError(QProcess::ProcessError err, QWidget *parent = nullptr);
 };

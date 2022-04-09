@@ -23,8 +23,7 @@ void RecentsMenu::updateActions(Editor *const editor)
                          [this, editor, pathStr] {
                              if (editor->load(pathStr))
                              {
-                                 emit this->messageController_->error(
-                                     FileErr::OpenFail, this->parentWidget());
+                                 emit this->error(FileErr::OpenFail);
                              }
                          });
         this->addAction(recentFile);

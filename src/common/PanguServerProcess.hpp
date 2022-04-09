@@ -22,6 +22,7 @@ private:
 
 signals:
     void output(QString data);
+    void error(QProcess::ProcessError err);
 
 private slots:
     void onReadyReadStdOut();

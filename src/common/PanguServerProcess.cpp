@@ -10,6 +10,9 @@ PanguServerProcess::PanguServerProcess(QObject *parent,
                      &PanguServerProcess::onReadyReadStdOut);
     QObject::connect(this->process_, &QProcess::readyReadStandardError, this,
                      &PanguServerProcess::onReadyReadStdErr);
+
+    QObject::connect(this->process_, &QProcess::errorOccurred, this,
+                     &PanguServerProcess::error);
 }
 
 PanguServerProcess::~PanguServerProcess()
