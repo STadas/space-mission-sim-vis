@@ -372,6 +372,18 @@ void MainWindow::initActions()
     this->actPaste_->setIcon(this->resources_->iconEditPaste);
     QObject::connect(this->actPaste_, &QAction::triggered, this->editor_,
                      &QPlainTextEdit::paste);
+
+    this->actOpenManual_ = new Action("Manual", this);
+    this->actOpenManual_->setStatusTip("Read the manual");
+    this->actOpenManual_->setIcon(this->resources_->iconQuestion);
+    QObject::connect(this->actOpenManual_, &QAction::triggered, this,
+                     &MainWindow::onActOpenManual);
+
+    this->actOpenAbout_ = new Action("About", this);
+    this->actOpenAbout_->setStatusTip("About the application and licenses");
+    this->actOpenAbout_->setIcon(this->resources_->iconInfo);
+    QObject::connect(this->actOpenAbout_, &QAction::triggered, this,
+                     &MainWindow::onActOpenAbout);
 }
 
 void MainWindow::initMenus()
@@ -447,6 +459,13 @@ void MainWindow::initMenus()
         this->actStartServer_,
         this->actConnectToServer_,
         this->actDisconnectFromServer_,
+    });
+
+    this->helpMenu_ = new QMenu("Help", this);
+    this->menuBar()->addMenu(this->helpMenu_);
+    this->helpMenu_->addActions({
+        this->actOpenManual_,
+        this->actOpenAbout_,
     });
 }
 
@@ -672,6 +691,17 @@ void MainWindow::onActToggleLogsView(bool on)
         this->dockLogsView_->show();
     else
         this->dockLogsView_->hide();
+}
+
+void MainWindow::onActOpenManual()
+{
+    QDesktopServices::openUrl(this->resources_->manualUrl);
+}
+
+void MainWindow::onActOpenAbout()
+{
+    AboutDialog *aboutDialog = new AboutDialog(this, this->resources_);
+    aboutDialog->show();
 }
 
 void MainWindow::onLineStarted(const unsigned int &lineNum)

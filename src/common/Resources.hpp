@@ -12,6 +12,9 @@ public:
     Resources(QObject *parent);
     ~Resources();
 
+    QUrl manualUrl = QUrl("https://github.com/STadas/space-mission-sim-vis/"
+                          "blob/main/SpaceMissionSimVis_User_Manual.pdf");
+
     QIcon iconDocumentNew = QIcon(":/icons/document-new");
     QIcon iconDocumentOpen = QIcon(":/icons/document-open");
     QIcon iconDocumentSave = QIcon(":/icons/document-save");
@@ -43,6 +46,9 @@ public:
 
     QIcon iconOk = QIcon(":/icons/ok");
     QIcon iconWarn = QIcon(":/icons/warn");
+
+    QIcon iconQuestion = QIcon(":/icons/question");
+    QIcon iconInfo = QIcon(":/icons/info");
 
     QByteArray flightPathVShader = Qt3DRender::QShaderProgram::loadSource(
         QUrl("qrc:/shaders/FlightPathV"));

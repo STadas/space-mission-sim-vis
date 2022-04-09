@@ -31,10 +31,18 @@
 
     <file alias="ok">breeze-icons/vcs-normal.svg</file>
     <file alias="warn">breeze-icons/vcs-conflicting.svg</file>
+
+    <file alias="question">breeze-icons/question.svg</file>
+    <file alias="info">breeze-icons/documentinfo.svg</file>
   </qresource>
 
   <qresource prefix="/shaders">
       <file alias="FlightPathV">shaders/FlightPath.vert</file>
       <file alias="FlightPathF">shaders/FlightPath.frag</file>
+  </qresource>
+
+  <qresource prefix="/licenses">
+      <file alias="breeze-icons">licenses/breeze-icons_lgpl-3.0.txt</file>
+      <file alias="qt">licenses/qt_lgpl-3.0.txt</file>
   </qresource>
 </RCC>

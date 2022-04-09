@@ -21,6 +21,7 @@
 #include "widgets/MenuSeparator.hpp"
 #include "widgets/PlaybackInterface.hpp"
 #include "widgets/RecentsMenu.hpp"
+#include "widgets/dialogs/AboutDialog.hpp"
 #include "widgets/dialogs/SettingsDialog.hpp"
 
 class MainWindow : public QMainWindow, public ISavableLoadable
@@ -79,6 +80,7 @@ private:
     QMenu *toolsMenu_;
     QMenu *commandsMenu_;
     QMenu *serverMenu_;
+    QMenu *helpMenu_;
 
     Action *actNewFile_;
     Action *actOpenFile_;
@@ -111,6 +113,9 @@ private:
 
     Action *actOpenSettings_;
 
+    Action *actOpenManual_;
+    Action *actOpenAbout_;
+
 private slots:
     /* on action */
     void onActNewFile();
@@ -136,6 +141,9 @@ private slots:
     void onActToggleCamPreview(bool on);
     void onActTogglePlaybackInterface(bool on);
     void onActToggleLogsView(bool on);
+
+    void onActOpenManual();
+    void onActOpenAbout();
 
     /* on other signal */
     void onLineStarted(const unsigned int &lineNum);

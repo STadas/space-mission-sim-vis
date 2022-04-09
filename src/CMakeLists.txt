@@ -63,6 +63,8 @@ set(SOURCE_PROJECT
         widgets/RecentsMenu.cpp
         widgets/RecentsMenu.hpp
 
+        widgets/dialogs/AboutDialog.cpp
+        widgets/dialogs/AboutDialog.hpp
         widgets/dialogs/Dialog.cpp
         widgets/dialogs/Dialog.hpp
         widgets/dialogs/SettingsDialog.cpp
