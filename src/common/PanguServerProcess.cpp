@@ -19,21 +19,28 @@ PanguServerProcess::~PanguServerProcess()
 
 void PanguServerProcess::start(const QString &pathStr, const QStringList &args)
 {
-    //NOTE: could probably make &args not const, maybe even copy, if we end up
-    //NOTE: adding more specific arg settings
+    QStringList settingsArgs{};
+
     if (this->settings_->serverCamPredefined.value())
     {
-        QStringList camArgs = {
+        settingsArgs += {
             "-use_save_size",
             "-save_width",
             QString::number(this->settings_->serverCamWidth.value()),
             "-save_height",
             QString::number(this->settings_->serverCamHeight.value()),
         };
-        this->process_->start(pathStr, camArgs + args);
     }
-    else
-        this->process_->start(pathStr, args);
+
+    if (this->settings_->serverIni.value().length() != 0)
+    {
+        settingsArgs += {
+            "-ini",
+            this->settings_->serverIni.value(),
+        };
+    }
+
+    this->process_->start(pathStr, settingsArgs + args);
 }
 
 void PanguServerProcess::stop()
