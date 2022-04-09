@@ -32,6 +32,7 @@ public:
 
     // server executable
     QStringSetting serverPath = {"server/exec/path", "", this->manager_};
+    QStringSetting serverIni = {"server/exec/ini", "", this->manager_};
     QStringSetting serverFlags = {"server/exec/flags", "", this->manager_};
 
     // server connection

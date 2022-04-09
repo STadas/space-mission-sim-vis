@@ -14,6 +14,11 @@ ServerPage::ServerPage(QWidget *parent, Settings *const settings)
             "Executables (*.exe);;Bash scripts (*.sh);;Batch scripts "
             "(*.bat);;All files (*)"));
 
+    execLayout->addRow("PANGU .ini path",
+                       this->createLineEditBrowse(
+                           this->settings_->serverIni, "Select .ini file", "",
+                           "INI files (*.ini);;All files (*)"));
+
     execLayout->addRow("Server executable flags",
                        this->createLineEdit(this->settings_->serverFlags));
 
