@@ -27,10 +27,10 @@ public:
                               unsigned long &size) override;
     ConnectionErr sendCommand(ParsedCommand &command) override;
 
-private:
-    SOCKET sock_;
-
 signals:
     void connected() override;
     void disconnected() override;
+
+private:
+    SOCKET sock_;
 };

@@ -17,7 +17,7 @@ Editor::Editor(QWidget *parent, Settings *const settings)
     QObject::connect(this, &QPlainTextEdit::customContextMenuRequested, this,
                      &Editor::showContextMenu);
 
-    highlightCurrentLine();
+    this->highlightCurrentLine();
 }
 
 Editor::~Editor()

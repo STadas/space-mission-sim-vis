@@ -18,10 +18,10 @@ public:
 
     void updateActions(Editor *const editor);
 
+signals:
+    void error(FileErr err);
+
 private:
     Settings *const settings_;
     MessageController *const messageController_;
-
-signals:
-    void error(FileErr err);
 };

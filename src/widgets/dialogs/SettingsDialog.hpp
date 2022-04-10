@@ -23,7 +23,18 @@ public:
                    Resources *const resources);
     ~SettingsDialog();
 
+private slots:
+    void onCurrentChanged(const int &current);
+    void onOkClicked();
+    void onCancelClicked();
+
 private:
+    void save() override;
+    void load() override;
+
+    void createPages();
+    void addPage(QAction *action, QWidget *page);
+
     QListWidget *pageSelect_;
     QStackedWidget *pages_;
 
@@ -32,15 +43,4 @@ private:
 
     Settings *const settings_;
     Resources *const resources_;
-
-    void save() override;
-    void load() override;
-
-    void createPages();
-    void addPage(QAction *action, QWidget *page);
-
-private slots:
-    void onCurrentChanged(const int &current);
-    void onOkClicked();
-    void onCancelClicked();
 };

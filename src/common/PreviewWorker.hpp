@@ -24,17 +24,6 @@ public:
     QList<CamPoint> camPoints() const;
     void cancelStepping();
 
-private:
-    Settings *const settings_;
-
-    PanguConnection *connection_;
-    PanguParser *parser_;
-
-    QList<CamPoint> camPoints_;
-
-    QSemaphore *previewLock_;
-    std::atomic<bool> isCancelled_;
-
 signals:
     ConnectionErr connect(const QString &address, const int &port) override;
     ConnectionErr disconnect() override;
@@ -66,4 +55,15 @@ private slots:
                            const int &msLineDelay = 0);
 
     void onUpdateCamPoints(const QString &str);
+
+private:
+    Settings *const settings_;
+
+    PanguConnection *connection_;
+    PanguParser *parser_;
+
+    QList<CamPoint> camPoints_;
+
+    QSemaphore *previewLock_;
+    std::atomic<bool> isCancelled_;
 };
