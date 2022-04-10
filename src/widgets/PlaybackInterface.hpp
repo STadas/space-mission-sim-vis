@@ -17,11 +17,11 @@ public:
     ~PlaybackInterface();
 
     void addButton(QAction *action);
-
-    ProgressBar *progressBar_;
+    ProgressBar *progressBar();
 
 private:
     Settings *const settings_;
 
     QWidget *buttonWrapper_;
+    ProgressBar *progressBar_;
 };

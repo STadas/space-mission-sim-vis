@@ -14,7 +14,6 @@ public:
     ~ConnectionDisplay();
 
     enum class Status { Connected, Disconnected };
-
     void updateStatus(ConnectionDisplay::Status status);
 
 private:

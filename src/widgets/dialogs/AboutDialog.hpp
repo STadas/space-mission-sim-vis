@@ -14,8 +14,8 @@ public:
     ~AboutDialog();
 
 private:
-    Resources *const resources_;
-
     void addLicense(QFormLayout *layout, const QString &name,
                     const QString &licensePath, const QString &website = "");
+
+    Resources *const resources_;
 };

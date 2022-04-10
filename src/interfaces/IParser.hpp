@@ -1,33 +1,13 @@
 #pragma once
 
-#include <optional>
-#include "common/ParsedCommand.hpp"
-#include "enums/CommandErr.hpp"
+#include <QtCore>
 
-struct ParseResult {
-public:
-    ParseResult(CommandErr err, ParsedCommand command)
-        : err(err)
-        , command(command)
-    {
-    }
-
-    ParseResult(CommandErr err)
-        : err(err)
-    {
-    }
-
-    CommandErr err;
-    std::optional<ParsedCommand> command;
-
-private:
-    ParseResult();
-};
+#include "common/ParseResult.hpp"
 
 class IParser
 {
 public:
-    ~IParser()
+    virtual ~IParser()
     {
     }
 

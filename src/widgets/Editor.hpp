@@ -29,14 +29,14 @@ public:
 
     void setExtraContextMenuActions(const QList<QAction *> &actions);
 
-private:
-    QString defaultSavePath_{};
-    Settings *const settings_;
-    QList<QAction *> extraContextMenuActions_;
+signals:
+    void recentsUpdated(Editor *editor);
 
+private:
     void highlightCurrentLine();
     void updateRecents();
 
-signals:
-    void recentsUpdated(Editor *editor);
+    QString defaultSavePath_{};
+    Settings *const settings_;
+    QList<QAction *> extraContextMenuActions_;
 };

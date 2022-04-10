@@ -18,11 +18,6 @@ public:
 
     QMessageBox::StandardButton question(FileQuestion qst, QWidget *parent);
 
-private:
-    bool messageOpen_;
-    void showCritical(QWidget *parent, const QString &title,
-                      const QString &text);
-
 signals:
     void error(CommandErr err, QWidget *parent = nullptr);
     void error(ConnectionErr err, QWidget *parent = nullptr);
@@ -34,4 +29,9 @@ public slots:
     void onError(ConnectionErr err, QWidget *parent = nullptr);
     void onError(FileErr err, QWidget *parent = nullptr);
     void onError(QProcess::ProcessError err, QWidget *parent = nullptr);
+
+private:
+    bool messageOpen_;
+    void showCritical(QWidget *parent, const QString &title,
+                      const QString &text);
 };

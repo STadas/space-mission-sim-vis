@@ -8,7 +8,7 @@
 class ICommandSender
 {
 public:
-    ~ICommandSender()
+    virtual ~ICommandSender()
     {
     }
 

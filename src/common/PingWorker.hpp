@@ -12,13 +12,14 @@ public:
 
     void stop();
 
-private:
-    std::atomic<bool> isActive_{};
-
-    void onStart();
-
 signals:
     void start();
 
     void pinged();
+
+private slots:
+    void onStart();
+
+private:
+    std::atomic<bool> isActive_{};
 };

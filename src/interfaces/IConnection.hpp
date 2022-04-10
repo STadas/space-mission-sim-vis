@@ -2,7 +2,6 @@
 
 #include <QtCore>
 
-#include "common/ParsedCommand.hpp"
 #include "enums/ConnectionErr.hpp"
 
 class IConnection

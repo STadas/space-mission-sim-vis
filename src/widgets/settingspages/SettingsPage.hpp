@@ -17,8 +17,6 @@ public:
     ~SettingsPage();
 
 protected:
-    Settings *const settings_;
-
     QCheckBox *createCheckBox(BoolSetting &setting, const QString &text = "");
 
     QLineEdit *createLineEdit(QStringSetting &setting);
@@ -37,4 +35,6 @@ protected:
 
     QPushButton *createColorPicker(QStringSetting &setting,
                                    const QString &btnText = "");
+
+    Settings *const settings_;
 };
