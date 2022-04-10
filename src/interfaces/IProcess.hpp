@@ -5,7 +5,7 @@
 class IProcess
 {
 public:
-    ~IProcess()
+    virtual ~IProcess()
     {
     }
 

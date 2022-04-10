@@ -27,7 +27,7 @@ private:
 class IParser
 {
 public:
-    ~IParser()
+    virtual ~IParser()
     {
     }
 

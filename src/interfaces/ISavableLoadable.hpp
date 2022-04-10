@@ -3,7 +3,7 @@
 class ISavableLoadable
 {
 public:
-    ISavableLoadable()
+    virtual ~ISavableLoadable()
     {
     }
 
