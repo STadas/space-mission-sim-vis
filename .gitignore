@@ -71,3 +71,6 @@ model.pan
 surface.dem
 surface.dem.txt
 _PERF_RESULTS.txt
+
+# docs
+doxygen/
