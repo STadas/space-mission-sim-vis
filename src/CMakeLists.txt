@@ -15,6 +15,8 @@ set(SOURCE_PROJECT
         common/PanguParser.hpp
         common/PanguServerProcess.cpp
         common/PanguServerProcess.hpp
+        common/ParseResult.cpp
+        common/ParseResult.hpp
         common/PingWorker.cpp
         common/PingWorker.hpp
         common/PreviewWorker.cpp
