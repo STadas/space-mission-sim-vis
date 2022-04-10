@@ -2,9 +2,9 @@
 
 PlaybackInterface::PlaybackInterface(QWidget *parent, Settings *const settings)
     : QWidget(parent)
-    , progressBar_(new ProgressBar(this))
     , settings_(settings)
     , buttonWrapper_(new QWidget(this))
+    , progressBar_(new ProgressBar(this))
 {
     this->setLayout(new VBoxLayout);
     this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
@@ -41,4 +41,9 @@ void PlaybackInterface::addButton(QAction *action)
     newButton->setDefaultAction(action);
 
     this->buttonWrapper_->layout()->addWidget(newButton);
+}
+
+ProgressBar *PlaybackInterface::progressBar()
+{
+    return this->progressBar_;
 }

@@ -18,6 +18,7 @@ public:
 
     void updateActions(Editor *const editor);
 
+private:
     Settings *const settings_;
     MessageController *const messageController_;
 

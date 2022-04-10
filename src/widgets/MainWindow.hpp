@@ -34,7 +34,6 @@ public:
 
     void closeEvent(QCloseEvent *event) override;
 
-private:
     void save() override;
     void load() override;
 
@@ -52,7 +51,6 @@ private:
     CoordsVis *coordsVis_;
     CamPreview *camPreview_;
     PlaybackInterface *playbackInterface_;
-    ProgressBar *progressBar_;
     LogsView *logsView_;
 
     QDockWidget *dockCoordsVis_;

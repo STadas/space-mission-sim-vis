@@ -22,7 +22,6 @@ MainWindow::MainWindow(QWidget *parent)
     this->coordsVis_ = new CoordsVis(this, this->settings_, this->resources_);
     this->serverProcess_ = new PanguServerProcess(this, this->settings_);
     this->playbackInterface_ = new PlaybackInterface(this, this->settings_);
-    this->progressBar_ = this->playbackInterface_->progressBar_;
 
     /* As weird as this is, it needs to be done for us to be able to use the
      * enums with signals and slots. */
@@ -166,10 +165,12 @@ void MainWindow::initSignalConnections()
     QObject::connect(this->editor_, &Editor::recentsUpdated, this->recentsMenu_,
                      &RecentsMenu::updateActions);
 
-    QObject::connect(this->progressBar_, &ProgressBar::valueChanged, this,
+    QObject::connect(this->playbackInterface_->progressBar(),
+                     &ProgressBar::valueChanged, this,
                      &MainWindow::onPBarChanged);
 
-    QObject::connect(this->progressBar_, &ProgressBar::sliderReleased, this,
+    QObject::connect(this->playbackInterface_->progressBar(),
+                     &ProgressBar::sliderReleased, this,
                      &MainWindow::onPBarReleased);
 
     QObject::connect(this->recentsMenu_, &RecentsMenu::error, this,
@@ -712,7 +713,8 @@ void MainWindow::onLineStarted(const unsigned int &lineNum)
         return;
 
     CamPoint camPoint =
-        this->previewWorker_->camPoints()[this->progressBar_->value()];
+        this->previewWorker_
+            ->camPoints()[this->playbackInterface_->progressBar()->value()];
     if (camPoint.lineNum() != lineNum)
     {
         /* try to find cam point by line number */
@@ -726,9 +728,9 @@ void MainWindow::onLineStarted(const unsigned int &lineNum)
         if (it != camPoints.end())
         {
             unsigned int activeIdx = it - camPoints.begin();
-            this->progressBar_->blockSignals(true);
-            this->progressBar_->setValue(activeIdx);
-            this->progressBar_->blockSignals(false);
+            this->playbackInterface_->progressBar()->blockSignals(true);
+            this->playbackInterface_->progressBar()->setValue(activeIdx);
+            this->playbackInterface_->progressBar()->blockSignals(false);
 
             this->coordsVis_->updateActive(activeIdx);
         }
@@ -777,7 +779,7 @@ void MainWindow::onPBarReleased()
 {
     this->previewWorker_->cancelStepping();
 
-    unsigned int idx = this->progressBar_->value();
+    unsigned int idx = this->playbackInterface_->progressBar()->value();
     CamPoint camPoint = this->previewWorker_->camPoints()[idx];
 
     this->coordsVis_->updateActive(idx);
@@ -789,19 +791,20 @@ void MainWindow::onCamPointsUpdated()
 {
     if (this->previewWorker_->camPoints().size() > 0)
     {
-        this->progressBar_->setEnabled(true);
-        this->progressBar_->setMaximum(
+        this->playbackInterface_->progressBar()->setEnabled(true);
+        this->playbackInterface_->progressBar()->setMaximum(
             this->previewWorker_->camPoints().size() - 1);
     }
     else
     {
-        this->progressBar_->blockSignals(true);
-        this->progressBar_->setMaximum(0);
-        this->progressBar_->blockSignals(false);
-        this->progressBar_->setEnabled(false);
+        this->playbackInterface_->progressBar()->blockSignals(true);
+        this->playbackInterface_->progressBar()->setMaximum(0);
+        this->playbackInterface_->progressBar()->blockSignals(false);
+        this->playbackInterface_->progressBar()->setEnabled(false);
     }
     this->coordsVis_->updatePoints(this->previewWorker_->camPoints());
-    this->coordsVis_->updateActive(this->progressBar_->value());
+    this->coordsVis_->updateActive(
+        this->playbackInterface_->progressBar()->value());
 }
 
 void MainWindow::onEditorContentChanged()
