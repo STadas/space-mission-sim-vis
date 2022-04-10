@@ -83,4 +83,10 @@ public:
                                           this->manager_};
     FloatSetting coordsVisActivePSize = {"coordsVis/points/activeSize", 8.0f,
                                          this->manager_};
+
+    // coords vis planes
+    FloatSetting coordsVisSurfacePlaneScale = {"coordsVis/surface/scale",
+                                               100.0f, this->manager_};
+    FloatSetting coordsVisCamFarPlane = {"coordsVis/cam/farPlane", 10000.0f,
+                                         this->manager_};
 };

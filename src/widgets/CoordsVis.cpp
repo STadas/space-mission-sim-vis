@@ -24,8 +24,9 @@ CoordsVis::CoordsVis(QWidget *parent, Settings *const settings,
 
     // camera
     this->camera_ = view3d->camera();
-    this->camera_->lens()->setPerspectiveProjection(45.0f, 4.0f / 3.0f, 0.1f,
-                                                    10000.0f);
+    this->camera_->lens()->setPerspectiveProjection(
+        45.0f, 4.0f / 3.0f, 0.1f,
+        this->settings_->coordsVisCamFarPlane.value());
     this->camera_->setPosition(QVector3D(0, 10.0f, 20.0f));
     this->camera_->setUpVector(QVector3D(0, 1, 0));
     this->camera_->setViewCenter(QVector3D(0, 0, 0));
@@ -52,10 +53,13 @@ void CoordsVis::initControls()
     QSpinBox *planeScaleBox = new QSpinBox(this);
     planeScaleBox->setMaximum(INT_MAX);
     planeScaleBox->setValue(this->planeTransform_->scale());
-    QObject::connect(planeScaleBox, QOverload<int>::of(&QSpinBox::valueChanged),
-                     this, [=](const int &newVal) {
-                         this->planeTransform_->setScale(newVal);
-                     });
+    QObject::connect(
+        planeScaleBox, QOverload<int>::of(&QSpinBox::valueChanged), this,
+        [=](const int &newVal) {
+            this->planeTransform_->setScale(newVal);
+            this->settings_->coordsVisSurfacePlaneScale.setValue(newVal);
+            this->settings_->coordsVisSurfacePlaneScale.save();
+        });
 
     // far plane
     QLabel *farPlaneLabel =
@@ -67,6 +71,8 @@ void CoordsVis::initControls()
     QObject::connect(farPlaneBox, QOverload<int>::of(&QSpinBox::valueChanged),
                      this, [=](const int &newVal) {
                          this->camera_->lens()->setFarPlane(newVal);
+                         this->settings_->coordsVisCamFarPlane.setValue(newVal);
+                         this->settings_->coordsVisCamFarPlane.save();
                      });
 
     controlsLayout->addWidget(planeScaleLabel);
@@ -114,7 +120,8 @@ void CoordsVis::initPlane()
     planeMaterial->setAmbient(QColor("#ffffff"));
     planeMaterial->setShininess(0);
 
-    this->planeTransform_->setScale(10);
+    this->planeTransform_->setScale(
+        this->settings_->coordsVisSurfacePlaneScale.value());
     this->planeTransform_->setRotation(
         QQuaternion::fromAxisAndAngle(QVector3D(1.0f, 0.0f, 0.0f), 0.0f));
     this->planeTransform_->setTranslation({0, 0, 0});
