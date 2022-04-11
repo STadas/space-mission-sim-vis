@@ -84,7 +84,7 @@ void SettingsDialog::createPages()
         new CoordsVisPage(this, this->settings_));
 }
 
-void SettingsDialog::addPage(QAction *action, QWidget *page)
+void SettingsDialog::addPage(QAction *action, SettingsPage *page)
 {
     this->pages_->addWidget(page);
     QListWidgetItem *item = new QListWidgetItem(action->icon(), action->text());

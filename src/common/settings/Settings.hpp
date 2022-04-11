@@ -16,6 +16,9 @@ using QStringSetting = GenericSetting<QString>;
 using QStringListSetting = GenericSetting<QStringList>;
 using QByteArraySetting = GenericSetting<QByteArray>;
 
+/**
+ * Settings class. Stores all of the settings
+ */
 class Settings : public QObject, public ISavableLoadable
 {
     Q_OBJECT
@@ -24,10 +27,23 @@ private:
     SettingManager *const manager_ = new SettingManager(this);
 
 public:
+    /**
+     * Constructor
+     * @param parent Parent object
+     */
     Settings(QObject *parent);
+    /**
+     * Destructor
+     */
     ~Settings();
 
+    /**
+     * Saves all of the settings
+     */
     void save() override;
+    /**
+     * Loads all of the settings
+     */
     void load() override;
 
     // server executable

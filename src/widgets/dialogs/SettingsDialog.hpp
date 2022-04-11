@@ -14,13 +14,25 @@
 #include "widgets/settingspages/EditorPage.hpp"
 #include "widgets/settingspages/ServerPage.hpp"
 
+/**
+ * Settings dialog class
+ */
 class SettingsDialog : public Dialog
 {
     Q_OBJECT
 
 public:
+    /**
+     * Constructor
+     * @param parent Parent widget
+     * @param settings Settings object
+     * @param resources Resources object
+     */
     SettingsDialog(QWidget *parent, Settings *const settings,
                    Resources *const resources);
+    /**
+     * Destructor
+     */
     ~SettingsDialog();
 
 private slots:
@@ -29,11 +41,25 @@ private slots:
     void onCancelClicked();
 
 private:
+    /**
+     * Save the window's geometry
+     */
     void save() override;
+    /**
+     *  Load the windows's geometry
+     */
     void load() override;
 
+    /**
+     * Create settings pages
+     */
     void createPages();
-    void addPage(QAction *action, QWidget *page);
+    /**
+     * Add a settings page
+     * @param action Action with an icon and text
+     * @param page Settings page widget
+     */
+    void addPage(QAction *action, SettingsPage *page);
 
     QListWidget *pageSelect_;
     QStackedWidget *pages_;
