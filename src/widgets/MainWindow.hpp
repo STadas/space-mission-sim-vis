@@ -58,8 +58,6 @@ public:
     QDockWidget *dockPlaybackInterface_;
     QDockWidget *dockLogsView_;
 
-    bool autoCommScan_;
-
     MessageController *messageController_;
 
     PanguServerProcess *serverProcess_;
@@ -147,7 +145,6 @@ private slots:
     void onLineStarted(const unsigned int &lineNum);
 
     void onCommandsProcessed();
-    void onChangePreview(QByteArray data);
 
     void onPBarChanged(int idx);
     void onPBarReleased();

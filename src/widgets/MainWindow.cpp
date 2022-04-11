@@ -6,7 +6,6 @@ MainWindow::MainWindow(QWidget *parent)
     , resources_(new Resources(this))
     , camPreview_(new CamPreview(this))
     , logsView_(new LogsView(this))
-    , autoCommScan_(false)
     , messageController_(new MessageController(this))
     , pingWorker_(new PingWorker)  // no parent so it can moveToThread
     , pingWorkerThread_(new QThread(this))
@@ -135,8 +134,8 @@ void MainWindow::initSignalConnections()
     QObject::connect(this->previewWorker_, &PreviewWorker::commandsProcessed,
                      this, &MainWindow::onCommandsProcessed);
 
-    QObject::connect(this->previewWorker_, &PreviewWorker::changePreview, this,
-                     &MainWindow::onChangePreview);
+    QObject::connect(this->previewWorker_, &PreviewWorker::changePreview,
+                     this->camPreview_, &CamPreview::showPreview);
 
     QObject::connect(this->previewWorker_, &PreviewWorker::camPointsUpdated,
                      this, &MainWindow::onCamPointsUpdated);
@@ -629,7 +628,6 @@ void MainWindow::onActCommScan()
 
 void MainWindow::onActToggleAutoCommScan(bool on)
 {
-    this->autoCommScan_ = on;
     if (on)
     {
         emit this->previewWorker_->updateCamPoints(
@@ -749,11 +747,6 @@ void MainWindow::onCommandsProcessed()
     this->actToggleMultiLine_->setChecked(false);
 }
 
-void MainWindow::onChangePreview(QByteArray data)
-{
-    this->camPreview_->showPreview(data);
-}
-
 void MainWindow::onPBarChanged(int idx)
 {
     this->previewWorker_->cancelStepping();
@@ -809,7 +802,7 @@ void MainWindow::onCamPointsUpdated()
 
 void MainWindow::onEditorContentChanged()
 {
-    if (this->autoCommScan_)
+    if (this->actToggleAutoCommScan_->isChecked())
         emit this->previewWorker_->updateCamPoints(
             this->editor_->toPlainText());
 }
