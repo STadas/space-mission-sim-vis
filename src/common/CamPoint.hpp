@@ -10,7 +10,7 @@
 class CamPoint
 {
 public:
-     /**
+    /**
      * Constructor
      * @param lineNum Line number of the command in the editor
      * @param position Position of the camera after executing the command
