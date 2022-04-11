@@ -12,21 +12,50 @@
 #include "common/VBoxLayout.hpp"
 #include "common/settings/Settings.hpp"
 
+/**
+ * 3D coordinates visualization class
+ */
 class CoordsVis : public QWidget
 {
     Q_OBJECT
 
 public:
+    /**
+     * Constructor
+     * @param parent Parent widget
+     * @param settings Settings object
+     * @param resources Resources object
+     */
     CoordsVis(QWidget *parent, Settings *const settings,
               Resources *const resources);
+    /**
+     * Destructor
+     */
     ~CoordsVis();
 
+    /**
+     * Update the points being drawn in the visualization
+     * @param pointsList List of camera points to update to
+     */
     void updatePoints(const QList<CamPoint> &pointsList);
+    /**
+     * Update the currently active point in the visualization
+     * @param activeIdx The index to set as the active point
+     */
     void updateActive(const unsigned int &activeIdx);
 
 private:
+    /**
+     * Initialize camera controls
+     */
     void initControls();
+    /**
+     * Initialize surface plane
+     */
     void initPlane();
+    /**
+     * Initialize points and lines of the flight path
+     */
     void initPathGeometry();
 
     Settings *const settings_;

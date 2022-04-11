@@ -17,7 +17,9 @@ PanguServerProcess::PanguServerProcess(QObject *parent,
 
 PanguServerProcess::~PanguServerProcess()
 {
+    this->blockSignals(true);
     this->stop();
+    this->blockSignals(false);
 }
 
 void PanguServerProcess::start(const QString &pathStr, const QStringList &args)

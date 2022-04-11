@@ -4,12 +4,22 @@
 #include <QtCore>
 #include <QtWidgets>
 
+/**
+ * Resources class. Stores all compiled resources
+ */
 class Resources : public QObject
 {
     Q_OBJECT
 
 public:
+    /**
+     * Constructor
+     * @param parent Parent object
+     */
     Resources(QObject *parent);
+    /**
+     * Destructor
+     */
     ~Resources();
 
     QUrl manualUrl = QUrl("https://github.com/STadas/space-mission-sim-vis/"
