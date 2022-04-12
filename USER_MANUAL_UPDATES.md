@@ -15,3 +15,4 @@ Checked - DONE
 - [ ] https://github.com/STadas/space-mission-sim-vis/pull/68
 - [ ] https://github.com/STadas/space-mission-sim-vis/pull/69
 - [ ] https://github.com/STadas/space-mission-sim-vis/pull/70
+- [ ] https://github.com/STadas/space-mission-sim-vis/pull/74
