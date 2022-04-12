@@ -1,4 +1,4 @@
-# space-mission-sim-vis
+# SpaceMissionSimVis
 ## About
 SpaceMissionSimVis is an application that is meant to make producing PANGU spacecraft mission simulations easier by making the process more interactive and intuitive. It includes features like:
 - launching and connecting to a PANGU server from the application for convenience (the user still needs to have their own PANGU server executable including the license)
