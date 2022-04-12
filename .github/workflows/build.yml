@@ -42,6 +42,7 @@ jobs:
         uses: jurplel/install-qt-action@v2
         with:
           aqtversion: '==1.1.1'
+          modules: 'qt3d'
           extra: --external 7z
           version: ${{ matrix.config.qt_version }}
 
