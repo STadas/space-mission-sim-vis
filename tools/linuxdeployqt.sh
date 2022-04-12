@@ -9,6 +9,7 @@ chmod +x linuxdeploy-x86_64.AppImage
 chmod +x linuxdeploy-plugin-qt-x86_64.AppImage
 
 ./linuxdeploy-x86_64.AppImage --appdir instdir --plugin qt
+cp -r /usr/lib/qt/plugins/renderers/ instdir/usr/plugins/
 
 rm \
     linuxdeploy-x86_64.AppImage \
