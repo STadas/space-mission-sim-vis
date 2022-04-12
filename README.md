@@ -9,7 +9,7 @@ SpaceMissionSimVis is an application that is meant to make producing PANGU space
   - playback interface
 
 ## Dependencies
-The only real dependency is Qt 5.15.2, though a threads (and winsock2 for Windows) library should also be present on the system (which usually is by default).
+The only real dependency is Qt 5.15.2, though a threads (and winsock2 for Windows) library should also be present on the system, which usually is by default.
 
 ## Building
 ```bash
