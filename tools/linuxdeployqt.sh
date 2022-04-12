@@ -15,7 +15,7 @@ if [ -z "$Qt5_DIR" ]; then
 fi
 
 ls "$Qt5_DIR"
-cp -r "$Qt5_DIR/plugins/renderers/ instdir/usr/plugins/"
+cp -r "$Qt5_DIR/plugins/renderers/" instdir/usr/plugins/
 
 rm \
     linuxdeploy-x86_64.AppImage \
