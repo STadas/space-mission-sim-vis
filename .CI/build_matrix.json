@@ -23,18 +23,6 @@
       "generators": "Ninja",
       "qt_version": "5.15.2",
       "asset_mimetype": "application/zip"
-    },
-    {
-      "name": "macOS latest Clang",
-      "os": "macos-latest",
-      "artifact": "SpaceMissionSimVis-macos_clang.zip",
-      "build_type": "Release",
-      "cc": "clang",
-      "cxx": "clang++",
-      "archiver": "7z a",
-      "generators": "Ninja",
-      "qt_version": "5.15.2",
-      "asset_mimetype": "application/zip"
     }
   ]
 }
