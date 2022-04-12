@@ -14,7 +14,6 @@ if [ -z "$Qt5_DIR" ]; then
     Qt5_DIR="/usr/lib/qt"
 fi
 
-ls "$Qt5_DIR"
 cp -r "$Qt5_DIR/plugins/renderers/" instdir/usr/plugins/
 
 rm \
