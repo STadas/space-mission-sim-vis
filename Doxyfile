@@ -1,4 +1,5 @@
 PROJECT_NAME           = "SpaceMissionSimVis"
+PROJECT_NUMBER         = v1.0
 OUTPUT_DIRECTORY       = doxygen/
 EXTRACT_ALL            = YES
 EXTRACT_PRIVATE        = YES
