@@ -2,7 +2,7 @@
 Unchecked - TODO<br>
 Checked - DONE
 
-# v1.0
+## v1.0
 - [x] https://github.com/STadas/space-mission-sim-vis/pull/47
 - [x] https://github.com/STadas/space-mission-sim-vis/pull/50
 - [x] https://github.com/STadas/space-mission-sim-vis/pull/51
