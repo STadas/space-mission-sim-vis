@@ -10,6 +10,12 @@ chmod +x linuxdeploy-plugin-qt-x86_64.AppImage
 
 ./linuxdeploy-x86_64.AppImage --appdir instdir --plugin qt
 
+if [ -z "$Qt5_DIR" ]; then
+    Qt5_DIR="/usr/lib/qt"
+fi
+
+cp -r "$Qt5_DIR/plugins/renderers/" instdir/usr/plugins/
+
 rm \
     linuxdeploy-x86_64.AppImage \
     linuxdeploy-plugin-qt-x86_64.AppImage

@@ -12,60 +12,52 @@ SpaceMissionSimVis is an application that is meant to make producing PANGU space
 The only real dependency is Qt 5.15.2, though a threads (and winsock2 for Windows) library should also be present on the system, which usually is by default.
 
 ## Building for Linux
-```bash
-cmake \
+```console
+$ cmake \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX=instdir/usr \
   -S . \
   -B build \
   -G Ninja
-```
-then
-```bash
-cmake \
+
+$ cmake \
   --build build \
   --config Release
 ```
 
 ## Building for Windows
-```bash
-cmake \
+```console
+$ cmake \
   -DCMAKE_BUILD_TYPE=Release \
   -DCMAKE_INSTALL_PREFIX=instdir/usr \
   -S . \
   -B build \
   -G "Visual Studio 17 2022"
-```
-then
-```bash
-cmake \
+
+$ cmake \
   --build build \
   --config Release
 ```
 
 ## Installing
-```bash
-cmake --install build
+```console
+$ cmake --install build
 ```
 
 ## Testing
-```bash
-cmake \
+```console
+$ cmake \
   -DCMAKE_BUILD_TYPE=Release \
   -DBUILD_TESTS=ON \
   -DBUILD_APP=OFF \
   -S . \
   -B build-test
-```
-then
-```bash
-cmake \
+
+$ cmake \
   --build build-test \
   --config Release
-```
-then
-```bash
-cd build-test/bin/ && ./SpaceMissionSimVis-test --platform minimal
+
+$ cd build-test/bin/ && ./SpaceMissionSimVis-test --platform minimal
 ```
 
 ## Documentation
